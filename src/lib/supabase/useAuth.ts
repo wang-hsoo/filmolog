@@ -1,5 +1,6 @@
 import type { Session, User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
+import { InteractionManager } from 'react-native';
 
 import { isSupabaseConfigured } from '../../config/env';
 import { getSupabaseClient } from './client';
@@ -26,7 +27,7 @@ export function useAuth(): AuthState {
     const supabase = getSupabaseClient();
     let cancelled = false;
 
-    supabase.auth.getUser().then(({ data, error }) => {
+    supabase.auth.getSession().then(({ data, error }) => {
       if (cancelled) {
         return;
       }
@@ -34,22 +35,31 @@ export function useAuth(): AuthState {
         setState({ user: null, session: null, isLoading: false });
         return;
       }
-      setState(prev => ({
-        ...prev,
-        user: data.user,
+      setState({
+        user: data.session?.user ?? null,
+        session: data.session,
         isLoading: false,
-      }));
+      });
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (!cancelled) {
-          setState({
-            user: session?.user ?? null,
-            session,
-            isLoading: false,
-          });
+      (event, session) => {
+        const apply = () => {
+          if (!cancelled) {
+            setState({
+              user: session?.user ?? null,
+              session,
+              isLoading: false,
+            });
+          }
+        };
+
+        if (event === 'SIGNED_IN') {
+          InteractionManager.runAfterInteractions(apply);
+          return;
         }
+
+        apply();
       },
     );
 

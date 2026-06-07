@@ -1,19 +1,30 @@
 import { useEffect, useState } from 'react';
-import { Alert, TextInput } from 'react-native';
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
-import { AnimatedEnter } from './AnimatedEnter';
 import { useOnboarding } from '../hooks/useOnboarding';
 import { useProfileContext } from '../../../lib/supabase/ProfileProvider';
 import { useAuth } from '../../../lib/supabase/useAuth';
 import { AppScreen, theme } from '../../../theme';
+import { AnimatedEnter } from './AnimatedEnter';
 
-function NickNameScreen() {
+type NickNameScreenProps = {
+  onNicknameSaved?: () => void;
+};
+
+function NickNameScreen({ onNicknameSaved }: NickNameScreenProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const { user } = useAuth();
   const { profile } = useProfileContext();
-  const { saveNickname, isSaving } = useOnboarding();
+  const { saveNickname, isSaving } = useOnboarding({ onNicknameSaved });
   const [nickname, setNickname] = useState('');
 
   useEffect(() => {
@@ -31,7 +42,10 @@ function NickNameScreen() {
     try {
       await saveNickname(trimmed);
     } catch {
-      Alert.alert('저장 실패', '닉네임 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      Alert.alert(
+        '저장 실패',
+        '닉네임 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
+      );
     }
   };
 
@@ -60,7 +74,8 @@ function NickNameScreen() {
         </AnimatedEnter>
 
         <AnimatedEnter delay={displayName ? 280 : 180}>
-          <Input
+          <TextInput
+            style={styles.input}
             placeholder="닉네임을 입력해주세요"
             placeholderTextColor={theme.colors.defaultText}
             value={nickname}
@@ -70,12 +85,18 @@ function NickNameScreen() {
           />
         </AnimatedEnter>
 
-        <AnimatedEnter delay={displayName ? 380 : 280} style={styles.buttonWrap}>
-          <SubmitButton
+        <AnimatedEnter delay={displayName ? 380 : 280}>
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              (!nickname.trim() || isSaving) && styles.submitButtonDisabled,
+            ]}
             onPress={handleSubmit}
             disabled={!nickname.trim() || isSaving}>
-            <SubmitText>{isSaving ? '저장 중...' : '다음'}</SubmitText>
-          </SubmitButton>
+            <Text style={styles.submitText}>
+              {isSaving ? '저장 중...' : '다음'}
+            </Text>
+          </TouchableOpacity>
         </AnimatedEnter>
       </Container>
     </AppScreen>
@@ -83,12 +104,6 @@ function NickNameScreen() {
 }
 
 export default NickNameScreen;
-
-const styles = {
-  buttonWrap: {
-    marginTop: 8,
-  },
-} as const;
 
 const Container = styled.View`
   flex: 1;
@@ -110,26 +125,29 @@ const Title = styled.Text`
   margin-bottom: 4px;
 `;
 
-const Input = styled(TextInput)`
-  height: 48px;
-  border-radius: 12px;
-  padding: 0 16px;
-  background-color: ${({ theme }) => theme.colors.buttonColor};
-  color: ${({ theme }) => theme.colors.defaultText};
-  font-size: 16px;
-`;
-
-const SubmitButton = styled.TouchableOpacity<{ disabled?: boolean }>`
-  height: 52px;
-  border-radius: 16px;
-  align-items: center;
-  justify-content: center;
-  background-color: ${({ theme }) => theme.colors.primary};
-  opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};
-`;
-
-const SubmitText = styled.Text`
-  font-size: 16px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.whiteText};
-`;
+const styles = StyleSheet.create({
+  input: {
+    height: 48,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    backgroundColor: theme.colors.buttonColor,
+    color: theme.colors.defaultText,
+    fontSize: 16,
+  },
+  submitButton: {
+    height: 52,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: theme.colors.primary,
+    marginTop: 8,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
+  submitText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.whiteText,
+  },
+});

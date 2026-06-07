@@ -2,12 +2,13 @@ import { Image } from 'react-native';
 import { LOGIN_IMAGE } from '../constants';
 import styled from 'styled-components/native';
 import { useLogin } from '../hooks/useLogin';
+import { AppScreen } from '../../../theme';
 
 function LoginScreen() {
     const { loginWithGoogle, isLoading } = useLogin();
 
     return (
-        <>
+        <AppScreen>
             <Image source={LOGIN_IMAGE.login} style={{ width: '100%', height: '100%', flex: 1 }} />
 
             <ButtonWrap>
@@ -16,7 +17,7 @@ function LoginScreen() {
                     <ButtonText>{isLoading ? '로그인 중...' : '구글로 로그인'}</ButtonText>
                 </Button>
             </ButtonWrap>
-        </>
+        </AppScreen>
     );
 }
 

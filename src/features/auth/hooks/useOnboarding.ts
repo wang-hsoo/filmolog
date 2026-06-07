@@ -1,20 +1,16 @@
 import { useCallback, useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import type { StackNavigationProp } from '@react-navigation/stack';
 
 import { getSupabaseClient } from '../../../lib/supabase/client';
 import { getGoogleIdFromAuthUser } from '../../../lib/supabase/profile';
 import { useProfileContext } from '../../../lib/supabase/ProfileProvider';
 import { useAuth } from '../../../lib/supabase/useAuth';
 
-type OnboardingStackParamList = {
-  Nickname: undefined;
-  Genre: undefined;
+type UseOnboardingOptions = {
+  onNicknameSaved?: () => void;
 };
 
-export function useOnboarding() {
-  const navigation =
-    useNavigation<StackNavigationProp<OnboardingStackParamList>>();
+export function useOnboarding(options: UseOnboardingOptions = {}) {
+  const { onNicknameSaved } = options;
   const { user } = useAuth();
   const { refetch } = useProfileContext();
   const [isSaving, setIsSaving] = useState(false);
@@ -43,7 +39,7 @@ export function useOnboarding() {
         }
 
         await refetch();
-        navigation.navigate('Genre');
+        onNicknameSaved?.();
       } catch (error) {
         console.error('[useOnboarding] saveNickname failed', error);
         throw error;
@@ -51,7 +47,7 @@ export function useOnboarding() {
         setIsSaving(false);
       }
     },
-    [navigation, refetch, user],
+    [onNicknameSaved, refetch, user],
   );
 
   const completeOnboarding = useCallback(

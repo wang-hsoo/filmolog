@@ -1,17 +1,20 @@
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { useProfileContext } from '../../../lib/supabase/ProfileProvider';
 import GenreScreen from './GenreScreen';
 import NickNameScreen from './NickNameScreen';
 
+export type OnboardingRouteName = 'Nickname' | 'Genre';
+
+type OnboardingStackProps = {
+  initialRouteName: OnboardingRouteName;
+};
+
 const Stack = createStackNavigator();
 
-function OnboardingStack() {
-  const { profile } = useProfileContext();
-  const initialRouteName = profile?.nickname?.trim() ? 'Genre' : 'Nickname';
-
+function OnboardingStack({ initialRouteName }: OnboardingStackProps) {
   return (
     <Stack.Navigator
+      key={initialRouteName}
       initialRouteName={initialRouteName}
       screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Nickname" component={NickNameScreen} />

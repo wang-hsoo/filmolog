@@ -89,6 +89,7 @@ export function AppRoot() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: '#070606',
   },
   splashOverlay: {
     ...StyleSheet.absoluteFill,
