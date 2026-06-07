@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView } from 'react-native';
-import { useSafeAreaFrame } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 import { useProfileContext } from '../../../lib/supabase/ProfileProvider';
@@ -12,7 +12,7 @@ import { useOnboarding } from '../hooks/useOnboarding';
 const MAX_GENRE_SELECTION = 3;
 
 function GenreScreen() {
-  const safeAreaFrame = useSafeAreaFrame();
+  const insets = useSafeAreaInsets();
   const { profile } = useProfileContext();
   const { data, isLoading, isError } = useGetGenres();
   const { completeOnboarding, isSaving } = useOnboarding();
@@ -56,10 +56,10 @@ function GenreScreen() {
   return (
     <AppScreen
       style={{
-        paddingTop: safeAreaFrame.y,
-        paddingBottom: safeAreaFrame.y,
-        paddingLeft: safeAreaFrame.x,
-        paddingRight: safeAreaFrame.x,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
+        paddingLeft: insets.left,
+        paddingRight: insets.right,
       }}>
       <Container>
         {nickname ? (

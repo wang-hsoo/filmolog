@@ -1,39 +1,28 @@
-import { Image, StyleSheet, View } from 'react-native';
-import styled from 'styled-components/native';
+import { Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 
+import { theme } from '../../../theme';
+import { SPLASH_IMAGE } from '../constants';
 import { SplashSoftGlow } from './SplashSoftGlow';
 import { SplashVintageVignette } from './SplashVintageVignette';
 
-const Root = styled.View`
-  flex: 1;
-  background-color: ${({ theme }) => theme.colors.splashBackground};
-`;
-
 export function SplashScreen() {
+  const { width, height } = useWindowDimensions();
+
   return (
-    <Root>
-      <View style={styles.stage}>
-        <SplashSoftGlow>
-          <Image
-            source={require('../../../../assets/splash/splash.png')}
-            style={styles.image}
-          />
-        </SplashSoftGlow>
-        <SplashVintageVignette />
-      </View>
-    </Root>
+    <View style={[styles.root, { width, height }]}>
+      <Image
+        source={SPLASH_IMAGE}
+        style={{ width, height }}
+        resizeMode="cover"
+      />
+      <SplashSoftGlow />
+      <SplashVintageVignette />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  stage: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  image: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
+  root: {
+    backgroundColor: theme.colors.splashBackground,
   },
 });

@@ -28,7 +28,7 @@ function AppRootContent() {
       toValue: 0,
       duration: SPLASH_FADE_OUT_MS,
       easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
+      useNativeDriver: false,
     }).start(({ finished }) => {
       if (finished) {
         setPhase('ready');
@@ -70,7 +70,8 @@ function AppRootContent() {
       {phase !== 'ready' ? (
         <Animated.View
           style={[styles.splashOverlay, { opacity: splashOpacity }]}
-          pointerEvents={phase === 'exiting' ? 'none' : 'auto'}>
+          pointerEvents={phase === 'exiting' ? 'none' : 'auto'}
+          collapsable={false}>
           <SplashScreen />
         </Animated.View>
       ) : null}

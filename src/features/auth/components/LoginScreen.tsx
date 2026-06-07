@@ -9,7 +9,11 @@ function LoginScreen() {
 
     return (
         <AppScreen>
-            <Image source={LOGIN_IMAGE.login} style={{ width: '100%', height: '100%', flex: 1 }} />
+            <Image
+                source={LOGIN_IMAGE.login}
+                style={{ width: '100%', height: '100%', flex: 1 }}
+                resizeMode="contain"
+            />
 
             <ButtonWrap>
                 <Button onPress={loginWithGoogle} disabled={isLoading}>
