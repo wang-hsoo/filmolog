@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useTheme } from 'styled-components/native';
 
+import { navigationTheme } from '../theme';
 import RootNavigator from './navigation/RootNavigator';
 import { queryClient } from '../lib/queryClient';
 
@@ -15,7 +16,7 @@ export function MainApp() {
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
-          <NavigationContainer>
+          <NavigationContainer theme={navigationTheme}>
             <StatusBar
               barStyle={'light-content'}
               backgroundColor={theme.colors.appBackground}

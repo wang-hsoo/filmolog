@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaFrame } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -21,7 +21,7 @@ type NickNameScreenProps = {
 };
 
 function NickNameScreen({ onNicknameSaved }: NickNameScreenProps) {
-  const safeAreaInsets = useSafeAreaInsets();
+  const safeAreaFrame = useSafeAreaFrame();
   const { user } = useAuth();
   const { profile } = useProfileContext();
   const { saveNickname, isSaving } = useOnboarding({ onNicknameSaved });
@@ -57,10 +57,10 @@ function NickNameScreen({ onNicknameSaved }: NickNameScreenProps) {
   return (
     <AppScreen
       style={{
-        paddingTop: safeAreaInsets.top,
-        paddingBottom: safeAreaInsets.bottom,
-        paddingLeft: safeAreaInsets.left,
-        paddingRight: safeAreaInsets.right,
+        paddingTop: safeAreaFrame.y,
+        paddingBottom: safeAreaFrame.y,
+        paddingLeft: safeAreaFrame.x,
+        paddingRight: safeAreaFrame.x,
       }}>
       <Container>
         {displayName ? (

@@ -3,6 +3,7 @@ export const theme = {
     primary: '#A18362',
     splashBackground: '#070606',
     appBackground: '#070606',
+    tabBarBackground: '#101010',
     buttonColor: '#ffffff',
     defaultText: '#333333',
     whiteText: '#ffffff',

@@ -1,0 +1,1 @@
+export { default as StatisticsScreen } from './components/StatisticsScreen';

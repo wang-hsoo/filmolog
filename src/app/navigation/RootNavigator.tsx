@@ -3,10 +3,8 @@ import {
   ActivityIndicator,
   InteractionManager,
   StyleSheet,
-  View,
 } from 'react-native';
 import { useEffect, useState } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LoginScreen, OnboardingFlow } from '../../features/auth';
 import {
@@ -14,26 +12,20 @@ import {
   useProfileContext,
 } from '../../lib/supabase/ProfileProvider';
 import { useAuth } from '../../lib/supabase/useAuth';
-import { AppScreen } from '../../theme';
+import { AppScreen, theme } from '../../theme';
 
 import type { RootStackParamList } from './types';
+import MainNavigator from './MainNavigator';
 
 export type { OnboardingStackParamList, RootStackParamList } from './types';
 
 const RootStack = createStackNavigator<RootStackParamList>();
 
-function HomeScreen() {
-  const safeAreaInsets = useSafeAreaInsets();
-
+function BootstrapLoader() {
   return (
-    <AppScreen
-      style={{
-        paddingTop: safeAreaInsets.top,
-        paddingBottom: safeAreaInsets.bottom,
-        paddingLeft: safeAreaInsets.left,
-        paddingRight: safeAreaInsets.right,
-      }}
-    />
+    <AppScreen style={styles.centered}>
+      <ActivityIndicator color={theme.colors.primary} size="large" />
+    </AppScreen>
   );
 }
 
@@ -41,35 +33,17 @@ function AuthenticatedScreens() {
   const { isLoading, isOnboardingComplete } = useProfileContext();
 
   if (isLoading) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator />
-      </View>
-    );
+    return <BootstrapLoader />;
   }
 
   if (isOnboardingComplete) {
-    return <HomeScreen />;
+    return <MainNavigator />;
   }
 
   return <OnboardingFlow />;
 }
 
-function AuthenticatedGate() {
-  const { user } = useAuth();
-
-  if (!user) {
-    return null;
-  }
-
-  return (
-    <ProfileProvider userId={user.id}>
-      <AuthenticatedScreens />
-    </ProfileProvider>
-  );
-}
-
-function RootNavigator() {
+function RootShell() {
   const { user, isLoading } = useAuth();
   const [authTransitionReady, setAuthTransitionReady] = useState(!user);
 
@@ -88,30 +62,37 @@ function RootNavigator() {
   }, [user?.id]);
 
   if (isLoading || (user && !authTransitionReady)) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator />
-      </View>
-    );
+    return <BootstrapLoader />;
+  }
+
+  if (!user) {
+    return <LoginScreen />;
   }
 
   return (
-    <RootStack.Navigator screenOptions={{ headerShown: false }}>
-      {user ? (
-        <RootStack.Screen name="App" component={AuthenticatedGate} />
-      ) : (
-        <RootStack.Screen name="Login" component={LoginScreen} />
-      )}
+    <ProfileProvider userId={user.id}>
+      <AuthenticatedScreens />
+    </ProfileProvider>
+  );
+}
+
+function RootNavigator() {
+  return (
+    <RootStack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'none',
+        cardStyle: { backgroundColor: theme.colors.appBackground },
+      }}>
+      <RootStack.Screen name="App" component={RootShell} />
     </RootStack.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
-  loader: {
-    flex: 1,
+  centered: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#070606',
   },
 });
 

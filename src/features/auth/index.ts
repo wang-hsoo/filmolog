@@ -1,4 +1,3 @@
-export { default as LoginStack } from './components/LoginStack';
 export { default as LoginScreen } from './components/LoginScreen';
 export { default as NickNameScreen } from './components/NickNameScreen';
 export { default as GenreScreen } from './components/GenreScreen';
