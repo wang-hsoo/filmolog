@@ -66,6 +66,9 @@ yarn-error.log
 # testing
 /coverage
 
+# Supabase keys (copy from env.local.example.ts)
+src/config/env.local.ts
+
 # Yarn
 .yarn/*
 !.yarn/patches

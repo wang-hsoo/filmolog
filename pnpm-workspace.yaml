@@ -1,0 +1,3 @@
+allowBuilds:
+  react-native-elements: true
+  sharp: true
