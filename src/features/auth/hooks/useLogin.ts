@@ -7,7 +7,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 
 import { env } from '../../../config/env';
-import { getSupabaseClient } from '../../../lib/supabase/client';
+import { getSupabaseClient } from '../../../lib/supabase';
 
 export function useLogin() {
   const [isLoading, setIsLoading] = useState(false);

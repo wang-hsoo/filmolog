@@ -1,5 +1,5 @@
-import { getGenres } from "./tmdb";
 import { useQuery } from "@tanstack/react-query";
+import { getGenres } from "./tmdb";
 
 
 export const useGetGenres = () => {

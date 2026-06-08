@@ -2,8 +2,8 @@ import type { Session, User } from '@supabase/supabase-js';
 import { useEffect, useState } from 'react';
 import { InteractionManager } from 'react-native';
 
-import { isSupabaseConfigured } from '../../config/env';
-import { getSupabaseClient } from './client';
+import { isSupabaseConfigured } from '../../../config/env';
+import { getSupabaseClient } from '../client';
 
 type AuthState = {
   user: User | null;

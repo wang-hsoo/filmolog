@@ -14,4 +14,4 @@ export const getGenres = async (): Promise<TmdbGenreListResponse> => {
   return response.data;
 };
 
-export type { TmdbGenre, TmdbGenreListResponse } from './types';
+

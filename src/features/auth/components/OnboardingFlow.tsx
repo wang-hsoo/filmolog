@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useProfileContext } from '../../../lib/supabase/ProfileProvider';
+import { useProfileContext } from '../../../lib/supabase';
 import GenreScreen from './GenreScreen';
 import NickNameScreen from './NickNameScreen';
 

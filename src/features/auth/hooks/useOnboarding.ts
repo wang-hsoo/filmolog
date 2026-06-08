@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react';
 
-import { getSupabaseClient } from '../../../lib/supabase/client';
-import { getGoogleIdFromAuthUser } from '../../../lib/supabase/profile';
-import { useProfileContext } from '../../../lib/supabase/ProfileProvider';
-import { useAuth } from '../../../lib/supabase/useAuth';
+import {
+  getGoogleIdFromAuthUser,
+  getSupabaseClient,
+  useAuth,
+  useProfileContext,
+} from '../../../lib/supabase';
 
 type UseOnboardingOptions = {
   onNicknameSaved?: () => void;

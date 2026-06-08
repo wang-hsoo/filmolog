@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 
-import { getSupabaseClient } from './client';
+import { getSupabaseClient } from '../client';
 
 export type UserProfile = {
   id: string;

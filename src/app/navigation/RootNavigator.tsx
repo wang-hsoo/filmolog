@@ -9,9 +9,9 @@ import { useEffect, useState } from 'react';
 import { LoginScreen, OnboardingFlow } from '../../features/auth';
 import {
   ProfileProvider,
+  useAuth,
   useProfileContext,
-} from '../../lib/supabase/ProfileProvider';
-import { useAuth } from '../../lib/supabase/useAuth';
+} from '../../lib/supabase';
 import { AppScreen, theme } from '../../theme';
 
 import type { RootStackParamList } from './types';

@@ -7,6 +7,11 @@ export const theme = {
     buttonColor: '#ffffff',
     defaultText: '#333333',
     whiteText: '#ffffff',
+    dashboardBackground: '#161512',
+    dashborderBorder: '#1F1E1D',
+    dashboardText: '#A18362',
+    dashboardValue: '#D6BBA1',
+    dashbordItemBorder: '#292825'
   },
 } as const;
 

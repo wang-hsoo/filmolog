@@ -3,11 +3,11 @@ import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
-import { useProfileContext } from '../../../lib/supabase/ProfileProvider';
-import { useGetGenres } from '../../../lib/tmdb/tmdbQueries';
+import { useProfileContext } from '../../../lib/supabase';
 import { AppScreen, theme } from '../../../theme';
 import { AnimatedEnter } from './AnimatedEnter';
 import { useOnboarding } from '../hooks/useOnboarding';
+import { useGetGenres } from '../../../lib/tmdb';
 
 const MAX_GENRE_SELECTION = 3;
 

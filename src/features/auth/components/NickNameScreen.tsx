@@ -11,8 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 import { useOnboarding } from '../hooks/useOnboarding';
-import { useProfileContext } from '../../../lib/supabase/ProfileProvider';
-import { useAuth } from '../../../lib/supabase/useAuth';
+import { useAuth, useProfileContext } from '../../../lib/supabase';
 import { AppScreen, theme } from '../../../theme';
 import { AnimatedEnter } from './AnimatedEnter';
 

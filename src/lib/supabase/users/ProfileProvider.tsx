@@ -1,7 +1,7 @@
 import { createContext, useContext, type ReactNode } from 'react';
 
-import { useProfile } from './useProfile';
 import type { UserProfile } from './profile';
+import { useProfile } from './useProfile';
 
 type ProfileContextValue = {
   profile: UserProfile | null;

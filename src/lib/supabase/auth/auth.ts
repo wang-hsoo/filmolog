@@ -1,6 +1,6 @@
 import type { Session, User } from '@supabase/supabase-js';
 
-import { getSupabaseClient } from './client';
+import { getSupabaseClient } from '../client';
 
 /** 로컬 세션 (bootstrap restore 와 동일 소스) */
 export async function getCurrentSession(): Promise<Session | null> {
