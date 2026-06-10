@@ -23,7 +23,7 @@ function HomeScreen() {
                     {Object.entries(userStats ?? {}).map(([key, value], index) => {
                         return (
                             <StatItem key={key} $isLast={index === Object.entries(userStats ?? {}).length - 1}>
-                                <Icon name={STATS_ICONS[key as keyof typeof STATS_ICONS]} size={24} color={theme.colors.dashboardText} />
+                                <Icon name={STATS_ICONS[key as keyof typeof STATS_ICONS]} size={24} color={theme.colors.dashboardIcon} />
                                 <StatItemLabel>{STATS_LABELS[key as keyof typeof STATS_LABELS]}</StatItemLabel>
                                 <StatItemValue>{value}</StatItemValue>
                             </StatItem>
