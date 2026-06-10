@@ -1,0 +1,7 @@
+Fonts in this directory:
+
+- Pretendard (SIL Open Font License 1.1)
+  https://github.com/orioncactus/pretendard
+
+- Gowun Batang (SIL Open Font License 1.1)
+  https://fonts.google.com/specimen/Gowun+Batang

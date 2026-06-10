@@ -1,44 +1,66 @@
-import { Image, StyleSheet, Text } from 'react-native';
+import { Image } from 'react-native';
 import styled from 'styled-components/native';
-
-import { HOME_BANNER_ASPECT_RATIO, HOME_IMAGE } from '../constatns';
-import { useGetUserStats } from '../../../lib/supabase';
-import { useAuth } from '../../../lib/supabase';
-import { Container, STATS_ICONS, STATS_LABELS } from '../../../components';
-import { theme } from '../../../theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import {
+  ArchivePanel,
+  ArchiveSectionHeader,
+  Container,
+  STATS_ICONS,
+  STATS_LABELS,
+} from '../../../components';
+import { useAuth, useGetUserStats } from '../../../lib/supabase';
+import { theme } from '../../../theme';
+import { HOME_BANNER_ASPECT_RATIO, HOME_IMAGE } from '../constatns';
+
 function HomeScreen() {
-    const { user } = useAuth();
-    const { data: userStats } = useGetUserStats(user?.id ?? '');
+  const { user } = useAuth();
+  const { data: userStats } = useGetUserStats(user?.id ?? '');
 
-    return (
-        <Container isGetter={false}>
-            <BannerFrame style={{ aspectRatio: HOME_BANNER_ASPECT_RATIO }}>
-                <Image source={HOME_IMAGE.home} style={{ width: '100%', height: '100%' }} resizeMode="contain" />
-            </BannerFrame>
+  return (
+    <Container isGetter={false}>
+      <BannerFrame style={{ aspectRatio: HOME_BANNER_ASPECT_RATIO }}>
+        <Image
+          source={HOME_IMAGE.home}
+          style={{ width: '100%', height: '100%' }}
+          resizeMode="contain"
+        />
+      </BannerFrame>
 
-            <HomeContainer>
-                <StatsContainer>
-                    {Object.entries(userStats ?? {}).map(([key, value], index) => {
-                        return (
-                            <StatItem key={key} $isLast={index === Object.entries(userStats ?? {}).length - 1}>
-                                <Icon name={STATS_ICONS[key as keyof typeof STATS_ICONS]} size={24} color={theme.colors.dashboardIcon} />
-                                <StatItemLabel>{STATS_LABELS[key as keyof typeof STATS_LABELS]}</StatItemLabel>
-                                <StatItemValue>{value}</StatItemValue>
-                            </StatItem>
-                        )
-                    })}
-                </StatsContainer>
-            </HomeContainer>
+      <HomeContainer>
+        <ArchivePanel accent>
+          <ArchiveSectionHeader
+            overline="MY ARCHIVE"
+            title="나의 기록"
+            subtitle="쌓아온 영화의 흔적을 한눈에."
+          />
 
-        </Container>
-    );
+          <StatsRow>
+            {Object.entries(userStats ?? {}).map(([key, value], index) => (
+              <StatItem
+                key={key}
+                $isLast={
+                  index === Object.entries(userStats ?? {}).length - 1
+                }>
+                <Icon
+                  name={STATS_ICONS[key as keyof typeof STATS_ICONS]}
+                  size={22}
+                  color={theme.colors.dashboardIcon}
+                />
+                <StatItemLabel>
+                  {STATS_LABELS[key as keyof typeof STATS_LABELS]}
+                </StatItemLabel>
+                <StatItemValue>{value}</StatItemValue>
+              </StatItem>
+            ))}
+          </StatsRow>
+        </ArchivePanel>
+      </HomeContainer>
+    </Container>
+  );
 }
 
 export default HomeScreen;
-
-
 
 const BannerFrame = styled.View`
   width: 100%;
@@ -46,40 +68,35 @@ const BannerFrame = styled.View`
 
 const HomeContainer = styled.View`
   flex: 1;
-  padding: 0 20px;
+  padding: 0 20px 24px;
 `;
 
-const StatsContainer = styled.View`
-  width: 100%;
-  height: 113px;
+const StatsRow = styled.View`
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.dashboardBackground};
-  padding: 10px;
-  border-radius: 10px;
-  border-width: 1px;
-  border-color: ${({ theme }) => theme.colors.dashborderBorder};
 `;
 
-const StatItem = styled.View<{ $isLast: boolean}>`
+const StatItem = styled.View<{ $isLast: boolean }>`
   flex: 1;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-
-  border-right-width: ${({ $isLast }) => !$isLast ? 1 : 0}px;
+  gap: 6px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-right-width: ${({ $isLast }) => ($isLast ? 0 : 1)}px;
   border-color: ${({ theme }) => theme.colors.dashbordItemBorder};
 `;
 
 const StatItemLabel = styled.Text`
-  font-size: 16px;
-  font-weight: 400;
+  font-family: ${({ theme }) => theme.fonts.bodyLight};
+  font-size: 12px;
+  letter-spacing: 0.2px;
   color: ${({ theme }) => theme.colors.dashboardText};
 `;
 
 const StatItemValue = styled.Text`
-  font-size: 16px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.colors.dashboardValue};
+  font-family: ${({ theme }) => theme.fonts.displayBold};
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  color: ${({ theme }) => theme.colors.goldBright};
 `;

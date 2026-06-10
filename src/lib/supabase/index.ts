@@ -16,4 +16,6 @@ export {
   type UserProfile,
   getUserStats,
   useGetUserStats,
+  getUserFavoriteGenres,
+  useGetUserFavoriteGenres,
 } from './users';

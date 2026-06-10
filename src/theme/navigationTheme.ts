@@ -9,6 +9,6 @@ export const navigationTheme: Theme = {
     primary: theme.colors.primary,
     background: theme.colors.appBackground,
     card: theme.colors.appBackground,
-    border: theme.colors.tabBarBackground,
+    border: theme.colors.tabBarBorder,
   },
 };

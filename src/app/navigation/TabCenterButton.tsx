@@ -45,10 +45,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: theme.colors.primary,
+    borderWidth: 1,
+    borderColor: theme.colors.goldSoft,
   },
   fabOpen: {
-    backgroundColor: theme.colors.dashboardBackground,
-    borderWidth: 1,
-    borderColor: theme.colors.dashbordItemBorder,
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.dashborderBorderAccent,
   },
 });

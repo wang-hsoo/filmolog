@@ -19,7 +19,7 @@ import { TabCenterButton } from './TabCenterButton';
 const Tab = createBottomTabNavigator();
 
 const TAB_BAR_ACTIVE_COLOR = theme.colors.primary;
-const TAB_BAR_INACTIVE_COLOR = '#847D73';
+const TAB_BAR_INACTIVE_COLOR = theme.colors.tabBarInactive;
 const TAB_BAR_ICON_LABEL_GAP = 4;
 const TAB_BAR_BOTTOM_PADDING = 8;
 const TAB_BAR_HEIGHT = 49;
@@ -115,7 +115,12 @@ function MainNavigator() {
             tabBarActiveTintColor: TAB_BAR_ACTIVE_COLOR,
             tabBarInactiveTintColor: TAB_BAR_INACTIVE_COLOR,
             tabBarIconStyle: { marginBottom: TAB_BAR_ICON_LABEL_GAP },
-            tabBarLabelStyle: { fontSize: 11, marginBottom: 2 },
+            tabBarLabelStyle: {
+              fontFamily: theme.fonts.bodyLight,
+              fontSize: 10,
+              letterSpacing: 0.4,
+              marginBottom: 2,
+            },
             tabBarStyle: {
               backgroundColor: theme.colors.tabBarBackground,
               borderTopWidth: 1,

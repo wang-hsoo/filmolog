@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@legendapp/list": "^3.0.3",
     "@react-native-async-storage/async-storage": "^3.1.1",
     "@react-native-google-signin/google-signin": "^16.1.2",
     "@react-native/new-app-screen": "0.85.3",
@@ -24,6 +25,7 @@
     "react": "19.2.3",
     "react-native": "0.85.3",
     "react-native-elements": "^3.4.3",
+    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^3.0.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-safe-area-context": "^5.5.2",

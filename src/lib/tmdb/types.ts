@@ -8,3 +8,35 @@ export type TmdbGenre = {
 export type TmdbGenreListResponse = {
   genres: TmdbGenre[];
 };
+
+/** GET /discover/movie — results 항목 */
+export type TmdbMovie = {
+  id: number;
+  title: string;
+  original_title: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date: string;
+  vote_average: number;
+  vote_count: number;
+  popularity: number;
+  genre_ids: number[];
+  original_language: string;
+};
+
+/** GET /discover/movie — 응답 */
+export type TmdbDiscoverMovieResponse = {
+  page: number;
+  results: TmdbMovie[];
+  total_pages: number;
+  total_results: number;
+};
+
+/** GET /search/movie — 응답 */
+export type TmdbSearchMovieResponse = {
+  page: number;
+  results: TmdbMovie[];
+  total_pages: number;
+  total_results: number;
+};
