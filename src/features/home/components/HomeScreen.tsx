@@ -9,13 +9,21 @@ import {
   STATS_ICONS,
   STATS_LABELS,
 } from '../../../components';
-import { useAuth, useGetUserStats } from '../../../lib/supabase';
+import { useAuth, useGetUserStats, useGetUserReviewedMovies } from '../../../lib/supabase';
+import { useGetCollections } from '../../../lib/supabase/collection';
 import { theme } from '../../../theme';
 import { HOME_BANNER_ASPECT_RATIO, HOME_IMAGE } from '../constatns';
+
+import HomeCollectionShelf from './HomeCollectionShelf';
+import HomeRecentLogs from './HomeRecentLogs';
 
 function HomeScreen() {
   const { user } = useAuth();
   const { data: userStats } = useGetUserStats(user?.id ?? '');
+  const { data: collections = [], isLoading: isCollectionsLoading } =
+    useGetCollections(user?.id ?? '');
+  const { data: reviewedMovies = [], isLoading: isReviewsLoading } =
+    useGetUserReviewedMovies(user?.id ?? '');
 
   return (
     <Container isGetter={false}>
@@ -47,7 +55,7 @@ function HomeScreen() {
                   size={22}
                   color={theme.colors.dashboardIcon}
                 />
-                <StatItemLabel numberOfLines={2} >
+                <StatItemLabel numberOfLines={2}>
                   {STATS_LABELS[key as keyof typeof STATS_LABELS]}
                 </StatItemLabel>
                 <StatItemValue>{value}</StatItemValue>
@@ -55,6 +63,16 @@ function HomeScreen() {
             ))}
           </StatsRow>
         </ArchivePanel>
+
+        <HomeCollectionShelf
+          collections={collections}
+          isLoading={isCollectionsLoading}
+        />
+
+        <HomeRecentLogs
+          reviews={reviewedMovies}
+          isLoading={isReviewsLoading}
+        />
       </HomeContainer>
     </Container>
   );
@@ -67,8 +85,8 @@ const BannerFrame = styled.View`
 `;
 
 const HomeContainer = styled.View`
-  flex: 1;
   padding: 0 20px 24px;
+  gap: 14px;
 `;
 
 const StatsRow = styled.View`

@@ -12,6 +12,7 @@ type ReviewWithMovieRow = {
   tmdb_id: number;
   rating: number;
   content: string | null;
+  watched_date: string | null;
   created_at: string;
   movies: MovieRow | MovieRow[] | null;
 };
@@ -21,6 +22,8 @@ export type UserReviewedMovie = {
   tmdbId: number;
   rating: number;
   content: string | null;
+  watchedDate: string | null;
+  createdAt: string;
   title: string;
   posterPath: string | null;
 };
@@ -47,6 +50,7 @@ export async function getUserReviewedMovies(
       tmdb_id,
       rating,
       content,
+      watched_date,
       created_at,
       movies (
         tmdb_id,
@@ -70,6 +74,8 @@ export async function getUserReviewedMovies(
       tmdbId: review.tmdb_id,
       rating: review.rating,
       content: review.content,
+      watchedDate: review.watched_date,
+      createdAt: review.created_at,
       title: movie?.title ?? `영화 #${review.tmdb_id}`,
       posterPath: movie?.poster_path ?? null,
     };

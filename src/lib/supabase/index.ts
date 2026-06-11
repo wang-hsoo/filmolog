@@ -18,6 +18,13 @@ export {
   useGetUserStats,
   getUserFavoriteGenres,
   useGetUserFavoriteGenres,
+  useGetUserReviewedMovies,
 } from './users';
 
-export { useCreateCollection, useAddCollectionMovie, type CreateCollectionParams } from './collection';
+export {
+  useCreateCollection,
+  useAddCollectionMovie,
+  useGetCollections,
+  type CreateCollectionParams,
+  type Collection,
+} from './collection';
