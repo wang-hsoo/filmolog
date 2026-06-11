@@ -15,6 +15,8 @@ import { AppScreen, theme } from '../../theme';
 
 import { CreateActionMenu } from './CreateActionMenu';
 import { TabCenterButton } from './TabCenterButton';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from './types';
 
 const Tab = createBottomTabNavigator();
 
@@ -83,6 +85,7 @@ function getTabBarHeight(bottomInset: number) {
 }
 
 function MainNavigator() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
   const tabBarHeight = getTabBarHeight(insets.bottom);
@@ -102,7 +105,7 @@ function MainNavigator() {
 
   const handleCollectionPress = useCallback(() => {
     closeCreateMenu();
-    // TODO: 컬렉션 생성 화면
+    navigation.navigate('Collection');
   }, [closeCreateMenu]);
 
   return (

@@ -10,3 +10,12 @@ export { getUserStats } from './stats';
 export { useGetUserStats } from './statsQueries';
 export { getUserFavoriteGenres } from './explore';
 export { useGetUserFavoriteGenres } from './exploreQueries';
+export {
+  getUserMovies,
+  getUserReviewedMovies,
+  type UserReviewedMovie,
+} from './movie';
+export {
+  useGetUserMovies,
+  useGetUserReviewedMovies,
+} from './movieQueries';

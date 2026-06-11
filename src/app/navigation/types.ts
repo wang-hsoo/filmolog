@@ -6,4 +6,5 @@ export type OnboardingStackParamList = {
 export type RootStackParamList = {
   Login: undefined;
   App: undefined;
+  Collection: undefined;
 };

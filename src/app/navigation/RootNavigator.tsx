@@ -16,6 +16,7 @@ import { AppScreen, theme } from '../../theme';
 
 import type { RootStackParamList } from './types';
 import MainNavigator from './MainNavigator';
+import { CollectionScreen } from '../../features/collection';
 
 export type { OnboardingStackParamList, RootStackParamList } from './types';
 
@@ -85,6 +86,7 @@ function RootNavigator() {
         cardStyle: { backgroundColor: theme.colors.appBackground },
       }}>
       <RootStack.Screen name="App" component={RootShell} />
+      <RootStack.Screen name="Collection" component={CollectionScreen} />
     </RootStack.Navigator>
   );
 }

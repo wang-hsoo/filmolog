@@ -19,3 +19,5 @@ export {
   getUserFavoriteGenres,
   useGetUserFavoriteGenres,
 } from './users';
+
+export { useCreateCollection, useAddCollectionMovie, type CreateCollectionParams } from './collection';
