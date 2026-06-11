@@ -40,3 +40,33 @@ export type TmdbSearchMovieResponse = {
   total_pages: number;
   total_results: number;
 };
+
+export type TmdbCastMember = {
+  id: number;
+  name: string;
+  character: string;
+  order: number;
+};
+
+export type TmdbCrewMember = {
+  id: number;
+  name: string;
+  job: string;
+  department: string;
+};
+
+export type TmdbMovieCredits = {
+  cast: TmdbCastMember[];
+  crew: TmdbCrewMember[];
+};
+
+/** GET /movie/{id}?append_to_response=credits */
+export type TmdbMovieDetail = {
+  id: number;
+  title: string;
+  poster_path: string | null;
+  release_date: string;
+  runtime: number | null;
+  genres: TmdbGenre[];
+  credits: TmdbMovieCredits;
+};

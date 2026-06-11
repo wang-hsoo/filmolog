@@ -104,10 +104,10 @@ function CollectionScreen() {
 
       if (collection?.id && selectedMovieIds.length > 0) {
         await Promise.all(
-          selectedMovieIds.map(movieId =>
+          selectedMovieIds.map(id =>
             addCollectionMovie({
               collectionId: collection.id,
-              movieId,
+              tmdbId: Number(id),
             }),
           ),
         );

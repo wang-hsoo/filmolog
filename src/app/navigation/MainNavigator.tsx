@@ -100,8 +100,8 @@ function MainNavigator() {
 
   const handleFilmLogPress = useCallback(() => {
     closeCreateMenu();
-    // TODO: 영화 기록 추가 화면
-  }, [closeCreateMenu]);
+    navigation.navigate('FilmLog');
+  }, [closeCreateMenu, navigation]);
 
   const handleCollectionPress = useCallback(() => {
     closeCreateMenu();

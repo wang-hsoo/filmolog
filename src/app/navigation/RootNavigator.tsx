@@ -17,6 +17,7 @@ import { AppScreen, theme } from '../../theme';
 import type { RootStackParamList } from './types';
 import MainNavigator from './MainNavigator';
 import { CollectionScreen } from '../../features/collection';
+import { FilmLogScreen } from '../../features/filmLog';
 
 export type { OnboardingStackParamList, RootStackParamList } from './types';
 
@@ -87,6 +88,7 @@ function RootNavigator() {
       }}>
       <RootStack.Screen name="App" component={RootShell} />
       <RootStack.Screen name="Collection" component={CollectionScreen} />
+      <RootStack.Screen name="FilmLog" component={FilmLogScreen} />
     </RootStack.Navigator>
   );
 }

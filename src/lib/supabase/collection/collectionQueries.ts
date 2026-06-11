@@ -25,7 +25,7 @@ export const useCreateCollection = () => {
 
 export const useAddCollectionMovie = () => {
     return useMutation({
-        mutationFn: ({ collectionId, movieId }: { collectionId: string, movieId: string }) => addCollectionMovie(collectionId, movieId),
+        mutationFn: ({ collectionId, tmdbId }: { collectionId: string, tmdbId: number }) => addCollectionMovie(collectionId, tmdbId),
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['collections'] });
             return data;

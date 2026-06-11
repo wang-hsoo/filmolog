@@ -3,6 +3,7 @@ import ApiClient from '../api/client';
 import type {
   TmdbDiscoverMovieResponse,
   TmdbGenreListResponse,
+  TmdbMovieDetail,
   TmdbSearchMovieResponse,
 } from './types';
 
@@ -86,6 +87,23 @@ export const searchMovies = async (
         query: trimmed,
         page,
         include_adult: false,
+      },
+    },
+  );
+
+  return response.data;
+};
+
+/** GET /movie/{id} — 상세 + credits */
+export const getMovieDetail = async (
+  movieId: number,
+): Promise<TmdbMovieDetail> => {
+  const response = await client.instance.get<TmdbMovieDetail>(
+    `/movie/${movieId}`,
+    {
+      params: {
+        language: 'ko-KR',
+        append_to_response: 'credits',
       },
     },
   );

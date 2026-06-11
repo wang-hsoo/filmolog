@@ -1,6 +1,11 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
-import { discoverMoviesByGenres, getGenres, searchMovies } from './tmdb';
+import {
+  discoverMoviesByGenres,
+  getGenres,
+  getMovieDetail,
+  searchMovies,
+} from './tmdb';
 
 export const useGetGenres = () => {
   return useQuery({
@@ -30,6 +35,15 @@ export const useSearchMovies = (query: string, page = 1) => {
     queryFn: () => searchMovies(trimmed, page),
     enabled: trimmed.length >= 2,
     staleTime: 60_000,
+  });
+};
+
+export const useMovieDetail = (movieId: number | null) => {
+  return useQuery({
+    queryKey: ['movieDetail', movieId],
+    queryFn: () => getMovieDetail(movieId!),
+    enabled: !!movieId,
+    staleTime: 300_000,
   });
 };
 
