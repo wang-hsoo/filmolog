@@ -137,7 +137,7 @@ function CollectionScreen() {
 
   return (
     <AppScreen style={{ paddingTop: insets.top }}>
-      <Header title="컬렉션 생성" navigation={navigation} />
+      <Header subtitle="NEW COLLECTION" navigation={navigation} hideRight />
 
       <ScrollView
         showsVerticalScrollIndicator={false}

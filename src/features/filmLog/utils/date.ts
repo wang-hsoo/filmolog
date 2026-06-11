@@ -18,6 +18,20 @@ export function startOfDay(date: Date) {
   return next;
 }
 
+export function parseDateOnly(value: string | null) {
+  if (!value) {
+    return startOfDay(new Date());
+  }
+
+  const [year, month, day] = value.split('-').map(Number);
+
+  if (!year || !month || !day) {
+    return startOfDay(new Date());
+  }
+
+  return startOfDay(new Date(year, month - 1, day));
+}
+
 export function addDays(date: Date, days: number) {
   const next = new Date(date);
   next.setDate(next.getDate() + days);

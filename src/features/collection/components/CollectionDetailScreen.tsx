@@ -112,11 +112,13 @@ function FilmListRow({
   movie,
   index,
   isLast,
+  onPress,
   onPressMore,
 }: {
   movie: CollectionMovieItem;
   index: number;
   isLast: boolean;
+  onPress: () => void;
   onPressMore: () => void;
 }) {
   const posterUri = getTmdbPosterUrl(movie.posterPath);
@@ -125,7 +127,9 @@ function FilmListRow({
 
   return (
     <>
-      <FilmListRowInner>
+      <FilmListRowPressable
+        onPress={onPress}
+        disabled={!movie.reviewId}>
         <RowIndex>{String(index + 1).padStart(2, '0')}</RowIndex>
 
         <RowPosterMat>
@@ -165,7 +169,11 @@ function FilmListRow({
         </RowRatingCol>
 
         <RowActions>
-          <RowActionButton onPress={onPressMore}>
+          <RowActionButton
+            onPress={event => {
+              event.stopPropagation();
+              onPressMore();
+            }}>
             <Icon
               name="more-horizontal"
               size={16}
@@ -173,7 +181,7 @@ function FilmListRow({
             />
           </RowActionButton>
         </RowActions>
-      </FilmListRowInner>
+      </FilmListRowPressable>
       {!isLast ? <RowDivider /> : null}
     </>
   );
@@ -230,6 +238,23 @@ function CollectionDetailScreen() {
     }
   }, [isRemoving]);
 
+  const handleViewReview = useCallback(
+    (reviewId: string) => {
+      setActionMovie(null);
+      navigation.navigate('ReviewDetail', { reviewId });
+    },
+    [navigation],
+  );
+
+  const handlePressMovie = useCallback(
+    (movie: CollectionMovieItem) => {
+      if (movie.reviewId) {
+        navigation.navigate('ReviewDetail', { reviewId: movie.reviewId });
+      }
+    },
+    [navigation],
+  );
+
   const handleDeleteMovie = useCallback(async () => {
     if (!actionMovie) {
       return;
@@ -251,7 +276,7 @@ function CollectionDetailScreen() {
 
   return (
     <ScreenRoot style={{ paddingTop: insets.top }}>
-      <Header title={''} navigation={navigation} />
+      <Header subtitle="COLLECTION" navigation={navigation} hideRight />
 
       {isLoading ? (
         <LoadingState>
@@ -345,6 +370,7 @@ function CollectionDetailScreen() {
                       movie={movie}
                       index={index}
                       isLast={index === sortedMovies.length - 1}
+                      onPress={() => handlePressMovie(movie)}
                       onPressMore={() => setActionMovie(movie)}
                     />
                   ))}
@@ -413,6 +439,19 @@ function CollectionDetailScreen() {
                 {actionMovie?.title}
               </ActionSheetTitle>
             </ActionSheetHeader>
+
+            {actionMovie?.reviewId ? (
+              <ActionSheetButton
+                disabled={isRemoving}
+                onPress={() => handleViewReview(actionMovie.reviewId!)}>
+                <MciIcon
+                  name="notebook-outline"
+                  size={18}
+                  color={theme.colors.primary}
+                />
+                <ActionSheetButtonLabel>기록 보기</ActionSheetButtonLabel>
+              </ActionSheetButton>
+            ) : null}
 
             <ActionSheetButton
               $destructive
@@ -628,7 +667,7 @@ const FilmList = styled.View`
   padding: 4px 0 8px;
 `;
 
-const FilmListRowInner = styled.View`
+const FilmListRowPressable = styled(Pressable)`
   flex-direction: row;
   align-items: center;
   gap: 10px;

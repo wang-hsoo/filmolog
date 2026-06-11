@@ -1,39 +1,133 @@
-import styled, { useTheme } from 'styled-components/native';
+import type { ReactNode } from 'react';
+import { Pressable } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import { ArchivePageHeader } from '../archive';
+import styled, { useTheme } from 'styled-components/native';
 
-function Header({ title, navigation }: { title?: string, navigation?: any }) {
-    const theme = useTheme();
+const H_PAD = 20;
 
-    const handleGoBack = () => {
-        navigation.goBack();
+export type HeaderProps = {
+  navigation: { goBack: () => void };
+  subtitle: string;
+  onPressRight?: () => void;
+  rightDisabled?: boolean;
+  hideRight?: boolean;
+  rightIcon?: string;
+  rightElement?: ReactNode;
+};
+
+function Header({
+  navigation,
+  subtitle,
+  onPressRight,
+  rightDisabled = false,
+  hideRight = false,
+  rightIcon = 'more-horizontal',
+  rightElement,
+}: HeaderProps) {
+  const theme = useTheme();
+
+  const renderRight = () => {
+    if (rightElement) {
+      return <HeaderSideSlot>{rightElement}</HeaderSideSlot>;
     }
 
-    return (
-        <Container>
-            <Icon name="arrow-left" size={24} color={theme.colors.primary} onPress={handleGoBack} />
-            <HeaderTitle>
-                {title || ''}
-            </HeaderTitle>
-        </Container>
-    )
+    if (onPressRight) {
+      return (
+        <HeaderIconButton
+          onPress={onPressRight}
+          disabled={rightDisabled}
+          accessibilityRole="button">
+          <Icon
+            name={rightIcon}
+            size={20}
+            color={
+              rightDisabled ? theme.colors.goldDim : theme.colors.primary
+            }
+          />
+        </HeaderIconButton>
+      );
+    }
+
+    if (hideRight) {
+      return <HeaderSideSlot />;
+    }
+
+    return <HeaderSideSlot />;
+  };
+
+  return (
+    <HeaderRoot>
+      <PageHeader>
+        <HeaderIconButton
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel="뒤로">
+          <Icon name="arrow-left" size={20} color={theme.colors.primary} />
+        </HeaderIconButton>
+
+        <BrandBlock>
+          <BrandTitle>FILMOLOG</BrandTitle>
+          <BrandSubtitle>{subtitle}</BrandSubtitle>
+        </BrandBlock>
+
+        {renderRight()}
+      </PageHeader>
+      <HeaderRule />
+    </HeaderRoot>
+  );
 }
 
 export default Header;
 
-
-const Container = styled.View`
-    width: 100%;
-    padding: 10px 20px;
-    gap: 10px;
-    flex-direction: row;
-    align-items: center;
+const HeaderRoot = styled.View`
+  width: 100%;
 `;
 
-const HeaderTitle = styled.Text`
+const PageHeader = styled.View`
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px ${H_PAD}px 10px;
+`;
+
+const HeaderRule = styled.View`
+  height: 1px;
+  margin: 0 ${H_PAD}px 4px;
+  background-color: ${({ theme }) => theme.colors.goldLine};
+`;
+
+const HeaderSideSlot = styled.View`
+  width: 38px;
+  height: 38px;
+`;
+
+const HeaderIconButton = styled(Pressable)`
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.dashborderBorderAccent};
+  background-color: ${({ theme }) => theme.colors.surface};
+`;
+
+const BrandBlock = styled.View`
   flex: 1;
-  font-family: ${({ theme }) => theme.fonts.display};
-  font-size: 20px;
-  letter-spacing: 0.5px;
-  color: ${({ theme }) => theme.colors.headerTitle};
+  align-items: center;
+  gap: 3px;
+`;
+
+const BrandTitle = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.displayBold};
+  font-size: 17px;
+  letter-spacing: 4px;
+  color: ${({ theme }) => theme.colors.goldBright};
+`;
+
+const BrandSubtitle = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.bodyLight};
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: ${({ theme }) => theme.colors.primaryMuted};
 `;

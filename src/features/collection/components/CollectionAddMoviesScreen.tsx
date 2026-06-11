@@ -239,7 +239,7 @@ function CollectionAddMoviesScreen() {
 
   return (
     <AppScreen style={{ paddingTop: insets.top }}>
-      <Header title="영화 추가" navigation={navigation} />
+      <Header subtitle="ADD FILMS" navigation={navigation} hideRight />
 
       <ArchiveSearchPanel>
         <SearchRow>

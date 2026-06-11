@@ -14,6 +14,7 @@ export type CollectionListItem = Collection & {
 
 export type CollectionMovieItem = {
   tmdbId: number;
+  reviewId: string | null;
   title: string;
   posterPath: string | null;
   rating: number | null;

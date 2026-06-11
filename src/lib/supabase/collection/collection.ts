@@ -276,6 +276,7 @@ export async function getCollectionDetail(
   const reviewMap = new Map<
     number,
     {
+      reviewId: string;
       rating: number;
       watchedDate: string | null;
       createdAt: string;
@@ -285,7 +286,7 @@ export async function getCollectionDetail(
   if (tmdbIds.length > 0) {
     const { data: reviews, error: reviewsError } = await supabase
       .from('reviews')
-      .select('tmdb_id, rating, watched_date, created_at')
+      .select('id, tmdb_id, rating, watched_date, created_at')
       .eq('user_id', collection.user_id)
       .in('tmdb_id', tmdbIds);
 
@@ -295,6 +296,7 @@ export async function getCollectionDetail(
 
     for (const review of reviews ?? []) {
       reviewMap.set(review.tmdb_id, {
+        reviewId: review.id,
         rating: review.rating,
         watchedDate: review.watched_date,
         createdAt: review.created_at,
@@ -314,6 +316,7 @@ export async function getCollectionDetail(
 
       return {
         tmdbId: row.tmdb_id,
+        reviewId: review?.reviewId ?? null,
         title: movie?.title ?? `영화 #${row.tmdb_id}`,
         posterPath: movie?.poster_path ?? null,
         rating: review?.rating ?? null,

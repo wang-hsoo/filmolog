@@ -23,6 +23,7 @@ import {
   CollectionScreen,
 } from '../../features/collection';
 import { FilmLogScreen } from '../../features/filmLog';
+import ReviewDetailScreen from '../../features/review/components/ReviewDetailScreen';
 
 export type { OnboardingStackParamList, RootStackParamList } from './types';
 
@@ -103,6 +104,7 @@ function RootNavigator() {
         component={CollectionAddMoviesScreen}
       />
       <RootStack.Screen name="FilmLog" component={FilmLogScreen} />
+      <RootStack.Screen name="ReviewDetail" component={ReviewDetailScreen} />
     </RootStack.Navigator>
   );
 }

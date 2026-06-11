@@ -162,7 +162,7 @@ function CollectionListScreen() {
 
   return (
     <AppScreen style={{ paddingTop: insets.top }}>
-      <Header title="나의 컬렉션" navigation={navigation} />
+      <Header subtitle="MY COLLECTIONS" navigation={navigation} hideRight />
 
       <ScrollView
         showsVerticalScrollIndicator={false}

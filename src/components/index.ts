@@ -17,4 +17,5 @@ export {
   POSTER_WIDTH,
 } from './ui/movieRowItem';
 export { default as Header } from './ui/Header/Header';
+export type { HeaderProps } from './ui/Header/Header';
 export * from './constants';
