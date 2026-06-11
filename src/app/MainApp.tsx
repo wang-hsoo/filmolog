@@ -5,24 +5,35 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useTheme } from 'styled-components/native';
 
+import { BadgeUnlockProvider } from '../features/badges';
+import { useAuth } from '../lib/supabase/auth';
 import { navigationTheme } from '../theme';
 import RootNavigator from './navigation/RootNavigator';
 import { queryClient } from '../lib/queryClient';
 
-export function MainApp() {
+function MainAppContent() {
   const theme = useTheme();
+  const { user } = useAuth();
 
+  return (
+    <BadgeUnlockProvider userId={user?.id ?? null}>
+      <NavigationContainer theme={navigationTheme}>
+        <StatusBar
+          barStyle={'light-content'}
+          backgroundColor={theme.colors.appBackground}
+        />
+        <RootNavigator />
+      </NavigationContainer>
+    </BadgeUnlockProvider>
+  );
+}
+
+export function MainApp() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
-          <NavigationContainer theme={navigationTheme}>
-            <StatusBar
-              barStyle={'light-content'}
-              backgroundColor={theme.colors.appBackground}
-            />
-            <RootNavigator />
-          </NavigationContainer>
+          <MainAppContent />
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

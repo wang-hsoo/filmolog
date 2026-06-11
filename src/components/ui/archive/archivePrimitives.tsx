@@ -138,7 +138,7 @@ const EmptyText = styled.Text`
 
 export const ArchiveSearchPanel = styled.View`
   margin: 0 ${H_PAD}px 14px;
-  padding: 12px 14px;
+  padding: 0px 14px;
   border-radius: ${({ theme }) => theme.radii.search}px;
   border-width: 1px;
   border-color: ${({ theme }) => theme.colors.dashborderBorderAccent};

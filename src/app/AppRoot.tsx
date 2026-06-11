@@ -6,9 +6,11 @@ import {
   SPLASH_FADE_OUT_MS,
   SPLASH_MIN_DURATION_MS,
 } from '../features/splash';
-import { ThemeProvider } from '../theme';
+import { configureTextAccessibility, ThemeProvider } from '../theme';
 import { runAppBootstrap } from './bootstrap';
 import { MainApp } from './MainApp';
+
+configureTextAccessibility();
 
 type AppPhase = 'splash' | 'exiting' | 'ready';
 

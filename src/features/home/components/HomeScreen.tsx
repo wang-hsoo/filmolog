@@ -47,7 +47,7 @@ function HomeScreen() {
                   size={22}
                   color={theme.colors.dashboardIcon}
                 />
-                <StatItemLabel>
+                <StatItemLabel numberOfLines={2} >
                   {STATS_LABELS[key as keyof typeof STATS_LABELS]}
                 </StatItemLabel>
                 <StatItemValue>{value}</StatItemValue>
@@ -92,6 +92,7 @@ const StatItemLabel = styled.Text`
   font-size: 12px;
   letter-spacing: 0.2px;
   color: ${({ theme }) => theme.colors.dashboardText};
+  text-align: center;
 `;
 
 const StatItemValue = styled.Text`

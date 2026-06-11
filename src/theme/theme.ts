@@ -1,3 +1,4 @@
+import { MAX_FONT_SIZE_MULTIPLIER } from './accessibility';
 import { fonts } from './typography';
 
 /** 블랙 · 브론즈/골드 · 아카이브 컬렉터 팔레트 */
@@ -50,6 +51,9 @@ const archiveColors = {
 
 export const theme = {
   fonts,
+  accessibility: {
+    maxFontSizeMultiplier: MAX_FONT_SIZE_MULTIPLIER,
+  },
   radii: {
     panel: 8,
     poster: 3,

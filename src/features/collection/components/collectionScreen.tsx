@@ -21,6 +21,8 @@ import {
   Header,
   MovieRowItem,
   MOVIE_ROW_ITEM_HEIGHT,
+  POSTER_HEIGHT,
+  POSTER_WIDTH,
 } from '../../../components';
 import { useAuth } from '../../../lib/supabase/auth';
 import {
@@ -216,6 +218,7 @@ function CollectionScreen() {
             ) : (
               <LegendList
                 data={userMovies}
+                extraData={selectedMovieIds}
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 renderItem={({ item }) => {
@@ -223,25 +226,25 @@ function CollectionScreen() {
                   const isSelected = selectedMovieIds.includes(movieId);
 
                   return (
-                    <SelectableMovie
-                      onPress={() => toggleMovie(movieId)}
-                      $selected={isSelected}>
+                    <SelectableMovie onPress={() => toggleMovie(movieId)}>
                       <MovieRowItem movie={toDisplayMovie(item)} />
                       {isSelected ? (
-                        <SelectedBadge>
-                          <Icon
-                            name="check"
-                            size={14}
-                            color={theme.colors.appBackground}
-                          />
-                        </SelectedBadge>
+                        <SelectionOverlay>
+                          <CheckCircle>
+                            <Icon
+                              name="check"
+                              size={22}
+                              color={theme.colors.appBackground}
+                            />
+                          </CheckCircle>
+                        </SelectionOverlay>
                       ) : null}
                     </SelectableMovie>
                   );
                 }}
                 keyExtractor={item => String(item.tmdbId)}
                 estimatedItemSize={122}
-                style={{ height: MOVIE_ROW_ITEM_HEIGHT }}
+                style={{ minHeight: MOVIE_ROW_ITEM_HEIGHT }}
               />
             )}
 
@@ -342,22 +345,35 @@ const MovieState = styled.View`
   justify-content: center;
 `;
 
-const SelectableMovie = styled(Pressable)<{ $selected: boolean }>`
+const POSTER_MAT = 3;
+
+const SelectableMovie = styled(Pressable)`
   position: relative;
-  opacity: ${({ $selected }) => ($selected ? 1 : 0.72)};
 `;
 
-const SelectedBadge = styled.View`
+const SelectionOverlay = styled.View`
   position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 22px;
-  height: 22px;
-  border-radius: 11px;
+  top: ${POSTER_MAT}px;
+  left: ${POSTER_MAT}px;
+  width: ${POSTER_WIDTH}px;
+  height: ${POSTER_HEIGHT}px;
+  border-radius: ${({ theme }) => theme.radii.poster}px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.58);
+  border-width: 2px;
+  border-color: ${({ theme }) => theme.colors.primary};
+  align-items: center;
+  justify-content: center;
+`;
+
+const CheckCircle = styled.View`
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
   align-items: center;
   justify-content: center;
   background-color: ${({ theme }) => theme.colors.primary};
-  border-width: 1px;
+  border-width: 1.5px;
   border-color: ${({ theme }) => theme.colors.goldSoft};
 `;
 

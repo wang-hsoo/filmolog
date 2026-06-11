@@ -93,10 +93,12 @@ const PosterPlaceholder = styled.View`
   background-color: ${({ theme }) => theme.colors.posterPlaceholderBackground};
 `;
 
-const Title = styled.Text`
+const Title = styled.Text.attrs(({ theme }) => ({
+  maxFontSizeMultiplier: theme.accessibility.maxFontSizeMultiplier,
+}))`
   margin-top: ${TITLE_GAP}px;
   width: 100%;
-  height: ${TITLE_HEIGHT}px;
+  min-height: ${TITLE_HEIGHT}px;
   font-family: ${({ theme }) => theme.fonts.display};
   font-size: 13px;
   line-height: 18px;

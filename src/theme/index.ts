@@ -1,3 +1,7 @@
+export {
+  configureTextAccessibility,
+  MAX_FONT_SIZE_MULTIPLIER,
+} from './accessibility';
 export { ThemeProvider } from './ThemeProvider';
 export { AppLoadingScreen, AppScreen } from './primitives';
 export { navigationTheme } from './navigationTheme';
