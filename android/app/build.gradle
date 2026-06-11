@@ -44,8 +44,8 @@ react {
     // extraPackagerArgs = []
 
     /* Hermes Commands */
-    //   The hermes compiler command to run. By default it is 'hermesc'
-    // hermesCommand = "$rootDir/my-custom-hermesc/bin/hermesc"
+    // RN 0.85: hermes-compiler npm 패키지 사용 (pnpm은 devDependency로 루트 호이스트 필요)
+    hermesCommand = "node_modules/hermes-compiler/hermesc/%OS-BIN%/hermesc.exe"
     //
     //   The list of flags to pass to the Hermes compiler. By default is "-O", "-output-source-map"
     // hermesFlags = ["-O", "-output-source-map"]

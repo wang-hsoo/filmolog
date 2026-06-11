@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "build:apk": "cd android && gradlew.bat assembleRelease"
   },
   "dependencies": {
     "@legendapp/list": "^3.0.3",
@@ -56,6 +57,7 @@
     "@types/styled-components": "^5.1.36",
     "@types/styled-components-react-native": "^5.2.5",
     "eslint": "^8.19.0",
+    "hermes-compiler": "250829098.0.10",
     "jest": "^29.6.3",
     "prettier": "2.8.8",
     "react-test-renderer": "19.2.3",
