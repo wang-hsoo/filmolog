@@ -20,7 +20,7 @@ import {
   COLLECTION_THEMES,
   Header,
   MovieRowItem,
-  MOVIE_ROW_ITEM_HEIGHT,
+  getMovieRowItemHeight,
   POSTER_HEIGHT,
   POSTER_WIDTH,
 } from '../../../components';
@@ -227,7 +227,10 @@ function CollectionScreen() {
 
                   return (
                     <SelectableMovie onPress={() => toggleMovie(movieId)}>
-                      <MovieRowItem movie={toDisplayMovie(item)} />
+                      <MovieRowItem
+                        movie={toDisplayMovie(item)}
+                        showRating
+                      />
                       {isSelected ? (
                         <SelectionOverlay>
                           <CheckCircle>
@@ -243,8 +246,8 @@ function CollectionScreen() {
                   );
                 }}
                 keyExtractor={item => String(item.tmdbId)}
-                estimatedItemSize={122}
-                style={{ minHeight: MOVIE_ROW_ITEM_HEIGHT }}
+                estimatedItemSize={getMovieRowItemHeight(true)}
+                style={{ minHeight: getMovieRowItemHeight(true) }}
               />
             )}
 
@@ -340,7 +343,7 @@ const ThemeIcon = styled(Image)`
 `;
 
 const MovieState = styled.View`
-  height: ${MOVIE_ROW_ITEM_HEIGHT}px;
+  height: ${getMovieRowItemHeight(true)}px;
   align-items: center;
   justify-content: center;
 `;

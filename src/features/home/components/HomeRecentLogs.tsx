@@ -4,7 +4,11 @@ import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
-import { ArchiveEmptyText, ArchivePanel } from '../../../components';
+import {
+  ArchiveEmptyText,
+  ArchivePanel,
+  ArchiveSectionHeader,
+} from '../../../components';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
 import { theme } from '../../../theme';
@@ -43,12 +47,11 @@ function HomeRecentLogs({
 
   return (
     <ArchivePanel accent compact>
-      <SectionHeaderRow>
-        <HeaderCopy>
-          <SectionOverline>RECENT LOG</SectionOverline>
-          <SectionTitle>최근 기록</SectionTitle>
-        </HeaderCopy>
-      </SectionHeaderRow>
+      <ArchiveSectionHeader
+        overline="RECENT LOG"
+        title="최근 기록"
+        subtitle="가장 최근에 남긴 감상."
+      />
 
       {isLoading ? (
         <LoadingState>
@@ -110,29 +113,6 @@ function HomeRecentLogs({
 }
 
 export default HomeRecentLogs;
-
-const SectionHeaderRow = styled.View`
-  margin-bottom: 14px;
-`;
-
-const HeaderCopy = styled.View`
-  gap: 4px;
-`;
-
-const SectionOverline = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.bodyLight};
-  font-size: 10px;
-  letter-spacing: 2.4px;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.primaryMuted};
-`;
-
-const SectionTitle = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.displayBold};
-  font-size: 17px;
-  letter-spacing: 0.3px;
-  color: ${({ theme }) => theme.colors.goldBright};
-`;
 
 const LoadingState = styled.View`
   min-height: 120px;

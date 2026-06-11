@@ -1,6 +1,9 @@
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { Image } from 'react-native';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import { RootStackParamList } from '../../../app/navigation/types';
 
 import {
   ArchivePanel,
@@ -18,10 +21,14 @@ import HomeCollectionShelf from './HomeCollectionShelf';
 import HomeRecentLogs from './HomeRecentLogs';
 
 function HomeScreen() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
+
   const { data: userStats } = useGetUserStats(user?.id ?? '');
+
   const { data: collections = [], isLoading: isCollectionsLoading } =
     useGetCollections(user?.id ?? '');
+    
   const { data: reviewedMovies = [], isLoading: isReviewsLoading } =
     useGetUserReviewedMovies(user?.id ?? '');
 
@@ -67,6 +74,12 @@ function HomeScreen() {
         <HomeCollectionShelf
           collections={collections}
           isLoading={isCollectionsLoading}
+          onViewAll={() => navigation.navigate('CollectionList')}
+          onPressCollection={collection =>
+            navigation.navigate('CollectionDetail', {
+              collectionId: collection.id,
+            })
+          }
         />
 
         <HomeRecentLogs

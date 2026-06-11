@@ -11,6 +11,7 @@ import styled from 'styled-components/native';
 import {
   ArchiveEmptyText,
   ArchivePanel,
+  ArchiveSectionHeader,
   COLLECTION_THEMES,
 } from '../../../components';
 import type { Collection } from '../../../lib/supabase/collection';
@@ -48,11 +49,14 @@ function HomeCollectionShelf({
   return (
     <ArchivePanel accent compact>
       <SectionHeaderRow>
-        <HeaderCopy>
-          <SectionOverline>MY COLLECTION</SectionOverline>
-          <SectionTitle>나의 컬렉션</SectionTitle>
-        </HeaderCopy>
-        {collections.length > 0 && onViewAll ? (
+        <HeaderFrame>
+          <ArchiveSectionHeader
+            overline="MY COLLECTION"
+            title="나의 컬렉션"
+            subtitle="취향대로 묶어둔 아카이브."
+          />
+        </HeaderFrame>
+        {onViewAll ? (
           <ViewAllButton onPress={onViewAll}>
             <ViewAllLabel>모두 보기</ViewAllLabel>
             <ViewAllChevron>›</ViewAllChevron>
@@ -116,29 +120,13 @@ export default HomeCollectionShelf;
 
 const SectionHeaderRow = styled.View`
   flex-direction: row;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 14px;
 `;
 
-const HeaderCopy = styled.View`
+const HeaderFrame = styled.View`
   flex: 1;
-  gap: 4px;
-`;
-
-const SectionOverline = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.bodyLight};
-  font-size: 10px;
-  letter-spacing: 2.4px;
-  text-transform: uppercase;
-  color: ${({ theme }) => theme.colors.primaryMuted};
-`;
-
-const SectionTitle = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.displayBold};
-  font-size: 17px;
-  letter-spacing: 0.3px;
-  color: ${({ theme }) => theme.colors.goldBright};
+  min-width: 0;
 `;
 
 const ViewAllButton = styled(Pressable)`

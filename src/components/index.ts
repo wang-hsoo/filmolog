@@ -11,6 +11,7 @@ export {
 export { default as Container } from './ui/container/container';
 export {
   default as MovieRowItem,
+  getMovieRowItemHeight,
   MOVIE_ROW_ITEM_HEIGHT,
   POSTER_HEIGHT,
   POSTER_WIDTH,

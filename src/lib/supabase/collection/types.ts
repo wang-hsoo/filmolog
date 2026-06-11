@@ -6,3 +6,21 @@ export type Collection = {
   theme_id: string;
   created_at: string;
 };
+
+export type CollectionListItem = Collection & {
+  movieCount: number;
+  latestMovieTitle: string | null;
+};
+
+export type CollectionMovieItem = {
+  tmdbId: number;
+  title: string;
+  posterPath: string | null;
+  rating: number | null;
+  watchedDate: string | null;
+  addedAt: string;
+};
+
+export type CollectionDetail = Collection & {
+  movies: CollectionMovieItem[];
+};
