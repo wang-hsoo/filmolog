@@ -4,6 +4,7 @@ export {
   useGetMovieGenres,
   useInfiniteSearchMovies,
   useMovieDetail,
+  usePersonMovieCredits,
   useSearchMovies,
 } from './tmdbQueries';
 export { getTmdbPosterUrl } from './images';
@@ -12,6 +13,7 @@ export {
   getGenres,
   getMovieDetail,
   getMovieGenres,
+  getPersonMovieCredits,
   searchMovies,
 } from './tmdb';
 export type {
@@ -20,5 +22,6 @@ export type {
   TmdbGenreListResponse,
   TmdbMovie,
   TmdbMovieDetail,
+  TmdbPersonMovieCreditsResponse,
   TmdbSearchMovieResponse,
 } from './types';

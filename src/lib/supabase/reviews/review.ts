@@ -1,6 +1,7 @@
 import { addCollectionMovie } from '../collection/collection';
 import { getSupabaseClient } from '../client';
 import { refreshMovieStats } from '../explore/communityExplore';
+import type { MoviePersonSnapshot } from '../../tmdb/creditsSnapshot';
 import type { UserReviewedMovie } from '../users/movie';
 
 export type UpsertMovieInput = {
@@ -8,6 +9,8 @@ export type UpsertMovieInput = {
   title: string;
   posterPath: string | null;
   genreIds?: number[];
+  directors?: MoviePersonSnapshot[];
+  topCast?: MoviePersonSnapshot[];
   releaseYear?: number | null;
   originalTitle?: string | null;
 };
@@ -18,6 +21,8 @@ export type CreateReviewInput = {
   title: string;
   posterPath: string | null;
   genreIds?: number[];
+  directors?: MoviePersonSnapshot[];
+  topCast?: MoviePersonSnapshot[];
   releaseYear?: number | null;
   originalTitle?: string | null;
   rating: number;
@@ -46,18 +51,33 @@ type ReviewWithMovieRow = {
         tmdb_id: number;
         title: string;
         poster_path: string | null;
+        genre_ids: number[] | null;
+        release_year: number | null;
+        directors: MoviePersonSnapshot[] | null;
+        top_cast: MoviePersonSnapshot[] | null;
       }
     | {
         tmdb_id: number;
         title: string;
         poster_path: string | null;
+        genre_ids: number[] | null;
+        release_year: number | null;
+        directors: MoviePersonSnapshot[] | null;
+        top_cast: MoviePersonSnapshot[] | null;
       }[]
     | null;
 };
 
 function normalizeReviewMovie(
   movies: ReviewWithMovieRow['movies'],
-): { title: string; posterPath: string | null } | null {
+): {
+  title: string;
+  posterPath: string | null;
+  genreIds: number[];
+  releaseYear: number | null;
+  directors: MoviePersonSnapshot[];
+  topCast: MoviePersonSnapshot[];
+} | null {
   if (!movies) {
     return null;
   }
@@ -71,6 +91,10 @@ function normalizeReviewMovie(
   return {
     title: movie.title,
     posterPath: movie.poster_path,
+    genreIds: movie.genre_ids ?? [],
+    releaseYear: movie.release_year ?? null,
+    directors: movie.directors ?? [],
+    topCast: movie.top_cast ?? [],
   };
 }
 
@@ -86,6 +110,10 @@ function mapReviewRow(review: ReviewWithMovieRow): UserReviewedMovie {
     createdAt: review.created_at,
     title: movie?.title ?? `영화 #${review.tmdb_id}`,
     posterPath: movie?.posterPath ?? null,
+    genreIds: movie?.genreIds ?? [],
+    releaseYear: movie?.releaseYear ?? null,
+    directors: movie?.directors ?? [],
+    topCast: movie?.topCast ?? [],
   };
 }
 
@@ -94,6 +122,8 @@ export async function upsertMovie({
   title,
   posterPath,
   genreIds,
+  directors,
+  topCast,
   releaseYear,
   originalTitle,
 }: UpsertMovieInput) {
@@ -105,6 +135,14 @@ export async function upsertMovie({
 
   if (genreIds && genreIds.length > 0) {
     row.genre_ids = genreIds;
+  }
+
+  if (directors && directors.length > 0) {
+    row.directors = directors;
+  }
+
+  if (topCast && topCast.length > 0) {
+    row.top_cast = topCast;
   }
 
   if (releaseYear != null) {
@@ -152,6 +190,8 @@ export async function createReview({
   title,
   posterPath,
   genreIds,
+  directors,
+  topCast,
   releaseYear,
   originalTitle,
   rating,
@@ -164,6 +204,8 @@ export async function createReview({
     title,
     posterPath,
     genreIds,
+    directors,
+    topCast,
     releaseYear,
     originalTitle,
   });
@@ -210,7 +252,11 @@ export async function getReviewById(
       movies (
         tmdb_id,
         title,
-        poster_path
+        poster_path,
+        genre_ids,
+        release_year,
+        directors,
+        top_cast
       )
     `,
     )

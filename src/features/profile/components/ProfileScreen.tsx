@@ -20,7 +20,7 @@ import { useGetGenres } from '../../../lib/tmdb';
 import { theme } from '../../../theme';
 
 const TAGLINE =
-  '모든 기록은 한 편의 영화가 되어 당신이라는 필모그래피로 남습니다.';
+  '오늘 당신의 마음을 움직인 단 하나의 장면은 무엇인가요?';
 
 type StatKey = keyof typeof STATS_LABELS;
 

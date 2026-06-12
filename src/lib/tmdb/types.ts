@@ -72,3 +72,29 @@ export type TmdbMovieDetail = {
   genres: TmdbGenre[];
   credits: TmdbMovieCredits;
 };
+
+/** GET /person/{id}/movie_credits — cast/crew 항목 (영화 메타) */
+export type TmdbPersonMovieCredit = {
+  id: number;
+  title: string;
+  original_title?: string;
+  overview?: string;
+  poster_path: string | null;
+  backdrop_path?: string | null;
+  release_date: string;
+  vote_average: number;
+  vote_count?: number;
+  popularity?: number;
+  genre_ids?: number[];
+  original_language?: string;
+  character?: string;
+  job?: string;
+  department?: string;
+};
+
+/** GET /person/{id}/movie_credits — 응답 */
+export type TmdbPersonMovieCreditsResponse = {
+  id: number;
+  cast: TmdbPersonMovieCredit[];
+  crew: TmdbPersonMovieCredit[];
+};

@@ -4,6 +4,7 @@ import type {
   TmdbDiscoverMovieResponse,
   TmdbGenreListResponse,
   TmdbMovieDetail,
+  TmdbPersonMovieCreditsResponse,
   TmdbSearchMovieResponse,
 } from './types';
 
@@ -105,6 +106,20 @@ export const getMovieDetail = async (
         language: 'ko-KR',
         append_to_response: 'credits',
       },
+    },
+  );
+
+  return response.data;
+};
+
+/** GET /person/{id}/movie_credits — 감독/배우 필모그래피 */
+export const getPersonMovieCredits = async (
+  personId: number,
+): Promise<TmdbPersonMovieCreditsResponse> => {
+  const response = await client.instance.get<TmdbPersonMovieCreditsResponse>(
+    `/person/${personId}/movie_credits`,
+    {
+      params: { language: 'ko-KR' },
     },
   );
 

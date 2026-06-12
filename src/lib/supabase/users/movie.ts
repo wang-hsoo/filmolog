@@ -1,9 +1,14 @@
 import { getSupabaseClient } from '../client';
+import type { MoviePersonSnapshot } from '../../tmdb/creditsSnapshot';
 
 type MovieRow = {
   tmdb_id: number;
   title: string;
   poster_path: string | null;
+  genre_ids: number[] | null;
+  release_year: number | null;
+  directors: MoviePersonSnapshot[] | null;
+  top_cast: MoviePersonSnapshot[] | null;
 };
 
 type ReviewWithMovieRow = {
@@ -26,6 +31,10 @@ export type UserReviewedMovie = {
   createdAt: string;
   title: string;
   posterPath: string | null;
+  genreIds: number[];
+  releaseYear: number | null;
+  directors: MoviePersonSnapshot[];
+  topCast: MoviePersonSnapshot[];
 };
 
 function normalizeMovie(
@@ -55,7 +64,11 @@ export async function getUserReviewedMovies(
       movies (
         tmdb_id,
         title,
-        poster_path
+        poster_path,
+        genre_ids,
+        release_year,
+        directors,
+        top_cast
       )
     `,
     )
@@ -78,6 +91,10 @@ export async function getUserReviewedMovies(
       createdAt: review.created_at,
       title: movie?.title ?? `영화 #${review.tmdb_id}`,
       posterPath: movie?.poster_path ?? null,
+      genreIds: movie?.genre_ids ?? [],
+      releaseYear: movie?.release_year ?? null,
+      directors: movie?.directors ?? [],
+      topCast: movie?.top_cast ?? [],
     };
   });
 }

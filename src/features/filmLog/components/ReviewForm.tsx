@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable } from 'react-native';
+import { useCallback, useMemo, useState, type RefObject } from 'react';
+import { ActivityIndicator, Pressable, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
@@ -33,6 +33,9 @@ export type ReviewFormProps = {
   isCollectionsLoading?: boolean;
   selectedCollectionIds?: string[];
   onToggleCollection?: (collectionId: string) => void;
+  onReviewInputFocus?: () => void;
+  onReviewInputBlur?: () => void;
+  reviewInputWrapRef?: RefObject<View | null>;
 };
 
 function ReviewForm({
@@ -46,6 +49,9 @@ function ReviewForm({
   isCollectionsLoading = false,
   selectedCollectionIds = [],
   onToggleCollection,
+  onReviewInputFocus,
+  onReviewInputBlur,
+  reviewInputWrapRef,
 }: ReviewFormProps) {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const today = useMemo(() => startOfDay(new Date()), []);
@@ -169,15 +175,19 @@ function ReviewForm({
           subtitle="짧은 메모도 좋아요."
         />
 
-        <ReviewInput
-          value={content}
-          onChangeText={onContentChange}
-          placeholder="이 영화에 대한 생각을 적어보세요."
-          placeholderTextColor={theme.colors.placeholderText}
-          multiline
-          textAlignVertical="top"
-          maxLength={1000}
-        />
+        <View ref={reviewInputWrapRef} collapsable={false}>
+          <ReviewInput
+            value={content}
+            onChangeText={onContentChange}
+            onFocus={onReviewInputFocus}
+            onBlur={onReviewInputBlur}
+            placeholder="이 영화에 대한 생각을 적어보세요."
+            placeholderTextColor={theme.colors.placeholderText}
+            multiline
+            textAlignVertical="top"
+            maxLength={1000}
+          />
+        </View>
       </ArchivePanel>
 
       {showCollections ? (

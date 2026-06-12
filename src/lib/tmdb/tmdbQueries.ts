@@ -4,6 +4,7 @@ import {
   discoverMoviesByGenres,
   getGenres,
   getMovieDetail,
+  getPersonMovieCredits,
   searchMovies,
 } from './tmdb';
 
@@ -44,6 +45,15 @@ export const useMovieDetail = (movieId: number | null) => {
     queryFn: () => getMovieDetail(movieId!),
     enabled: !!movieId,
     staleTime: 300_000,
+  });
+};
+
+export const usePersonMovieCredits = (personId: number | null) => {
+  return useQuery({
+    queryKey: ['personMovieCredits', personId],
+    queryFn: () => getPersonMovieCredits(personId!),
+    enabled: !!personId,
+    staleTime: 86_400_000,
   });
 };
 

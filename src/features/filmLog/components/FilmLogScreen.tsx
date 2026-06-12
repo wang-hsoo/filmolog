@@ -8,6 +8,10 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Dimensions,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   View,
@@ -31,6 +35,10 @@ import { useAuth } from '../../../lib/supabase/auth';
 import { useGetCollections } from '../../../lib/supabase/collection';
 import { useCreateReview } from '../../../lib/supabase/reviews';
 import { useInfiniteSearchMovies, useMovieDetail } from '../../../lib/tmdb';
+import {
+  extractDirectorSnapshots,
+  extractTopCastSnapshots,
+} from '../../../lib/tmdb/creditsSnapshot';
 import type { TmdbMovie, TmdbMovieDetail } from '../../../lib/tmdb/types';
 import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
@@ -41,6 +49,8 @@ import { startOfDay, toDateOnlyString } from '../utils/date';
 
 const SEARCH_DEBOUNCE_MS = 300;
 const HORIZONTAL_PADDING = 20;
+const REVIEW_HEADER_OFFSET = 64;
+const KEYBOARD_SCROLL_BUFFER = 24;
 
 type FilmLogRoute = RouteProp<RootStackParamList, 'FilmLog'>;
 
@@ -68,6 +78,11 @@ function FilmLogScreen() {
   const initialTmdbId = route.params?.tmdbId;
   const { user } = useAuth();
   const hasAppliedInitialMovie = useRef(false);
+  const reviewScrollRef = useRef<ScrollView>(null);
+  const reviewInputWrapRef = useRef<View>(null);
+  const scrollOffsetY = useRef(0);
+  const isReviewInputFocused = useRef(false);
+  const keyboardHeightRef = useRef(0);
 
   const [phase, setPhase] = useState<'search' | 'review'>('search');
   const [searchQuery, setSearchQuery] = useState('');
@@ -99,6 +114,72 @@ function FilmLogScreen() {
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  const scrollReviewInputIntoView = useCallback((keyboardHeight: number) => {
+    if (!isReviewInputFocused.current || keyboardHeight <= 0) {
+      return;
+    }
+
+    const inputWrap = reviewInputWrapRef.current;
+    if (!inputWrap) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      inputWrap.measureInWindow((_x, inputY, _w, inputHeight) => {
+        const windowHeight = Dimensions.get('window').height;
+        const visibleBottom = windowHeight - keyboardHeight;
+        const inputBottom = inputY + inputHeight;
+        const overflow = inputBottom - visibleBottom + KEYBOARD_SCROLL_BUFFER;
+
+        if (overflow > 0) {
+          reviewScrollRef.current?.scrollTo({
+            y: scrollOffsetY.current + overflow,
+            animated: true,
+          });
+        }
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    if (phase !== 'review') {
+      return undefined;
+    }
+
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, event => {
+      keyboardHeightRef.current = event.endCoordinates.height;
+      scrollReviewInputIntoView(event.endCoordinates.height);
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      keyboardHeightRef.current = 0;
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [phase, scrollReviewInputIntoView]);
+
+  const handleReviewInputFocus = useCallback(() => {
+    isReviewInputFocused.current = true;
+
+    if (keyboardHeightRef.current > 0) {
+      setTimeout(
+        () => scrollReviewInputIntoView(keyboardHeightRef.current),
+        Platform.OS === 'ios' ? 100 : 150,
+      );
+    }
+  }, [scrollReviewInputIntoView]);
+
+  const handleReviewInputBlur = useCallback(() => {
+    isReviewInputFocused.current = false;
+  }, []);
 
   const isSearching = debouncedQuery.trim().length >= 2;
 
@@ -181,6 +262,12 @@ function FilmLogScreen() {
       : null;
     const originalTitle =
       movieDetail?.original_title ?? selectedMovie.original_title;
+    const directors = movieDetail
+      ? extractDirectorSnapshots(movieDetail.credits)
+      : [];
+    const topCast = movieDetail
+      ? extractTopCastSnapshots(movieDetail.credits)
+      : [];
 
     try {
       await createReview({
@@ -189,6 +276,8 @@ function FilmLogScreen() {
         title: selectedMovie.title,
         posterPath: selectedMovie.poster_path,
         genreIds,
+        directors,
+        topCast,
         releaseYear: Number.isFinite(releaseYear) ? releaseYear : null,
         originalTitle,
         rating,
@@ -321,59 +410,78 @@ function FilmLogScreen() {
           )}
         </SearchContent>
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
-          <ReviewContent>
-            <ArchivePanel accent>
-              <ArchiveSectionHeader
-                overline="SELECTED"
-                title="기본 정보"
-                subtitle="선택한 작품의 정보를 확인하세요."
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          keyboardVerticalOffset={
+            Platform.OS === 'ios' ? insets.top + REVIEW_HEADER_OFFSET : 0
+          }>
+          <ScrollView
+            ref={reviewScrollRef}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+            onScroll={event => {
+              scrollOffsetY.current = event.nativeEvent.contentOffset.y;
+            }}
+            scrollEventThrottle={16}
+            contentContainerStyle={{
+              paddingBottom: insets.bottom + 24,
+            }}>
+            <ReviewContent>
+              <ArchivePanel accent>
+                <ArchiveSectionHeader
+                  overline="SELECTED"
+                  title="기본 정보"
+                  subtitle="선택한 작품의 정보를 확인하세요."
+                />
+
+                {isDetailLoading ? (
+                  <DetailState>
+                    <ActivityIndicator color={theme.colors.primary} />
+                  </DetailState>
+                ) : isDetailError || !movieDetail ? (
+                  <ArchiveEmptyText>
+                    영화 정보를 불러오지 못했습니다.
+                  </ArchiveEmptyText>
+                ) : (
+                  <MovieInfoCard detail={movieDetail} />
+                )}
+
+                <ChangeMovieButton onPress={handleBackToSearch}>
+                  <ChangeMovieLabel>다른 영화 선택</ChangeMovieLabel>
+                </ChangeMovieButton>
+              </ArchivePanel>
+
+              <ReviewForm
+                rating={rating}
+                onRatingChange={setRating}
+                content={content}
+                onContentChange={setContent}
+                watchedDate={watchedDate}
+                onWatchedDateChange={setWatchedDate}
+                collections={collections}
+                isCollectionsLoading={isCollectionsLoading}
+                selectedCollectionIds={selectedCollectionIds}
+                onToggleCollection={toggleCollection}
+                reviewInputWrapRef={reviewInputWrapRef}
+                onReviewInputFocus={handleReviewInputFocus}
+                onReviewInputBlur={handleReviewInputBlur}
               />
 
-              {isDetailLoading ? (
-                <DetailState>
-                  <ActivityIndicator color={theme.colors.primary} />
-                </DetailState>
-              ) : isDetailError || !movieDetail ? (
-                <ArchiveEmptyText>
-                  영화 정보를 불러오지 못했습니다.
-                </ArchiveEmptyText>
-              ) : (
-                <MovieInfoCard detail={movieDetail} />
-              )}
-
-              <ChangeMovieButton onPress={handleBackToSearch}>
-                <ChangeMovieLabel>다른 영화 선택</ChangeMovieLabel>
-              </ChangeMovieButton>
-            </ArchivePanel>
-
-            <ReviewForm
-              rating={rating}
-              onRatingChange={setRating}
-              content={content}
-              onContentChange={setContent}
-              watchedDate={watchedDate}
-              onWatchedDateChange={setWatchedDate}
-              collections={collections}
-              isCollectionsLoading={isCollectionsLoading}
-              selectedCollectionIds={selectedCollectionIds}
-              onToggleCollection={toggleCollection}
-            />
-
-            <SubmitButton
-              onPress={handleSubmitReview}
-              disabled={isSubmitting}
-              $disabled={isSubmitting}>
-              {isSubmitting ? (
-                <ActivityIndicator color={theme.colors.appBackground} />
-              ) : (
-                <SubmitLabel>기록 저장</SubmitLabel>
-              )}
-            </SubmitButton>
-          </ReviewContent>
-        </ScrollView>
+              <SubmitButton
+                onPress={handleSubmitReview}
+                disabled={isSubmitting}
+                $disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <ActivityIndicator color={theme.colors.appBackground} />
+                ) : (
+                  <SubmitLabel>기록 저장</SubmitLabel>
+                )}
+              </SubmitButton>
+            </ReviewContent>
+          </ScrollView>
+        </KeyboardAvoidingView>
       )}
     </AppScreen>
   );

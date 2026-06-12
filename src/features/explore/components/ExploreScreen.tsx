@@ -36,6 +36,7 @@ import {
 import { useDiscoverMovies, useInfiniteSearchMovies } from '../../../lib/tmdb';
 import type { TmdbMovie } from '../../../lib/tmdb/types';
 import { theme } from '../../../theme';
+import { useStatsPersonRecommendations } from '../../statistics/hooks/useStatsPersonRecommendations';
 import { useMovieGridLayout } from '../hooks/useMovieGridLayout';
 
 import ExploreMovieShelf from './ExploreMovieShelf';
@@ -107,6 +108,17 @@ function ExploreScreen() {
     isLoading: isMostCollectedLoading,
     isError: isMostCollectedError,
   } = useCommunityMostCollected(userId);
+
+  const {
+    topDirector,
+    topCast,
+    directorRecommendMovies,
+    castRecommendMovies,
+    isDirectorCreditsLoading,
+    isDirectorCreditsError,
+    isCastCreditsLoading,
+    isCastCreditsError,
+  } = useStatsPersonRecommendations(userId);
 
   const {
     data: searchPages,
@@ -186,6 +198,32 @@ function ExploreScreen() {
           />
         )}
       </ArchivePanel>
+
+      {topDirector ? (
+        <ExploreMovieShelf
+          overline="YOUR TASTE"
+          title={`${topDirector.name}의 다른 작품`}
+          subtitle="Director’s Log · 당신의 리뷰로 다시 읽는 감독의 작품들."
+          movies={directorRecommendMovies}
+          isLoading={isDirectorCreditsLoading}
+          isError={isDirectorCreditsError}
+          hideWhenEmpty
+          onPressMovie={handlePressMovie}
+        />
+      ) : null}
+
+      {topCast ? (
+        <ExploreMovieShelf
+          overline="YOUR TASTE"
+          title={`${topCast.name} 출연작`}
+          subtitle="당신의 페르소나 · 리뷰로 쌓아 올린 배우 아카이브."
+          movies={castRecommendMovies}
+          isLoading={isCastCreditsLoading}
+          isError={isCastCreditsError}
+          hideWhenEmpty
+          onPressMovie={handlePressMovie}
+        />
+      ) : null}
 
       <ExploreMovieShelf
         overline="FILMOLOG PICKS"
