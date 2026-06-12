@@ -6,6 +6,7 @@ export {
   upsertMovie,
   type CreateReviewInput,
   type UpdateReviewInput,
+  type UpsertMovieInput,
 } from './review';
 export {
   useCreateReview,

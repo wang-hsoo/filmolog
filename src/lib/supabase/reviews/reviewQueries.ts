@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { queryClient } from '../../queryClient';
+import { communityExploreKeys } from '../explore/exploreQueries';
 import {
   createReview,
   deleteReview,
@@ -22,6 +23,9 @@ export const useCreateReview = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ['collections', variables.userId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: communityExploreKeys.all,
       });
     },
   });

@@ -1,12 +1,25 @@
 import { addCollectionMovie } from '../collection/collection';
 import { getSupabaseClient } from '../client';
+import { refreshMovieStats } from '../explore/communityExplore';
 import type { UserReviewedMovie } from '../users/movie';
+
+export type UpsertMovieInput = {
+  tmdbId: number;
+  title: string;
+  posterPath: string | null;
+  genreIds?: number[];
+  releaseYear?: number | null;
+  originalTitle?: string | null;
+};
 
 export type CreateReviewInput = {
   userId: string;
   tmdbId: number;
   title: string;
   posterPath: string | null;
+  genreIds?: number[];
+  releaseYear?: number | null;
+  originalTitle?: string | null;
   rating: number;
   content: string;
   watchedDate: string;
@@ -76,21 +89,35 @@ function mapReviewRow(review: ReviewWithMovieRow): UserReviewedMovie {
   };
 }
 
-export async function upsertMovie(
-  tmdbId: number,
-  title: string,
-  posterPath: string | null,
-) {
+export async function upsertMovie({
+  tmdbId,
+  title,
+  posterPath,
+  genreIds,
+  releaseYear,
+  originalTitle,
+}: UpsertMovieInput) {
+  const row: Record<string, unknown> = {
+    tmdb_id: tmdbId,
+    title,
+    poster_path: posterPath,
+  };
+
+  if (genreIds && genreIds.length > 0) {
+    row.genre_ids = genreIds;
+  }
+
+  if (releaseYear != null) {
+    row.release_year = releaseYear;
+  }
+
+  if (originalTitle) {
+    row.original_title = originalTitle;
+  }
+
   const { error } = await getSupabaseClient()
     .from('movies')
-    .upsert(
-      {
-        tmdb_id: tmdbId,
-        title,
-        poster_path: posterPath,
-      },
-      { onConflict: 'tmdb_id' },
-    );
+    .upsert(row, { onConflict: 'tmdb_id' });
 
   if (error) {
     throw error;
@@ -124,12 +151,22 @@ export async function createReview({
   tmdbId,
   title,
   posterPath,
+  genreIds,
+  releaseYear,
+  originalTitle,
   rating,
   content,
   watchedDate,
   collectionIds = [],
 }: CreateReviewInput) {
-  await upsertMovie(tmdbId, title, posterPath);
+  await upsertMovie({
+    tmdbId,
+    title,
+    posterPath,
+    genreIds,
+    releaseYear,
+    originalTitle,
+  });
 
   const { data, error } = await getSupabaseClient()
     .from('reviews')
@@ -150,6 +187,8 @@ export async function createReview({
   if (collectionIds.length > 0) {
     await addMovieToCollections(collectionIds, tmdbId);
   }
+
+  void refreshMovieStats().catch(() => undefined);
 
   return data;
 }

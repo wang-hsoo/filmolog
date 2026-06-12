@@ -129,12 +129,27 @@ function FilmLogScreen() {
       return;
     }
 
+    const genreIds =
+      movieDetail?.genres.map(genre => genre.id) ??
+      selectedMovie.genre_ids ??
+      [];
+    const releaseDate =
+      movieDetail?.release_date ?? selectedMovie.release_date ?? '';
+    const releaseYear = releaseDate
+      ? Number.parseInt(releaseDate.slice(0, 4), 10)
+      : null;
+    const originalTitle =
+      movieDetail?.original_title ?? selectedMovie.original_title;
+
     try {
       await createReview({
         userId: user.id,
         tmdbId: selectedMovie.id,
         title: selectedMovie.title,
         posterPath: selectedMovie.poster_path,
+        genreIds,
+        releaseYear: Number.isFinite(releaseYear) ? releaseYear : null,
+        originalTitle,
         rating,
         content,
         watchedDate: toDateOnlyString(watchedDate),
@@ -161,6 +176,7 @@ function FilmLogScreen() {
   }, [
     content,
     createReview,
+    movieDetail,
     navigation,
     rating,
     selectedCollectionIds,

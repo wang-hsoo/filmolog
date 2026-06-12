@@ -18,10 +18,21 @@ import {
   MovieRowItem,
   MOVIE_ROW_ITEM_HEIGHT,
 } from '../../../components';
-import { useAuth, useGetUserFavoriteGenres } from '../../../lib/supabase';
+import { queryClient } from '../../../lib/queryClient';
+import {
+  communityExploreKeys,
+  useAuth,
+  useCommunityMostCollected,
+  useCommunityMostReviewed,
+  useCommunityTopRatedByGenres,
+  useCommunityTopRatedForMe,
+  useGetUserFavoriteGenres,
+} from '../../../lib/supabase';
 import { useDiscoverMovies, useInfiniteSearchMovies } from '../../../lib/tmdb';
 import { theme } from '../../../theme';
 import { useMovieGridLayout } from '../hooks/useMovieGridLayout';
+
+import ExploreMovieShelf from './ExploreMovieShelf';
 
 const SEARCH_DEBOUNCE_MS = 300;
 const HORIZONTAL_PADDING = 20;
@@ -35,6 +46,9 @@ function ExploreScreen() {
   useFocusEffect(
     useCallback(() => {
       setFeedKey(key => key + 1);
+      void queryClient.invalidateQueries({
+        queryKey: communityExploreKeys.all,
+      });
     }, []),
   );
 
@@ -48,11 +62,13 @@ function ExploreScreen() {
 
   const isSearching = debouncedQuery.trim().length >= 2;
   const gridLayout = useMovieGridLayout({
-    panelPadding: isSearching ? 16 : 0, // ArchiveListFrame content padding
+    panelPadding: isSearching ? 16 : 0,
   });
 
+  const userId = user?.id ?? '';
+
   const { data: favoriteGenres, isLoading: isGenresLoading } =
-    useGetUserFavoriteGenres(user?.id ?? '');
+    useGetUserFavoriteGenres(userId);
   const genreIds = favoriteGenres?.preferred_genres ?? [];
 
   const {
@@ -60,6 +76,30 @@ function ExploreScreen() {
     isLoading: isMoviesLoading,
     isError: isMoviesError,
   } = useDiscoverMovies(genreIds, feedKey);
+
+  const {
+    data: topRatedForMe = [],
+    isLoading: isTopRatedLoading,
+    isError: isTopRatedError,
+  } = useCommunityTopRatedForMe(userId);
+
+  const {
+    data: topRatedByGenres = [],
+    isLoading: isGenreTopRatedLoading,
+    isError: isGenreTopRatedError,
+  } = useCommunityTopRatedByGenres(userId, genreIds);
+
+  const {
+    data: mostReviewed = [],
+    isLoading: isMostReviewedLoading,
+    isError: isMostReviewedError,
+  } = useCommunityMostReviewed(userId);
+
+  const {
+    data: mostCollected = [],
+    isLoading: isMostCollectedLoading,
+    isError: isMostCollectedError,
+  } = useCommunityMostCollected(userId);
 
   const {
     data: searchPages,
@@ -130,6 +170,51 @@ function ExploreScreen() {
           />
         )}
       </ArchivePanel>
+
+      <ExploreMovieShelf
+        overline="FILMOLOG PICKS"
+        title="커뮤니티 고평점"
+        subtitle="Filmolog 유저들이 높게 평가한 작품."
+        movies={topRatedForMe}
+        isLoading={isTopRatedLoading}
+        isError={isTopRatedError}
+        showRating
+        hideWhenEmpty
+      />
+
+      {genreIds.length > 0 ? (
+        <ExploreMovieShelf
+          overline="YOUR GENRE"
+          title="내 장르, Filmolog 고평점"
+          subtitle="선호 장르 × 커뮤니티 평점."
+          movies={topRatedByGenres}
+          isLoading={isGenreTopRatedLoading}
+          isError={isGenreTopRatedError}
+          showRating
+          emptyMessage="장르 데이터가 쌓이면 추천이 표시됩니다. 리뷰를 작성해주세요."
+          hideWhenEmpty
+        />
+      ) : null}
+
+      <ExploreMovieShelf
+        overline="TRENDING LOGS"
+        title="많이 기록된 작품"
+        subtitle="Filmolog에서 가장 많이 리뷰된 영화."
+        movies={mostReviewed}
+        isLoading={isMostReviewedLoading}
+        isError={isMostReviewedError}
+        hideWhenEmpty
+      />
+
+      <ExploreMovieShelf
+        overline="COLLECTED"
+        title="많이 담긴 작품"
+        subtitle="컬렉션에 자주 담긴 영화."
+        movies={mostCollected}
+        isLoading={isMostCollectedLoading}
+        isError={isMostCollectedError}
+        hideWhenEmpty
+      />
     </ArchiveContent>
   );
 

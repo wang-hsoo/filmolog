@@ -189,7 +189,7 @@ function CollectionListScreen() {
         ) : sortedCollections.length === 0 ? (
           <EmptyState>
             <ArchiveEmptyText>
-              아직 폴더가 없습니다. 첫 컬렉션을 만들어보세요.
+              아직 컬렉션이 없습니다. 첫 컬렉션을 만들어보세요.
             </ArchiveEmptyText>
           </EmptyState>
         ) : (
