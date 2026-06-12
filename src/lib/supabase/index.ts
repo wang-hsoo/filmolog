@@ -42,3 +42,8 @@ export {
   useGetMovieCommunityStats,
   type MovieCommunityStats,
 } from './movies';
+export {
+  useIsInWishlist,
+  useToggleWishlist,
+  wishlistKeys,
+} from './wishlist';

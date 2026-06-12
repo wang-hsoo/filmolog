@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
 import { ActivityIndicator } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
 import {
@@ -10,34 +8,23 @@ import {
   ArchiveSectionHeader,
 } from '../../../components';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
-import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
 import { theme } from '../../../theme';
 
+import ReviewLogRow from '../../review/components/ReviewLogRow';
+
 const HOME_RECENT_LIMIT = 5;
-const POSTER_WIDTH = 46;
-const POSTER_HEIGHT = 69;
 
 type HomeRecentLogsProps = {
   reviews: UserReviewedMovie[];
   isLoading: boolean;
+  onViewAll?: () => void;
   onPressReview?: (review: UserReviewedMovie) => void;
 };
-
-function formatWatchedDate(date: string | null) {
-  if (!date) {
-    return null;
-  }
-
-  return date.replace(/-/g, '.');
-}
-
-function formatRating(rating: number) {
-  return rating.toFixed(1);
-}
 
 function HomeRecentLogs({
   reviews,
   isLoading,
+  onViewAll,
   onPressReview,
 }: HomeRecentLogsProps) {
   const recentReviews = useMemo(
@@ -45,13 +32,25 @@ function HomeRecentLogs({
     [reviews],
   );
 
+  const showViewAll = !!onViewAll && reviews.length > 0;
+
   return (
     <ArchivePanel accent compact>
-      <ArchiveSectionHeader
-        overline="RECENT LOG"
-        title="최근 기록"
-        subtitle="가장 최근에 남긴 감상."
-      />
+      <SectionHeaderRow>
+        <HeaderFrame>
+          <ArchiveSectionHeader
+            overline="RECENT LOG"
+            title="최근 기록"
+            subtitle="가장 최근에 남긴 감상."
+          />
+        </HeaderFrame>
+        {showViewAll ? (
+          <ViewAllButton onPress={onViewAll}>
+            <ViewAllLabel>모두 보기</ViewAllLabel>
+            <ViewAllChevron>›</ViewAllChevron>
+          </ViewAllButton>
+        ) : null}
+      </SectionHeaderRow>
 
       {isLoading ? (
         <LoadingState>
@@ -63,49 +62,14 @@ function HomeRecentLogs({
         </ArchiveEmptyText>
       ) : (
         <LogList>
-          {recentReviews.map((review, index) => {
-            const posterUri = getTmdbPosterUrl(review.posterPath);
-            const watchedLabel = formatWatchedDate(review.watchedDate);
-            const isLast = index === recentReviews.length - 1;
-
-            return (
-              <LogRow
-                key={review.reviewId}
-                $isLast={isLast}
-                onPress={() => onPressReview?.(review)}>
-                <PosterMat>
-                  {posterUri ? (
-                    <Poster
-                      source={{ uri: posterUri }}
-                      resizeMode={FastImage.resizeMode.cover}
-                    />
-                  ) : (
-                    <PosterPlaceholder />
-                  )}
-                </PosterMat>
-
-                <LogBody>
-                  <LogTitle numberOfLines={1}>{review.title}</LogTitle>
-                  <LogMetaRow>
-                    <RatingWrap>
-                      <Icon
-                        name="star"
-                        size={12}
-                        color={theme.colors.primary}
-                      />
-                      <RatingText>{formatRating(review.rating)}</RatingText>
-                    </RatingWrap>
-                    {watchedLabel ? (
-                      <WatchedDate>{watchedLabel}</WatchedDate>
-                    ) : null}
-                  </LogMetaRow>
-                  {review.content ? (
-                    <LogNote numberOfLines={1}>{review.content}</LogNote>
-                  ) : null}
-                </LogBody>
-              </LogRow>
-            );
-          })}
+          {recentReviews.map((review, index) => (
+            <ReviewLogRow
+              key={review.reviewId}
+              review={review}
+              isLast={index === recentReviews.length - 1}
+              onPress={() => onPressReview?.(review)}
+            />
+          ))}
         </LogList>
       )}
     </ArchivePanel>
@@ -113,6 +77,39 @@ function HomeRecentLogs({
 }
 
 export default HomeRecentLogs;
+
+const SectionHeaderRow = styled.View`
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 2px;
+`;
+
+const HeaderFrame = styled.View`
+  flex: 1;
+  min-width: 0;
+`;
+
+const ViewAllButton = styled.Pressable`
+  flex-direction: row;
+  align-items: center;
+  gap: 2px;
+  padding-top: 4px;
+`;
+
+const ViewAllLabel = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.bodyLight};
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  color: ${({ theme }) => theme.colors.primary};
+`;
+
+const ViewAllChevron = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.bodyLight};
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.primary};
+`;
 
 const LoadingState = styled.View`
   min-height: 120px;
@@ -122,80 +119,4 @@ const LoadingState = styled.View`
 
 const LogList = styled.View`
   gap: 0;
-`;
-
-const LogRow = styled.Pressable<{ $isLast: boolean }>`
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom-width: ${({ $isLast }) => ($isLast ? 0 : 1)}px;
-  border-color: ${({ theme }) => theme.colors.dashbordItemBorder};
-`;
-
-const PosterMat = styled.View`
-  width: ${POSTER_WIDTH + 6}px;
-  height: ${POSTER_HEIGHT + 6}px;
-  padding: 3px;
-  border-radius: ${({ theme }) => theme.radii.poster + 2}px;
-  border-width: 1px;
-  border-color: ${({ theme }) => theme.colors.posterBorder};
-  background-color: ${({ theme }) => theme.colors.posterMat};
-`;
-
-const Poster = styled(FastImage)`
-  width: ${POSTER_WIDTH}px;
-  height: ${POSTER_HEIGHT}px;
-  border-radius: ${({ theme }) => theme.radii.poster}px;
-`;
-
-const PosterPlaceholder = styled.View`
-  width: ${POSTER_WIDTH}px;
-  height: ${POSTER_HEIGHT}px;
-  border-radius: ${({ theme }) => theme.radii.poster}px;
-  background-color: ${({ theme }) => theme.colors.posterPlaceholderBackground};
-`;
-
-const LogBody = styled.View`
-  flex: 1;
-  min-width: 0;
-  gap: 4px;
-`;
-
-const LogTitle = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.display};
-  font-size: 14px;
-  letter-spacing: 0.2px;
-  color: ${({ theme }) => theme.colors.goldSoft};
-`;
-
-const LogMetaRow = styled.View`
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-`;
-
-const RatingWrap = styled.View`
-  flex-direction: row;
-  align-items: center;
-  gap: 3px;
-`;
-
-const RatingText = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.bodyMedium};
-  font-size: 12px;
-  color: ${({ theme }) => theme.colors.goldBright};
-`;
-
-const WatchedDate = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.bodyLight};
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.dashboardText};
-`;
-
-const LogNote = styled.Text`
-  font-family: ${({ theme }) => theme.fonts.bodyLight};
-  font-size: 12px;
-  line-height: 17px;
-  color: ${({ theme }) => theme.colors.dashboardText};
 `;

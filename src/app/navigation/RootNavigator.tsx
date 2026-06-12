@@ -25,6 +25,7 @@ import {
 import { FilmLogScreen } from '../../features/filmLog';
 import { MovieDetailScreen } from '../../features/movie';
 import ReviewDetailScreen from '../../features/review/components/ReviewDetailScreen';
+import ReviewLogListScreen from '../../features/review/components/ReviewLogListScreen';
 
 export type { OnboardingStackParamList, RootStackParamList } from './types';
 
@@ -106,6 +107,7 @@ function RootNavigator() {
       />
       <RootStack.Screen name="FilmLog" component={FilmLogScreen} />
       <RootStack.Screen name="ReviewDetail" component={ReviewDetailScreen} />
+      <RootStack.Screen name="ReviewLogList" component={ReviewLogListScreen} />
       <RootStack.Screen name="MovieDetail" component={MovieDetailScreen} />
     </RootStack.Navigator>
   );

@@ -4,7 +4,8 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import { ActivityIndicator, ScrollView } from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { ActivityIndicator, Alert, Pressable, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MciIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,7 +23,12 @@ import {
   getStarIconName,
   STAR_VALUES,
 } from '../../filmLog/utils/rating';
-import { useGetMovieCommunityStats } from '../../../lib/supabase/movies';
+import {
+  useAuth,
+  useGetMovieCommunityStats,
+  useIsInWishlist,
+  useToggleWishlist,
+} from '../../../lib/supabase';
 import { useMovieDetail } from '../../../lib/tmdb';
 import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
 import {
@@ -64,6 +70,7 @@ function MovieDetailScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<MovieDetailRoute>();
   const tmdbId = route.params.tmdbId;
+  const { user } = useAuth();
 
   const {
     data: movieDetail,
@@ -75,6 +82,12 @@ function MovieDetailScreen() {
     isLoading: isStatsLoading,
     isError: isStatsError,
   } = useGetMovieCommunityStats(tmdbId);
+  const {
+    data: isInWishlist = false,
+    isLoading: isWishlistLoading,
+  } = useIsInWishlist(user?.id ?? '', tmdbId);
+  const { mutateAsync: toggleWishlist, isPending: isWishlistPending } =
+    useToggleWishlist();
 
   const posterUri = getTmdbPosterUrl(movieDetail?.poster_path ?? null);
   const releaseYear = movieDetail
@@ -97,6 +110,47 @@ function MovieDetailScreen() {
   const communityRating = communityStats?.avgRating ?? null;
   const reviewCount = communityStats?.reviewCount ?? 0;
 
+  const wishlistMovieInput = useMemo(() => {
+    if (!movieDetail) {
+      return null;
+    }
+
+    const releaseDate = movieDetail.release_date ?? '';
+    const releaseYear = releaseDate
+      ? Number.parseInt(releaseDate.slice(0, 4), 10)
+      : null;
+
+    return {
+      title: movieDetail.title,
+      posterPath: movieDetail.poster_path,
+      genreIds: movieDetail.genres.map(genre => genre.id),
+      releaseYear: Number.isFinite(releaseYear) ? releaseYear : null,
+      originalTitle: movieDetail.original_title,
+    };
+  }, [movieDetail]);
+
+  const handleToggleWishlist = useCallback(async () => {
+    if (!user?.id || !wishlistMovieInput) {
+      return;
+    }
+
+    try {
+      await toggleWishlist({
+        userId: user.id,
+        tmdbId,
+        isInWishlist,
+        movie: wishlistMovieInput,
+      });
+    } catch {
+      Alert.alert(
+        '저장 실패',
+        '위시리스트를 업데이트하지 못했습니다. 잠시 후 다시 시도해주세요.',
+      );
+    }
+  }, [isInWishlist, tmdbId, toggleWishlist, user?.id, wishlistMovieInput]);
+
+  const isWishlistBusy = isWishlistLoading || isWishlistPending;
+
   return (
     <AppScreen style={{ paddingTop: insets.top }}>
       <Header navigation={navigation} subtitle="FILM DETAIL" hideRight />
@@ -110,11 +164,12 @@ function MovieDetailScreen() {
           <ArchiveEmptyText>영화 정보를 불러오지 못했습니다.</ArchiveEmptyText>
         </ErrorState>
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: insets.bottom + 32,
-          }}>
+        <>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingBottom: insets.bottom + 96,
+            }}>
           <Content>
             <ArchivePanel accent>
               <CatalogHeader>
@@ -270,6 +325,40 @@ function MovieDetailScreen() {
             </ArchivePanel>
           </Content>
         </ScrollView>
+
+          <ActionBar style={{ paddingBottom: insets.bottom + 12 }}>
+            <WishlistButton
+              onPress={handleToggleWishlist}
+              disabled={isWishlistBusy}
+              $active={isInWishlist}>
+              {isWishlistBusy ? (
+                <ActivityIndicator
+                  color={
+                    isInWishlist
+                      ? theme.colors.appBackground
+                      : theme.colors.primary
+                  }
+                  size="small"
+                />
+              ) : (
+                <>
+                  <MciIcon
+                    name={isInWishlist ? 'bookmark' : 'bookmark-outline'}
+                    size={18}
+                    color={
+                      isInWishlist
+                        ? theme.colors.appBackground
+                        : theme.colors.primary
+                    }
+                  />
+                  <WishlistLabel $active={isInWishlist}>
+                    {isInWishlist ? '위시리스트에서 제거' : '위시리스트에 담기'}
+                  </WishlistLabel>
+                </>
+              )}
+            </WishlistButton>
+          </ActionBar>
+        </>
       )}
     </AppScreen>
   );
@@ -475,4 +564,34 @@ const OverviewText = styled.Text`
   line-height: 22px;
   letter-spacing: 0.1px;
   color: ${({ theme }) => theme.colors.goldSoft};
+`;
+
+const ActionBar = styled.View`
+  position: absolute;
+  right: ${H_PAD}px;
+  bottom: 0;
+  left: ${H_PAD}px;
+`;
+
+const WishlistButton = styled(Pressable)<{ $active: boolean }>`
+  min-height: 50px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: ${({ theme }) => theme.radii.panel}px;
+  border-width: 1px;
+  border-color: ${({ theme, $active }) =>
+    $active ? theme.colors.goldSoft : theme.colors.dashborderBorderAccent};
+  background-color: ${({ theme, $active }) =>
+    $active ? theme.colors.primary : theme.colors.surfaceRaised};
+  opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
+`;
+
+const WishlistLabel = styled.Text<{ $active: boolean }>`
+  font-family: ${({ theme }) => theme.fonts.bodySemiBold};
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: ${({ theme, $active }) =>
+    $active ? theme.colors.appBackground : theme.colors.goldSoft};
 `;

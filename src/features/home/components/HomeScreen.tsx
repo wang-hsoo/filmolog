@@ -85,6 +85,7 @@ function HomeScreen() {
         <HomeRecentLogs
           reviews={reviewedMovies}
           isLoading={isReviewsLoading}
+          onViewAll={() => navigation.navigate('ReviewLogList')}
           onPressReview={review =>
             navigation.navigate('ReviewDetail', {
               reviewId: review.reviewId,
