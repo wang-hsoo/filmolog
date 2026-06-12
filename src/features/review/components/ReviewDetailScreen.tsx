@@ -4,13 +4,14 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
   Pressable,
   ScrollView,
   Share,
+  View,
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -51,6 +52,9 @@ import {
 import { useMovieDetail } from '../../../lib/tmdb';
 import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
+
+import ReviewShareCard from './ReviewShareCard';
+import { shareReviewAsImage } from '../utils/shareReviewCard';
 
 type ReviewDetailRoute = RouteProp<RootStackParamList, 'ReviewDetail'>;
 
@@ -100,6 +104,9 @@ function ReviewDetailScreen() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const shareCardRef = useRef<View>(null);
+  const posterReadyRef = useRef(false);
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState('');
   const [watchedDate, setWatchedDate] = useState(() => startOfDay(new Date()));
@@ -118,7 +125,16 @@ function ReviewDetailScreen() {
   const posterUri = getTmdbPosterUrl(
     movieDetail?.poster_path ?? review?.posterPath ?? null,
   );
-  const isBusy = isUpdating || isDeleting;
+  const isBusy = isUpdating || isDeleting || isSharing;
+  const catalogRef = review ? formatCatalogRef(review.createdAt) : null;
+
+  useEffect(() => {
+    posterReadyRef.current = !posterUri;
+  }, [posterUri]);
+
+  const handleSharePosterReady = useCallback(() => {
+    posterReadyRef.current = true;
+  }, []);
   const displayTitle = movieDetail?.title ?? review?.title ?? '';
   const releaseYear = movieDetail
     ? getReleaseYear(movieDetail.release_date)
@@ -129,7 +145,6 @@ function ReviewDetailScreen() {
   const castLabel = movieDetail ? getCast(movieDetail) : null;
   const runtimeLabel = movieDetail ? formatRuntime(movieDetail.runtime) : null;
   const watchedLabel = formatWatchedDateWithWeekday(review?.watchedDate ?? null);
-  const catalogRef = review ? formatCatalogRef(review.createdAt) : null;
 
   const resolveMovieMeta = (value: string | null | undefined) => {
     if (isMovieLoading) {
@@ -231,8 +246,9 @@ function ReviewDetailScreen() {
     }
 
     setIsMenuOpen(false);
+    setIsSharing(true);
 
-    const message = [
+    const fallbackMessage = [
       `🎬 ${displayTitle}`,
       `⭐ ${formatRating(review.rating)}`,
       watchedLabel ? `📅 ${watchedLabel}` : null,
@@ -243,11 +259,25 @@ function ReviewDetailScreen() {
       .join('\n');
 
     try {
-      await Share.share({ message });
+      await shareReviewAsImage({
+        cardRef: shareCardRef,
+        posterUri: posterUri ?? null,
+        posterReadyRef,
+        title: displayTitle,
+        rating: review.rating,
+        watchedLabel,
+        content: review.content,
+      });
     } catch {
-      // 사용자가 공유 시트를 닫은 경우 등은 무시
+      try {
+        await Share.share({ message: fallbackMessage });
+      } catch {
+        // 사용자가 공유 시트를 닫은 경우 등은 무시
+      }
+    } finally {
+      setIsSharing(false);
     }
-  }, [displayTitle, review, watchedLabel]);
+  }, [displayTitle, posterUri, review, watchedLabel]);
 
   const handleOpenMovieDetail = useCallback(() => {
     if (!review?.tmdbId) {
@@ -525,13 +555,20 @@ function ReviewDetailScreen() {
                   />
                   <MenuLabel>수정</MenuLabel>
                 </MenuButton>
-                <MenuButton onPress={handleShare}>
-                  <MciIcon
-                    name="share-variant-outline"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                  <MenuLabel>공유</MenuLabel>
+                <MenuButton disabled={isSharing} onPress={handleShare}>
+                  {isSharing ? (
+                    <ActivityIndicator
+                      size="small"
+                      color={theme.colors.primary}
+                    />
+                  ) : (
+                    <MciIcon
+                      name="share-variant-outline"
+                      size={18}
+                      color={theme.colors.primary}
+                    />
+                  )}
+                  <MenuLabel>{isSharing ? '공유 중…' : '공유'}</MenuLabel>
                 </MenuButton>
                 <MenuButton $isLast $destructive onPress={handleDelete}>
                   <MciIcon
@@ -546,11 +583,34 @@ function ReviewDetailScreen() {
           </Modal>
         </>
       )}
+
+      {review ? (
+        <ShareCardHost pointerEvents="none">
+          <ReviewShareCard
+            ref={shareCardRef}
+            title={displayTitle}
+            subtitle={subtitleLine || undefined}
+            posterUri={posterUri ?? null}
+            rating={review.rating}
+            content={review.content}
+            watchedLabel={watchedLabel}
+            catalogRef={catalogRef}
+            onPosterLoad={handleSharePosterReady}
+          />
+        </ShareCardHost>
+      ) : null}
     </AppScreen>
   );
 }
 
 export default ReviewDetailScreen;
+
+const ShareCardHost = styled.View`
+  position: absolute;
+  top: -10000px;
+  left: 0;
+  opacity: 0;
+`;
 
 const Content = styled.View`
   padding: 14px ${H_PAD}px 0;

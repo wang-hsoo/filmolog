@@ -88,23 +88,23 @@ function StatisticsScreen() {
   const { rankings: castRankings, missingReviewCount: missingCastCount } =
     useMemo(() => buildCastRankings(reviews), [reviews]);
 
-  const {
-    topDirector,
-    topCast,
-    directorRecommendMovies,
-    castRecommendMovies,
-    isDirectorCreditsLoading,
-    isDirectorCreditsError,
-    isCastCreditsLoading,
-    isCastCreditsError,
-  } = useStatsPersonRecommendations(userId);
+  // const {
+  //   topDirector,
+  //   topCast,
+  //   directorRecommendMovies,
+  //   castRecommendMovies,
+  //   isDirectorCreditsLoading,
+  //   isDirectorCreditsError,
+  //   isCastCreditsLoading,
+  //   isCastCreditsError,
+  // } = useStatsPersonRecommendations(userId);
 
-  const handlePressRecommendMovie = useCallback(
-    (movie: TmdbMovie) => {
-      navigation.navigate('MovieDetail', { tmdbId: movie.id });
-    },
-    [navigation],
-  );
+  // const handlePressRecommendMovie = useCallback(
+  //   (movie: TmdbMovie) => {
+  //     navigation.navigate('MovieDetail', { tmdbId: movie.id });
+  //   },
+  //   [navigation],
+  // );
 
   const genreRatingStats = useMemo(
     () => buildGenreRatingStats(reviews, genreNameById),
@@ -381,20 +381,6 @@ function StatisticsScreen() {
                 ) : null}
               </ArchivePanel>
 
-              {topDirector ? (
-                <ExploreMovieShelf
-                  overline="FOR YOU"
-                  title={`${topDirector.name}의 다른 작품`}
-                  subtitle="아직 기록하지 않은 필모그래피."
-                  movies={directorRecommendMovies}
-                  isLoading={isDirectorCreditsLoading}
-                  isError={isDirectorCreditsError}
-                  hideWhenEmpty
-                  emptyMessage="아직 추천할 작품이 없습니다."
-                  onPressMovie={handlePressRecommendMovie}
-                />
-              ) : null}
-
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="CAST"
@@ -412,20 +398,6 @@ function StatisticsScreen() {
                   </GenreNote>
                 ) : null}
               </ArchivePanel>
-
-              {topCast ? (
-                <ExploreMovieShelf
-                  overline="FOR YOU"
-                  title={`${topCast.name} 출연작`}
-                  subtitle="아직 기록하지 않은 장면들."
-                  movies={castRecommendMovies}
-                  isLoading={isCastCreditsLoading}
-                  isError={isCastCreditsError}
-                  hideWhenEmpty
-                  emptyMessage="아직 추천할 작품이 없습니다."
-                  onPressMovie={handlePressRecommendMovie}
-                />
-              ) : null}
 
               <ArchivePanel accent>
                 <ArchiveSectionHeader

@@ -34,6 +34,7 @@ import { useMovieGridLayout } from '../../explore/hooks/useMovieGridLayout';
 import { useAuth } from '../../../lib/supabase/auth';
 import { useGetCollections } from '../../../lib/supabase/collection';
 import { useCreateReview } from '../../../lib/supabase/reviews';
+import { useGetUserReviewedMovies, useGetUserWishlist } from '../../../lib/supabase';
 import { useInfiniteSearchMovies, useMovieDetail } from '../../../lib/tmdb';
 import {
   extractDirectorSnapshots,
@@ -45,6 +46,7 @@ import { AppScreen, theme } from '../../../theme';
 
 import MovieInfoCard from './MovieInfoCard';
 import ReviewForm from './ReviewForm';
+import WishlistQuickRow from './WishlistQuickRow';
 import { startOfDay, toDateOnlyString } from '../utils/date';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -100,6 +102,12 @@ function FilmLogScreen() {
     useCreateReview();
   const { data: collections = [], isLoading: isCollectionsLoading } =
     useGetCollections(user?.id ?? '');
+  const {
+    data: wishlist = [],
+    isLoading: isWishlistLoading,
+    isError: isWishlistError,
+  } = useGetUserWishlist(user?.id ?? '');
+  const { data: reviewedMovies = [] } = useGetUserReviewedMovies(user?.id ?? '');
   const {
     data: movieDetail,
     isLoading: isDetailLoading,
@@ -195,6 +203,16 @@ function FilmLogScreen() {
   const searchResults = useMemo(
     () => searchPages?.pages.flatMap(page => page.results) ?? [],
     [searchPages],
+  );
+
+  const reviewedTmdbIds = useMemo(
+    () => new Set(reviewedMovies.map(review => review.tmdbId)),
+    [reviewedMovies],
+  );
+
+  const wishlistQuickItems = useMemo(
+    () => wishlist.filter(item => !reviewedTmdbIds.has(item.tmdbId)),
+    [reviewedTmdbIds, wishlist],
   );
 
   const handleSelectMovie = useCallback((movie: TmdbMovie) => {
@@ -325,7 +343,7 @@ function FilmLogScreen() {
 
       {phase === 'search' ? (
         <SearchContent>
-          <ArchiveSearchPanel>
+          <FilmLogSearchPanel>
             <SearchRow>
               <Icon
                 name="magnify"
@@ -342,7 +360,16 @@ function FilmLogScreen() {
                 autoFocus
               />
             </SearchRow>
-          </ArchiveSearchPanel>
+          </FilmLogSearchPanel>
+
+          {!isSearching ? (
+            <WishlistQuickRow
+              items={wishlistQuickItems}
+              isLoading={isWishlistLoading}
+              isError={isWishlistError}
+              onSelectMovie={handleSelectMovie}
+            />
+          ) : null}
 
           {isSearching ? (
             <ArchiveListFrame>
@@ -402,7 +429,7 @@ function FilmLogScreen() {
               />
             </ArchiveListFrame>
           ) : (
-            <HintPanel>
+            <HintPanel $compact={wishlistQuickItems.length > 0}>
               <ArchiveEmptyText>
                 영화 제목을 2자 이상 입력해 검색하세요.
               </ArchiveEmptyText>
@@ -491,7 +518,13 @@ export default FilmLogScreen;
 
 const SearchContent = styled.View`
   flex: 1;
+  gap: 12px;
   padding: 0 ${HORIZONTAL_PADDING}px;
+`;
+
+const FilmLogSearchPanel = styled(ArchiveSearchPanel)`
+  margin-left: 0;
+  margin-right: 0;
 `;
 
 const SearchRow = styled.View`
@@ -509,11 +542,11 @@ const ArchiveListFrame = styled.View`
   overflow: hidden;
 `;
 
-const HintPanel = styled.View`
+const HintPanel = styled.View<{ $compact?: boolean }>`
   flex: 1;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: ${({ $compact }) => ($compact ? '16px 0' : '40px 0')};
 `;
 
 const SearchState = styled.View`
