@@ -249,6 +249,15 @@ function ReviewDetailScreen() {
     }
   }, [displayTitle, review, watchedLabel]);
 
+  const handleOpenMovieDetail = useCallback(() => {
+    if (!review?.tmdbId) {
+      return;
+    }
+
+    setIsMenuOpen(false);
+    navigation.navigate('MovieDetail', { tmdbId: review.tmdbId });
+  }, [navigation, review?.tmdbId]);
+
   return (
     <AppScreen style={{ paddingTop: insets.top }}>
       <Header
@@ -300,7 +309,11 @@ function ReviewDetailScreen() {
                   </PosterFrame>
 
                   <MovieHeroInfo>
-                    <MovieTitle numberOfLines={3}>{displayTitle}</MovieTitle>
+                    <Pressable
+                      onPress={handleOpenMovieDetail}
+                      disabled={!review.tmdbId}>
+                      <MovieTitle numberOfLines={3}>{displayTitle}</MovieTitle>
+                    </Pressable>
                     {subtitleLine ? (
                       <MovieSubtitle numberOfLines={2}>
                         {subtitleLine}
@@ -496,6 +509,14 @@ function ReviewDetailScreen() {
             <MenuModalRoot>
               <MenuBackdrop onPress={() => setIsMenuOpen(false)} />
               <MenuSheet style={{ top: insets.top + 56, right: H_PAD }}>
+                <MenuButton onPress={handleOpenMovieDetail}>
+                  <MciIcon
+                    name="movie-open-outline"
+                    size={18}
+                    color={theme.colors.primary}
+                  />
+                  <MenuLabel>작품 정보</MenuLabel>
+                </MenuButton>
                 <MenuButton onPress={handleStartEdit}>
                   <MciIcon
                     name="pencil-outline"

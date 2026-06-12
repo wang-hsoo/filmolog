@@ -37,3 +37,8 @@ export {
   useTopRatedFromStats,
   type CommunityMovieRow,
 } from './explore';
+export {
+  getMovieCommunityStats,
+  useGetMovieCommunityStats,
+  type MovieCommunityStats,
+} from './movies';

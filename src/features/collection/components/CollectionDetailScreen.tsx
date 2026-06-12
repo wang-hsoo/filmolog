@@ -250,7 +250,10 @@ function CollectionDetailScreen() {
     (movie: CollectionMovieItem) => {
       if (movie.reviewId) {
         navigation.navigate('ReviewDetail', { reviewId: movie.reviewId });
+        return;
       }
+
+      navigation.navigate('MovieDetail', { tmdbId: movie.tmdbId });
     },
     [navigation],
   );

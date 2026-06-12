@@ -27,6 +27,9 @@ export const useCreateReview = () => {
       queryClient.invalidateQueries({
         queryKey: communityExploreKeys.all,
       });
+      queryClient.invalidateQueries({
+        queryKey: ['movieCommunityStats', variables.tmdbId],
+      });
     },
   });
 };
@@ -49,6 +52,7 @@ export const useUpdateReview = () => {
       queryClient.invalidateQueries({ queryKey: ['userReviewedMovies'] });
       queryClient.invalidateQueries({ queryKey: ['userStats'] });
       queryClient.invalidateQueries({ queryKey: ['collectionDetail'] });
+      queryClient.invalidateQueries({ queryKey: ['movieCommunityStats'] });
     },
   });
 };
@@ -62,6 +66,7 @@ export const useDeleteReview = () => {
       queryClient.invalidateQueries({ queryKey: ['userStats'] });
       queryClient.invalidateQueries({ queryKey: ['collectionDetail'] });
       queryClient.invalidateQueries({ queryKey: ['collectionList'] });
+      queryClient.invalidateQueries({ queryKey: ['movieCommunityStats'] });
     },
   });
 };

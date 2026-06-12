@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Pressable } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -35,6 +36,7 @@ type MovieRowItemProps = {
   width?: number;
   variant?: 'row' | 'grid';
   showRating?: boolean;
+  onPress?: () => void;
 };
 
 function MovieRowItem({
@@ -42,6 +44,7 @@ function MovieRowItem({
   width = DEFAULT_POSTER_WIDTH,
   variant = 'row',
   showRating = false,
+  onPress,
 }: MovieRowItemProps) {
   const posterUri = useMemo(
     () => getTmdbPosterUrl(movie.poster_path),
@@ -51,8 +54,8 @@ function MovieRowItem({
   const frameSize = width + POSTER_MAT * 2;
   const frameHeight = posterHeight + POSTER_MAT * 2;
 
-  return (
-    <Container $width={width} $variant={variant}>
+  const content = (
+    <>
       <PosterMat $width={frameSize} $height={frameHeight}>
         <PosterFrame $width={width} $height={posterHeight}>
           {posterUri ? (
@@ -77,6 +80,22 @@ function MovieRowItem({
           <RatingText>{movie.vote_average.toFixed(1)}</RatingText>
         </RatingRow>
       ) : null}
+    </>
+  );
+
+  if (onPress) {
+    return (
+      <Pressable onPress={onPress}>
+        <Container $width={width} $variant={variant}>
+          {content}
+        </Container>
+      </Pressable>
+    );
+  }
+
+  return (
+    <Container $width={width} $variant={variant}>
+      {content}
     </Container>
   );
 }

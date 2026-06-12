@@ -41,6 +41,29 @@ export function formatRuntime(minutes: number | null | undefined) {
   return `${hours}시간 ${mins}분`;
 }
 
+export function getGenres(detail: TmdbMovieDetail) {
+  return detail.genres.length > 0
+    ? detail.genres.map(genre => genre.name).join(', ')
+    : null;
+}
+
+export function formatReleaseDate(value: string) {
+  if (!value) {
+    return null;
+  }
+
+  const [year, month, day] = value.split('-');
+  if (!year) {
+    return null;
+  }
+
+  if (month && day) {
+    return `${year}.${month}.${day}`;
+  }
+
+  return year;
+}
+
 export function formatWatchedDateWithWeekday(dateStr: string | null) {
   if (!dateStr) {
     return null;

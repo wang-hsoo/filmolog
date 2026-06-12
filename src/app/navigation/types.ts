@@ -12,4 +12,5 @@ export type RootStackParamList = {
   CollectionAddMovies: { collectionId: string };
   FilmLog: undefined;
   ReviewDetail: { reviewId: string };
+  MovieDetail: { tmdbId: number };
 };

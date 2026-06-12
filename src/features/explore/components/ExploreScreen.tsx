@@ -1,10 +1,15 @@
-import { useFocusEffect } from '@react-navigation/native';
+import {
+  NavigationProp,
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
 import { LegendList } from '@legendapp/list/react-native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
+import { RootStackParamList } from '../../../app/navigation/types';
 import {
   ArchiveContent,
   ArchiveEmptyText,
@@ -29,6 +34,7 @@ import {
   useGetUserFavoriteGenres,
 } from '../../../lib/supabase';
 import { useDiscoverMovies, useInfiniteSearchMovies } from '../../../lib/tmdb';
+import type { TmdbMovie } from '../../../lib/tmdb/types';
 import { theme } from '../../../theme';
 import { useMovieGridLayout } from '../hooks/useMovieGridLayout';
 
@@ -38,6 +44,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 const HORIZONTAL_PADDING = 20;
 
 function ExploreScreen() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
   const [feedKey, setFeedKey] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -124,6 +131,13 @@ function ExploreScreen() {
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+  const handlePressMovie = useCallback(
+    (movie: TmdbMovie) => {
+      navigation.navigate('MovieDetail', { tmdbId: movie.id });
+    },
+    [navigation],
+  );
+
   const searchField = (
     <SearchRow>
       <Icon name="magnify" size={20} color={theme.colors.dashboardIcon} />
@@ -163,7 +177,9 @@ function ExploreScreen() {
             horizontal
             nestedScrollEnabled
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => <MovieRowItem movie={item} />}
+            renderItem={({ item }) => (
+              <MovieRowItem movie={item} onPress={() => handlePressMovie(item)} />
+            )}
             keyExtractor={item => String(item.id)}
             estimatedItemSize={122}
             style={{ height: MOVIE_ROW_ITEM_HEIGHT }}
@@ -180,6 +196,7 @@ function ExploreScreen() {
         isError={isTopRatedError}
         showRating
         hideWhenEmpty
+        onPressMovie={handlePressMovie}
       />
 
       {genreIds.length > 0 ? (
@@ -193,6 +210,7 @@ function ExploreScreen() {
           showRating
           emptyMessage="장르 데이터가 쌓이면 추천이 표시됩니다. 리뷰를 작성해주세요."
           hideWhenEmpty
+          onPressMovie={handlePressMovie}
         />
       ) : null}
 
@@ -204,6 +222,7 @@ function ExploreScreen() {
         isLoading={isMostReviewedLoading}
         isError={isMostReviewedError}
         hideWhenEmpty
+        onPressMovie={handlePressMovie}
       />
 
       <ExploreMovieShelf
@@ -214,6 +233,7 @@ function ExploreScreen() {
         isLoading={isMostCollectedLoading}
         isError={isMostCollectedError}
         hideWhenEmpty
+        onPressMovie={handlePressMovie}
       />
     </ArchiveContent>
   );
@@ -276,6 +296,7 @@ function ExploreScreen() {
                   movie={item}
                   width={gridLayout.itemWidth}
                   variant="grid"
+                  onPress={() => handlePressMovie(item)}
                 />
               )}
               keyExtractor={item => String(item.id)}

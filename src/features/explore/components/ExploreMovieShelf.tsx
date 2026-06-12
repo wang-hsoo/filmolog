@@ -22,6 +22,7 @@ type ExploreMovieShelfProps = {
   showRating?: boolean;
   emptyMessage?: string;
   hideWhenEmpty?: boolean;
+  onPressMovie?: (movie: TmdbMovie) => void;
 };
 
 function ExploreMovieShelf({
@@ -34,6 +35,7 @@ function ExploreMovieShelf({
   showRating = false,
   emptyMessage = '아직 표시할 작품이 없습니다.',
   hideWhenEmpty = false,
+  onPressMovie,
 }: ExploreMovieShelfProps) {
   const isInitialLoading = isLoading && movies.length === 0;
 
@@ -68,7 +70,11 @@ function ExploreMovieShelf({
           nestedScrollEnabled
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <MovieRowItem movie={item} showRating={showRating} />
+            <MovieRowItem
+              movie={item}
+              showRating={showRating}
+              onPress={onPressMovie ? () => onPressMovie(item) : undefined}
+            />
           )}
           keyExtractor={item => String(item.id)}
           estimatedItemSize={122}
