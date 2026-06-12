@@ -5,6 +5,7 @@ export {
   getCurrentUserWithProfile,
   getUserProfile,
   useAuth,
+  signOutFromApp,
 } from './auth';
 export {
   fetchUserProfile,
@@ -19,6 +20,8 @@ export {
   getUserFavoriteGenres,
   useGetUserFavoriteGenres,
   useGetUserReviewedMovies,
+  DeleteAccountError,
+  deleteUserAccount,
 } from './users';
 
 export {
@@ -45,5 +48,7 @@ export {
 export {
   useIsInWishlist,
   useToggleWishlist,
+  useGetUserWishlist,
   wishlistKeys,
 } from './wishlist';
+export { badgeKeys, useGetUserBadges } from './badges';

@@ -149,6 +149,10 @@ function MovieDetailScreen() {
     }
   }, [isInWishlist, tmdbId, toggleWishlist, user?.id, wishlistMovieInput]);
 
+  const handleWriteReview = useCallback(() => {
+    navigation.navigate('FilmLog', { tmdbId });
+  }, [navigation, tmdbId]);
+
   const isWishlistBusy = isWishlistLoading || isWishlistPending;
 
   return (
@@ -327,36 +331,47 @@ function MovieDetailScreen() {
         </ScrollView>
 
           <ActionBar style={{ paddingBottom: insets.bottom + 12 }}>
-            <WishlistButton
-              onPress={handleToggleWishlist}
-              disabled={isWishlistBusy}
-              $active={isInWishlist}>
-              {isWishlistBusy ? (
-                <ActivityIndicator
-                  color={
-                    isInWishlist
-                      ? theme.colors.appBackground
-                      : theme.colors.primary
-                  }
-                  size="small"
+            <ActionRow>
+              <ReviewButton onPress={handleWriteReview}>
+                <MciIcon
+                  name="notebook-edit-outline"
+                  size={18}
+                  color={theme.colors.appBackground}
                 />
-              ) : (
-                <>
-                  <MciIcon
-                    name={isInWishlist ? 'bookmark' : 'bookmark-outline'}
-                    size={18}
+                <ReviewLabel>리뷰 작성</ReviewLabel>
+              </ReviewButton>
+
+              <WishlistButton
+                onPress={handleToggleWishlist}
+                disabled={isWishlistBusy}
+                $active={isInWishlist}>
+                {isWishlistBusy ? (
+                  <ActivityIndicator
                     color={
                       isInWishlist
                         ? theme.colors.appBackground
                         : theme.colors.primary
                     }
+                    size="small"
                   />
-                  <WishlistLabel $active={isInWishlist}>
-                    {isInWishlist ? '위시리스트에서 제거' : '위시리스트에 담기'}
-                  </WishlistLabel>
-                </>
-              )}
-            </WishlistButton>
+                ) : (
+                  <>
+                    <MciIcon
+                      name={isInWishlist ? 'bookmark' : 'bookmark-outline'}
+                      size={18}
+                      color={
+                        isInWishlist
+                          ? theme.colors.appBackground
+                          : theme.colors.primary
+                      }
+                    />
+                    <WishlistLabel $active={isInWishlist}>
+                      {isInWishlist ? '제거' : '담기'}
+                    </WishlistLabel>
+                  </>
+                )}
+              </WishlistButton>
+            </ActionRow>
           </ActionBar>
         </>
       )}
@@ -573,7 +588,33 @@ const ActionBar = styled.View`
   left: ${H_PAD}px;
 `;
 
+const ActionRow = styled.View`
+  flex-direction: row;
+  gap: 10px;
+`;
+
+const ReviewButton = styled(Pressable)`
+  flex: 1;
+  min-height: 50px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: ${({ theme }) => theme.radii.panel}px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.goldSoft};
+  background-color: ${({ theme }) => theme.colors.primary};
+`;
+
+const ReviewLabel = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.bodySemiBold};
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: ${({ theme }) => theme.colors.appBackground};
+`;
+
 const WishlistButton = styled(Pressable)<{ $active: boolean }>`
+  flex: 1;
   min-height: 50px;
   flex-direction: row;
   align-items: center;

@@ -1,6 +1,11 @@
 import { LegendList } from '@legendapp/list/react-native';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -27,7 +32,7 @@ import { useAuth } from '../../../lib/supabase/auth';
 import { useGetCollections } from '../../../lib/supabase/collection';
 import { useCreateReview } from '../../../lib/supabase/reviews';
 import { useInfiniteSearchMovies, useMovieDetail } from '../../../lib/tmdb';
-import type { TmdbMovie } from '../../../lib/tmdb/types';
+import type { TmdbMovie, TmdbMovieDetail } from '../../../lib/tmdb/types';
 import { AppScreen, theme } from '../../../theme';
 
 import MovieInfoCard from './MovieInfoCard';
@@ -37,10 +42,32 @@ import { startOfDay, toDateOnlyString } from '../utils/date';
 const SEARCH_DEBOUNCE_MS = 300;
 const HORIZONTAL_PADDING = 20;
 
+type FilmLogRoute = RouteProp<RootStackParamList, 'FilmLog'>;
+
+function toTmdbMovieFromDetail(detail: TmdbMovieDetail): TmdbMovie {
+  return {
+    id: detail.id,
+    title: detail.title,
+    original_title: detail.original_title,
+    overview: detail.overview,
+    poster_path: detail.poster_path,
+    backdrop_path: null,
+    release_date: detail.release_date,
+    vote_average: 0,
+    vote_count: 0,
+    popularity: 0,
+    genre_ids: detail.genres.map(genre => genre.id),
+    original_language: '',
+  };
+}
+
 function FilmLogScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const route = useRoute<FilmLogRoute>();
+  const initialTmdbId = route.params?.tmdbId;
   const { user } = useAuth();
+  const hasAppliedInitialMovie = useRef(false);
 
   const [phase, setPhase] = useState<'search' | 'review'>('search');
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,6 +90,7 @@ function FilmLogScreen() {
     isLoading: isDetailLoading,
     isError: isDetailError,
   } = useMovieDetail(selectedMovie?.id ?? null);
+  const { data: initialMovieDetail } = useMovieDetail(initialTmdbId ?? null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -96,6 +124,19 @@ function FilmLogScreen() {
     setSelectedCollectionIds([]);
     setPhase('review');
   }, []);
+
+  useEffect(() => {
+    if (
+      hasAppliedInitialMovie.current ||
+      !initialTmdbId ||
+      !initialMovieDetail
+    ) {
+      return;
+    }
+
+    hasAppliedInitialMovie.current = true;
+    handleSelectMovie(toTmdbMovieFromDetail(initialMovieDetail));
+  }, [handleSelectMovie, initialMovieDetail, initialTmdbId]);
 
   const handleBackToSearch = useCallback(() => {
     setPhase('search');

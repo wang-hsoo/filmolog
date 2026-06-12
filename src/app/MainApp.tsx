@@ -8,6 +8,8 @@ import { useTheme } from 'styled-components/native';
 import { BadgeUnlockProvider } from '../features/badges';
 import { useAuth } from '../lib/supabase/auth';
 import { navigationTheme } from '../theme';
+import { AuthNavigationSync } from './navigation/AuthNavigationSync';
+import { rootNavigationRef } from './navigation/navigationRef';
 import RootNavigator from './navigation/RootNavigator';
 import { queryClient } from '../lib/queryClient';
 
@@ -17,7 +19,8 @@ function MainAppContent() {
 
   return (
     <BadgeUnlockProvider userId={user?.id ?? null}>
-      <NavigationContainer theme={navigationTheme}>
+      <NavigationContainer ref={rootNavigationRef} theme={navigationTheme}>
+        <AuthNavigationSync />
         <StatusBar
           barStyle={'light-content'}
           backgroundColor={theme.colors.appBackground}

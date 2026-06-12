@@ -26,6 +26,11 @@ import { FilmLogScreen } from '../../features/filmLog';
 import { MovieDetailScreen } from '../../features/movie';
 import ReviewDetailScreen from '../../features/review/components/ReviewDetailScreen';
 import ReviewLogListScreen from '../../features/review/components/ReviewLogListScreen';
+import ProfileEditScreen from '../../features/profile/components/ProfileEditScreen';
+import GenreEditScreen from '../../features/profile/components/GenreEditScreen';
+import SettingsScreen from '../../features/profile/components/SettingsScreen';
+import WishlistListScreen from '../../features/wishlist/components/WishlistListScreen';
+import BadgeListScreen from '../../features/badges/components/BadgeListScreen';
 
 export type { OnboardingStackParamList, RootStackParamList } from './types';
 
@@ -79,16 +84,15 @@ function RootShell() {
     return <LoginScreen />;
   }
 
-  return (
-    <ProfileProvider userId={user.id}>
-      <AuthenticatedScreens />
-    </ProfileProvider>
-  );
+  return <AuthenticatedScreens />;
 }
 
 function RootNavigator() {
-  return (
+  const { user, isLoading: isAuthLoading } = useAuth();
+
+  const stack = (
     <RootStack.Navigator
+      key={user?.id ?? 'guest'}
       screenOptions={{
         headerShown: false,
         animation: 'none',
@@ -109,8 +113,23 @@ function RootNavigator() {
       <RootStack.Screen name="ReviewDetail" component={ReviewDetailScreen} />
       <RootStack.Screen name="ReviewLogList" component={ReviewLogListScreen} />
       <RootStack.Screen name="MovieDetail" component={MovieDetailScreen} />
+      <RootStack.Screen name="Settings" component={SettingsScreen} />
+      <RootStack.Screen name="ProfileEdit" component={ProfileEditScreen} />
+      <RootStack.Screen name="GenreEdit" component={GenreEditScreen} />
+      <RootStack.Screen name="WishlistList" component={WishlistListScreen} />
+      <RootStack.Screen name="BadgeList" component={BadgeListScreen} />
     </RootStack.Navigator>
   );
+
+  if (isAuthLoading) {
+    return <BootstrapLoader />;
+  }
+
+  if (!user) {
+    return stack;
+  }
+
+  return <ProfileProvider userId={user.id}>{stack}</ProfileProvider>;
 }
 
 const styles = StyleSheet.create({

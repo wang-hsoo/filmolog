@@ -6,17 +6,17 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 
-import { env } from '../../../config/env';
+import {
+  configureGoogleSignIn,
+  prepareGoogleAccountPicker,
+} from '../../../lib/google/googleAuth';
 import { getSupabaseClient } from '../../../lib/supabase';
 
 export function useLogin() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    GoogleSignin.configure({
-      webClientId: env.googleClientId,
-      offlineAccess: true,
-    });
+    configureGoogleSignIn();
   }, []);
 
   const loginWithGoogle = useCallback(async () => {
@@ -27,6 +27,7 @@ export function useLogin() {
     setIsLoading(true);
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      await prepareGoogleAccountPicker();
 
       const googleResponse = await GoogleSignin.signIn();
       if (!isSuccessResponse(googleResponse)) {

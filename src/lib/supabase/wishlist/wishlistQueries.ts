@@ -4,6 +4,7 @@ import { queryClient } from '../../queryClient';
 
 import {
   addToWishlist,
+  getUserWishlist,
   isMovieInWishlist,
   removeFromWishlist,
   type WishlistMovieInput,
@@ -13,7 +14,16 @@ export const wishlistKeys = {
   all: ['wishlist'] as const,
   status: (userId: string, tmdbId: number) =>
     [...wishlistKeys.all, 'status', userId, tmdbId] as const,
+  list: (userId: string) => [...wishlistKeys.all, 'list', userId] as const,
 };
+
+export function useGetUserWishlist(userId: string) {
+  return useQuery({
+    queryKey: wishlistKeys.list(userId),
+    queryFn: () => getUserWishlist(userId),
+    enabled: !!userId,
+  });
+}
 
 export function useIsInWishlist(userId: string, tmdbId: number) {
   return useQuery({
@@ -51,6 +61,9 @@ export function useToggleWishlist() {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: wishlistKeys.status(variables.userId, variables.tmdbId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: wishlistKeys.list(variables.userId),
       });
       queryClient.invalidateQueries({
         queryKey: ['userStats', variables.userId],
