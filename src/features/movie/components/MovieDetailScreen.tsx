@@ -5,7 +5,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { useCallback, useMemo } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MciIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -39,6 +39,7 @@ import {
   getGenres,
   getReleaseYear,
 } from '../../../lib/tmdb/movieMeta';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
 type MovieDetailRoute = RouteProp<RootStackParamList, 'MovieDetail'>;
@@ -142,7 +143,7 @@ function MovieDetailScreen() {
         movie: wishlistMovieInput,
       });
     } catch {
-      Alert.alert(
+      archiveAlert(
         '저장 실패',
         '위시리스트를 업데이트하지 못했습니다. 잠시 후 다시 시도해주세요.',
       );

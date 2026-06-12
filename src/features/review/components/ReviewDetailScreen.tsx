@@ -7,7 +7,6 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Modal,
   Pressable,
   ScrollView,
@@ -50,6 +49,7 @@ import {
   getReleaseYear,
 } from '../../../lib/tmdb/movieMeta';
 import { useMovieDetail } from '../../../lib/tmdb';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
 type ReviewDetailRoute = RouteProp<RootStackParamList, 'ReviewDetail'>;
@@ -174,7 +174,7 @@ function ReviewDetailScreen() {
     }
 
     if (rating === 0) {
-      Alert.alert('입력 확인', '평점을 선택해주세요.');
+      archiveAlert('입력 확인', '평점을 선택해주세요.');
       return;
     }
 
@@ -187,7 +187,7 @@ function ReviewDetailScreen() {
       });
       setIsEditing(false);
     } catch {
-      Alert.alert(
+      archiveAlert(
         '저장 실패',
         '기록을 수정하지 못했습니다. 잠시 후 다시 시도해주세요.',
       );
@@ -201,7 +201,7 @@ function ReviewDetailScreen() {
 
     setIsMenuOpen(false);
 
-    Alert.alert(
+    archiveAlert(
       '기록 삭제',
       `"${review.title}" 기록을 삭제할까요?`,
       [
@@ -214,7 +214,7 @@ function ReviewDetailScreen() {
               await deleteReview(review.reviewId);
               navigation.goBack();
             } catch {
-              Alert.alert(
+              archiveAlert(
                 '삭제 실패',
                 '기록을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.',
               );

@@ -7,7 +7,6 @@ import {
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Modal,
   Pressable,
@@ -32,6 +31,7 @@ import {
   type CollectionMovieItem,
 } from '../../../lib/supabase/collection';
 import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
 const H_PAD = 20;
@@ -270,7 +270,7 @@ function CollectionDetailScreen() {
       });
       setActionMovie(null);
     } catch {
-      Alert.alert(
+      archiveAlert(
         '삭제 실패',
         '영화를 컬렉션에서 제거하지 못했습니다. 잠시 후 다시 시도해주세요.',
       );

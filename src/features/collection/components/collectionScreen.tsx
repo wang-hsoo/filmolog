@@ -3,7 +3,6 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -34,6 +33,7 @@ import {
   type UserReviewedMovie,
 } from '../../../lib/supabase/users';
 import type { TmdbMovie } from '../../../lib/tmdb/types';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
 function toDisplayMovie(item: UserReviewedMovie): TmdbMovie {
@@ -92,7 +92,7 @@ function CollectionScreen() {
       return;
     }
     if (!trimmedName) {
-      Alert.alert('입력 확인', '컬렉션 이름을 입력해주세요.');
+      archiveAlert('입력 확인', '컬렉션 이름을 입력해주세요.');
       return;
     }
 
@@ -117,7 +117,7 @@ function CollectionScreen() {
 
       navigation.goBack();
     } catch {
-      Alert.alert(
+      archiveAlert(
         '생성 실패',
         '컬렉션을 만들지 못했습니다. 잠시 후 다시 시도해주세요.',
       );

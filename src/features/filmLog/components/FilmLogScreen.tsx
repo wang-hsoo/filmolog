@@ -8,7 +8,6 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   View,
@@ -33,6 +32,7 @@ import { useGetCollections } from '../../../lib/supabase/collection';
 import { useCreateReview } from '../../../lib/supabase/reviews';
 import { useInfiniteSearchMovies, useMovieDetail } from '../../../lib/tmdb';
 import type { TmdbMovie, TmdbMovieDetail } from '../../../lib/tmdb/types';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
 import MovieInfoCard from './MovieInfoCard';
@@ -166,7 +166,7 @@ function FilmLogScreen() {
       return;
     }
     if (rating === 0) {
-      Alert.alert('입력 확인', '평점을 선택해주세요.');
+      archiveAlert('입력 확인', '평점을 선택해주세요.');
       return;
     }
 
@@ -205,11 +205,11 @@ function FilmLogScreen() {
           : '';
 
       if (code === '23505') {
-        Alert.alert('이미 기록됨', '이미 리뷰를 작성한 영화입니다.');
+        archiveAlert('이미 기록됨', '이미 리뷰를 작성한 영화입니다.');
         return;
       }
 
-      Alert.alert(
+      archiveAlert(
         '저장 실패',
         '영화 기록을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.',
       );

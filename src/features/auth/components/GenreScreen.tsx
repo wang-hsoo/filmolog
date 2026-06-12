@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { ActivityIndicator, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 import { useProfileContext } from '../../../lib/supabase';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 import { AnimatedEnter } from './AnimatedEnter';
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -44,7 +45,7 @@ function GenreScreen() {
     try {
       await completeOnboarding(selectedIds);
     } catch {
-      Alert.alert(
+      archiveAlert(
         '저장 실패',
         '선호 장르 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
       );

@@ -6,7 +6,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable } from 'react-native';
+import { ActivityIndicator, Pressable } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -31,6 +31,7 @@ import {
   type UserReviewedMovie,
 } from '../../../lib/supabase/users';
 import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
 type AddMoviesRoute = RouteProp<RootStackParamList, 'CollectionAddMovies'>;
@@ -181,7 +182,7 @@ function CollectionAddMoviesScreen() {
 
   const handleSubmit = useCallback(async () => {
     if (selectedMovieIds.length === 0) {
-      Alert.alert('선택 확인', '추가할 영화를 선택해주세요.');
+      archiveAlert('선택 확인', '추가할 영화를 선택해주세요.');
       return;
     }
 
@@ -207,7 +208,7 @@ function CollectionAddMoviesScreen() {
 
       navigation.goBack();
     } catch {
-      Alert.alert(
+      archiveAlert(
         '추가 실패',
         '영화를 컬렉션에 담지 못했습니다. 잠시 후 다시 시도해주세요.',
       );

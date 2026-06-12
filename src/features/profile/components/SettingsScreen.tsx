@@ -1,6 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -14,6 +14,7 @@ import {
   signOutFromApp,
   useAuth,
 } from '../../../lib/supabase';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
 const APP_VERSION = '0.0.1';
@@ -25,7 +26,7 @@ function SettingsScreen() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert('로그아웃', '정말 로그아웃하시겠습니까?', [
+    archiveAlert('로그아웃', '정말 로그아웃하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       {
         text: '로그아웃',
@@ -35,7 +36,7 @@ function SettingsScreen() {
 
           void signOutFromApp().catch(error => {
             console.error('[SettingsScreen] signOut failed', error);
-            Alert.alert('로그아웃 실패', '잠시 후 다시 시도해주세요.');
+            archiveAlert('로그아웃 실패', '잠시 후 다시 시도해주세요.');
           });
         },
       },
@@ -47,7 +48,7 @@ function SettingsScreen() {
       return;
     }
 
-    Alert.alert(
+    archiveAlert(
       '회원 탈퇴',
       '탈퇴 시 작성한 리뷰, 컬렉션, 위시리스트 등 모든 기록이 삭제되며 복구할 수 없습니다.',
       [
@@ -68,7 +69,7 @@ function SettingsScreen() {
                     ? error.message
                     : '회원 탈퇴 처리에 실패했습니다. 잠시 후 다시 시도해주세요.';
 
-                Alert.alert('탈퇴 실패', message);
+                archiveAlert('탈퇴 실패', message);
               })
               .finally(() => {
                 setIsDeleting(false);

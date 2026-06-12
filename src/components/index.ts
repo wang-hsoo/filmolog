@@ -18,4 +18,5 @@ export {
 } from './ui/movieRowItem';
 export { default as Header } from './ui/Header/Header';
 export type { HeaderProps } from './ui/Header/Header';
+export { ArchiveDialogProvider } from './ui/archiveDialog';
 export * from './constants';

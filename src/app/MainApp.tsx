@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useTheme } from 'styled-components/native';
 
+import { ArchiveDialogProvider } from '../components';
 import { BadgeUnlockProvider } from '../features/badges';
 import { useAuth } from '../lib/supabase/auth';
 import { navigationTheme } from '../theme';
@@ -19,14 +20,16 @@ function MainAppContent() {
 
   return (
     <BadgeUnlockProvider userId={user?.id ?? null}>
-      <NavigationContainer ref={rootNavigationRef} theme={navigationTheme}>
-        <AuthNavigationSync />
-        <StatusBar
-          barStyle={'light-content'}
-          backgroundColor={theme.colors.appBackground}
-        />
-        <RootNavigator />
-      </NavigationContainer>
+      <ArchiveDialogProvider>
+        <NavigationContainer ref={rootNavigationRef} theme={navigationTheme}>
+          <AuthNavigationSync />
+          <StatusBar
+            barStyle={'light-content'}
+            backgroundColor={theme.colors.appBackground}
+          />
+          <RootNavigator />
+        </NavigationContainer>
+      </ArchiveDialogProvider>
     </BadgeUnlockProvider>
   );
 }

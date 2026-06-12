@@ -2,7 +2,6 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   ScrollView,
   TextInput,
 } from 'react-native';
@@ -13,6 +12,7 @@ import { RootStackParamList } from '../../../app/navigation/types';
 import { ArchiveSectionHeader, Header } from '../../../components';
 import { useProfileContext } from '../../../lib/supabase';
 import { useGetGenres } from '../../../lib/tmdb';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 import { useOnboarding } from '../../auth/hooks/useOnboarding';
 
@@ -74,7 +74,7 @@ function ProfileEditScreen() {
 
       navigation.goBack();
     } catch {
-      Alert.alert(
+      archiveAlert(
         '저장 실패',
         '프로필 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
       );

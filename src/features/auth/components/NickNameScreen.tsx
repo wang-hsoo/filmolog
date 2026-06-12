@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -12,6 +11,7 @@ import styled from 'styled-components/native';
 
 import { useOnboarding } from '../hooks/useOnboarding';
 import { useAuth, useProfileContext } from '../../../lib/supabase';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 import { AnimatedEnter } from './AnimatedEnter';
 
@@ -41,7 +41,7 @@ function NickNameScreen({ onNicknameSaved }: NickNameScreenProps) {
     try {
       await saveNickname(trimmed);
     } catch {
-      Alert.alert(
+      archiveAlert(
         '저장 실패',
         '닉네임 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
       );
