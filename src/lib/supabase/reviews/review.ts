@@ -1,5 +1,6 @@
 import { addCollectionMovie } from '../collection/collection';
 import { getSupabaseClient } from '../client';
+import { i18n } from '../../../i18n';
 import { refreshMovieStats } from '../explore/communityExplore';
 import type { MoviePersonSnapshot } from '../../tmdb/creditsSnapshot';
 import type { UserReviewedMovie } from '../users/movie';
@@ -108,7 +109,7 @@ function mapReviewRow(review: ReviewWithMovieRow): UserReviewedMovie {
     content: review.content,
     watchedDate: review.watched_date,
     createdAt: review.created_at,
-    title: movie?.title ?? `영화 #${review.tmdb_id}`,
+    title: movie?.title ?? i18n.t('common.movieMeta.fallbackMovieTitle', { id: review.tmdb_id }),
     posterPath: movie?.posterPath ?? null,
     genreIds: movie?.genreIds ?? [],
     releaseYear: movie?.releaseYear ?? null,

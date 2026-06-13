@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
@@ -20,6 +21,7 @@ type NickNameScreenProps = {
 };
 
 function NickNameScreen({ onNicknameSaved }: NickNameScreenProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { profile } = useProfileContext();
@@ -42,8 +44,8 @@ function NickNameScreen({ onNicknameSaved }: NickNameScreenProps) {
       await saveNickname(trimmed);
     } catch {
       archiveAlert(
-        '저장 실패',
-        '닉네임 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.saveFailed.generic'),
+        t('errors.saveFailed.nickname'),
       );
     }
   };
@@ -64,18 +66,18 @@ function NickNameScreen({ onNicknameSaved }: NickNameScreenProps) {
       <Container>
         {displayName ? (
           <AnimatedEnter delay={80}>
-            <Greeting>{displayName}님, 환영해요.</Greeting>
+            <Greeting>{t('auth.nickname.greeting', { name: displayName })}</Greeting>
           </AnimatedEnter>
         ) : null}
 
         <AnimatedEnter delay={displayName ? 180 : 80}>
-          <Title>닉네임을 설정해주세요.</Title>
+          <Title>{t('auth.nickname.title')}</Title>
         </AnimatedEnter>
 
         <AnimatedEnter delay={displayName ? 280 : 180}>
           <TextInput
             style={styles.input}
-            placeholder="닉네임을 입력해주세요"
+            placeholder={t('auth.nickname.placeholder')}
             placeholderTextColor={theme.colors.defaultText}
             value={nickname}
             onChangeText={setNickname}
@@ -93,7 +95,7 @@ function NickNameScreen({ onNicknameSaved }: NickNameScreenProps) {
             onPress={handleSubmit}
             disabled={!nickname.trim() || isSaving}>
             <Text style={styles.submitText}>
-              {isSaving ? '저장 중...' : '다음'}
+              {isSaving ? t('common.actions.saving') : t('common.actions.next')}
             </Text>
           </TouchableOpacity>
         </AnimatedEnter>

@@ -1,5 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import styled from 'styled-components/native';
@@ -11,6 +12,7 @@ import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
 import { AppScreen, theme } from '../../../theme';
 
 function WishlistListScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
@@ -34,10 +36,10 @@ function WishlistListScreen() {
             </LoaderWrap>
           ) : isError ? (
             <ArchiveEmptyText>
-              위시리스트를 불러오지 못했습니다.
+              {t('profile.wishlist.loadFailed')}
             </ArchiveEmptyText>
           ) : items.length === 0 ? (
-            <ArchiveEmptyText>담아둔 영화가 없습니다.</ArchiveEmptyText>
+            <ArchiveEmptyText>{t('profile.wishlist.empty')}</ArchiveEmptyText>
           ) : (
             items.map(item => (
               <MovieRow

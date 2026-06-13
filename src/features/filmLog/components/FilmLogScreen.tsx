@@ -16,6 +16,7 @@ import {
   ScrollView,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -79,6 +80,7 @@ function toTmdbMovieFromDetail(detail: TmdbMovieDetail): TmdbMovie {
 }
 
 function FilmLogScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const route = useRoute<FilmLogRoute>();
@@ -280,7 +282,10 @@ function FilmLogScreen() {
       return;
     }
     if (rating === 0) {
-      archiveAlert('입력 확인', '평점을 선택해주세요.');
+      archiveAlert(
+        t('dialogs.validation.title'),
+        t('errors.validation.selectRating'),
+      );
       return;
     }
 
@@ -333,13 +338,16 @@ function FilmLogScreen() {
           : '';
 
       if (code === '23505') {
-        archiveAlert('이미 기록됨', '이미 리뷰를 작성한 영화입니다.');
+        archiveAlert(
+          t('errors.duplicateReview.title'),
+          t('errors.duplicateReview.message'),
+        );
         return;
       }
 
       archiveAlert(
-        '저장 실패',
-        '영화 기록을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.saveFailed.generic'),
+        t('errors.saveFailed.reviewCreate'),
       );
     }
   }, [
@@ -351,6 +359,7 @@ function FilmLogScreen() {
     reviewedMovies.length,
     selectedCollectionIds,
     selectedMovie,
+    t,
     user?.id,
     watchedDate,
   ]);
@@ -375,7 +384,7 @@ function FilmLogScreen() {
               <ArchiveSearchInput
                 value={searchQuery}
                 onChangeText={setSearchQuery}
-                placeholder="기록할 영화를 검색하세요"
+                placeholder={t('filmLog.search.placeholder')}
                 placeholderTextColor={theme.colors.placeholderText}
                 returnKeyType="search"
                 autoCorrect={false}
@@ -415,8 +424,10 @@ function FilmLogScreen() {
                   <View style={{ marginBottom: 14 }}>
                     <ArchiveSectionHeader
                       overline="SEARCH"
-                      title="영화 검색"
-                      subtitle={`"${debouncedQuery.trim()}" 결과`}
+                      title={t('filmLog.search.title')}
+                      subtitle={t('common.archive.searchResultsFor', {
+                        query: debouncedQuery.trim(),
+                      })}
                     />
                   </View>
                 }
@@ -427,10 +438,12 @@ function FilmLogScreen() {
                     </SearchState>
                   ) : isSearchError ? (
                     <ArchiveEmptyText>
-                      검색 결과를 불러오지 못했습니다.
+                      {t('filmLog.search.loadFailed')}
                     </ArchiveEmptyText>
                   ) : (
-                    <ArchiveEmptyText>검색 결과가 없습니다.</ArchiveEmptyText>
+                    <ArchiveEmptyText>
+                      {t('filmLog.search.noResults')}
+                    </ArchiveEmptyText>
                   )
                 }
                 ListFooterComponent={
@@ -465,9 +478,7 @@ function FilmLogScreen() {
             </ArchiveListFrame>
           ) : (
             <HintPanel $compact={wishlistQuickItems.length > 0}>
-              <ArchiveEmptyText>
-                영화 제목을 2자 이상 입력해 검색하세요.
-              </ArchiveEmptyText>
+              <ArchiveEmptyText>{t('filmLog.search.hint')}</ArchiveEmptyText>
             </HintPanel>
           )}
         </SearchContent>
@@ -494,8 +505,8 @@ function FilmLogScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="SELECTED"
-                  title="기본 정보"
-                  subtitle="선택한 작품의 정보를 확인하세요."
+                  title={t('filmLog.selected.title')}
+                  subtitle={t('filmLog.selected.subtitle')}
                 />
 
                 {isDetailLoading ? (
@@ -504,14 +515,16 @@ function FilmLogScreen() {
                   </DetailState>
                 ) : isDetailError || !movieDetail ? (
                   <ArchiveEmptyText>
-                    영화 정보를 불러오지 못했습니다.
+                    {t('filmLog.selected.loadFailed')}
                   </ArchiveEmptyText>
                 ) : (
                   <MovieInfoCard detail={movieDetail} />
                 )}
 
                 <ChangeMovieButton onPress={handleBackToSearch}>
-                  <ChangeMovieLabel>다른 영화 선택</ChangeMovieLabel>
+                  <ChangeMovieLabel>
+                    {t('filmLog.selected.changeMovie')}
+                  </ChangeMovieLabel>
                 </ChangeMovieButton>
               </ArchivePanel>
 
@@ -538,7 +551,7 @@ function FilmLogScreen() {
                 {isSubmitting ? (
                   <ActivityIndicator color={theme.colors.appBackground} />
                 ) : (
-                  <SubmitLabel>기록 저장</SubmitLabel>
+                  <SubmitLabel>{t('filmLog.form.submit')}</SubmitLabel>
                 )}
               </SubmitButton>
             </ReviewContent>

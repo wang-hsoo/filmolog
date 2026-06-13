@@ -1,7 +1,9 @@
 import FastImage from 'react-native-fast-image';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/native';
 
 import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
+import { formatRuntimeLocalized } from '../../../i18n/labels';
 import type { TmdbMovieDetail } from '../../../lib/tmdb/types';
 
 const POSTER_WIDTH = 96;
@@ -52,26 +54,8 @@ function getGenres(detail: TmdbMovieDetail) {
     : '-';
 }
 
-function formatRuntime(minutes: number | null | undefined) {
-  if (!minutes || minutes <= 0) {
-    return '-';
-  }
-
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-
-  if (hours === 0) {
-    return `${mins}분`;
-  }
-
-  if (mins === 0) {
-    return `${hours}시간`;
-  }
-
-  return `${hours}시간 ${mins}분`;
-}
-
 function MovieInfoCard({ detail }: MovieInfoCardProps) {
+  const { t } = useTranslation();
   const posterUri = getTmdbPosterUrl(detail.poster_path);
   const posterHeight = POSTER_WIDTH * POSTER_ASPECT_RATIO;
   const frameWidth = POSTER_WIDTH + POSTER_MAT * 2;
@@ -97,23 +81,25 @@ function MovieInfoCard({ detail }: MovieInfoCardProps) {
 
         <MetaList>
           <MetaRow>
-            <MetaLabel>출시일</MetaLabel>
+            <MetaLabel>{t('common.movieMeta.releaseDate')}</MetaLabel>
             <MetaValue>{formatReleaseDate(detail.release_date)}</MetaValue>
           </MetaRow>
           <MetaRow>
-            <MetaLabel>러닝타임</MetaLabel>
-            <MetaValue>{formatRuntime(detail.runtime)}</MetaValue>
+            <MetaLabel>{t('common.movieMeta.runtime')}</MetaLabel>
+            <MetaValue>
+              {formatRuntimeLocalized(t, detail.runtime) ?? '-'}
+            </MetaValue>
           </MetaRow>
           <MetaRow>
-            <MetaLabel>장르</MetaLabel>
+            <MetaLabel>{t('common.movieMeta.genre')}</MetaLabel>
             <MetaValue numberOfLines={2}>{getGenres(detail)}</MetaValue>
           </MetaRow>
           <MetaRow>
-            <MetaLabel>감독</MetaLabel>
+            <MetaLabel>{t('common.movieMeta.director')}</MetaLabel>
             <MetaValue numberOfLines={2}>{getDirectors(detail)}</MetaValue>
           </MetaRow>
           <MetaRow>
-            <MetaLabel>출연</MetaLabel>
+            <MetaLabel>{t('common.movieMeta.castShort')}</MetaLabel>
             <MetaValue numberOfLines={3}>{getCast(detail)}</MetaValue>
           </MetaRow>
         </MetaList>

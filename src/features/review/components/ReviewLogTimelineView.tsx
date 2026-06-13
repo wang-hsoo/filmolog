@@ -1,6 +1,7 @@
 import styled from 'styled-components/native';
+import { useTranslation } from 'react-i18next';
 
-import { formatWatchedDateWithWeekday } from '../../../lib/tmdb/movieMeta';
+import { formatWatchedDateWithWeekdayLocalized } from '../../../i18n/labels';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 
 import type { ReviewLogDateGroup } from '../utils/reviewLogUtils';
@@ -16,15 +17,19 @@ function ReviewLogTimelineView({
   groups,
   onPressReview,
 }: ReviewLogTimelineViewProps) {
+  const { t } = useTranslation();
+
   return (
     <TimelineRoot>
       {groups.map(group => (
         <TimelineGroup key={group.dateKey}>
           <TimelineHeader>
             <TimelineDate>
-              {formatWatchedDateWithWeekday(group.dateKey)}
+              {formatWatchedDateWithWeekdayLocalized(t, group.dateKey)}
             </TimelineDate>
-            <TimelineCount>{group.reviews.length}편</TimelineCount>
+            <TimelineCount>
+              {t('common.units.filmCount', { count: group.reviews.length })}
+            </TimelineCount>
           </TimelineHeader>
 
           <TimelineCard>

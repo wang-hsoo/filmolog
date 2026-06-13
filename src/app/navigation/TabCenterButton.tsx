@@ -1,4 +1,5 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Feather from 'react-native-vector-icons/Feather';
 
 import { theme } from '../../theme';
@@ -9,13 +10,19 @@ type TabCenterButtonProps = {
 };
 
 export function TabCenterButton({ isOpen, onPress }: TabCenterButtonProps) {
+  const { t } = useTranslation();
+
   return (
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
       style={styles.wrapper}
       accessibilityRole="button"
-      accessibilityLabel={isOpen ? '메뉴 닫기' : '기록 추가'}
+      accessibilityLabel={
+        isOpen
+          ? t('common.accessibility.closeCreateMenu')
+          : t('common.accessibility.openCreateMenu')
+      }
       accessibilityState={{ expanded: isOpen }}>
       <View style={[styles.fab, isOpen && styles.fabOpen]}>
         <Feather

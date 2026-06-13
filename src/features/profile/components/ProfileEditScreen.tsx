@@ -5,6 +5,7 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
@@ -19,6 +20,7 @@ import { useOnboarding } from '../../auth/hooks/useOnboarding';
 const MAX_GENRE_SELECTION = 3;
 
 function ProfileEditScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { profile } = useProfileContext();
@@ -75,8 +77,8 @@ function ProfileEditScreen() {
       navigation.goBack();
     } catch {
       archiveAlert(
-        '저장 실패',
-        '프로필 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.saveFailed.generic'),
+        t('errors.saveFailed.profile'),
       );
     }
   };
@@ -96,16 +98,16 @@ function ProfileEditScreen() {
         <Content>
           <ArchiveSectionHeader
             overline="PROFILE"
-            title="프로필 수정"
-            subtitle="닉네임과 선호 장르를 변경할 수 있어요."
+            title={t('profile.edit.title')}
+            subtitle={t('profile.edit.subtitle')}
           />
 
           <FieldBlock>
-            <FieldLabel>닉네임</FieldLabel>
+            <FieldLabel>{t('profile.edit.nicknameLabel')}</FieldLabel>
             <NicknameInput
               value={nickname}
               onChangeText={setNickname}
-              placeholder="닉네임"
+              placeholder={t('profile.edit.nicknamePlaceholder')}
               placeholderTextColor={theme.colors.primaryMuted}
               maxLength={20}
               autoCapitalize="none"
@@ -114,13 +116,17 @@ function ProfileEditScreen() {
           </FieldBlock>
 
           <FieldBlock>
-            <FieldLabel>선호 장르 (최대 {MAX_GENRE_SELECTION}개)</FieldLabel>
+            <FieldLabel>
+              {t('common.units.preferredGenresMax', {
+                count: MAX_GENRE_SELECTION,
+              })}
+            </FieldLabel>
             {isLoading ? (
               <LoaderWrap>
                 <ActivityIndicator color={theme.colors.primary} size="large" />
               </LoaderWrap>
             ) : isError ? (
-              <ErrorText>장르 목록을 불러오지 못했습니다.</ErrorText>
+              <ErrorText>{t('auth.genre.loadFailed')}</ErrorText>
             ) : (
               <GenreGrid>
                 {(data?.genres ?? []).map(genre => {
@@ -145,7 +151,9 @@ function ProfileEditScreen() {
             disabled={!canSave}
             $disabled={!canSave}
             accessibilityRole="button">
-            <SaveText>{isSaving ? '저장 중...' : '저장하기'}</SaveText>
+            <SaveText>
+              {isSaving ? t('common.actions.saving') : t('common.actions.saveAction')}
+            </SaveText>
           </SaveButton>
         </Content>
       </ScrollView>

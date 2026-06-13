@@ -1,6 +1,7 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
@@ -15,6 +16,7 @@ import { useOnboarding } from '../../auth/hooks/useOnboarding';
 const MAX_GENRE_SELECTION = 3;
 
 function GenreEditScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { profile } = useProfileContext();
@@ -60,8 +62,8 @@ function GenreEditScreen() {
       navigation.goBack();
     } catch {
       archiveAlert(
-        '저장 실패',
-        '선호 장르 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.saveFailed.generic'),
+        t('errors.saveFailed.genres'),
       );
     }
   };
@@ -80,8 +82,10 @@ function GenreEditScreen() {
         <Content>
           <ArchiveSectionHeader
             overline="TASTE"
-            title="선호 장르 변경"
-            subtitle={`최대 ${MAX_GENRE_SELECTION}개까지 선택할 수 있어요.`}
+            title={t('profile.genreEdit.title')}
+            subtitle={t('profile.genreEdit.subtitle', {
+              count: MAX_GENRE_SELECTION,
+            })}
           />
 
           {isLoading ? (
@@ -89,7 +93,7 @@ function GenreEditScreen() {
               <ActivityIndicator color={theme.colors.primary} size="large" />
             </LoaderWrap>
           ) : isError ? (
-            <ErrorText>장르 목록을 불러오지 못했습니다.</ErrorText>
+            <ErrorText>{t('auth.genre.loadFailed')}</ErrorText>
           ) : (
             <GenreGrid>
               {(data?.genres ?? []).map(genre => {
@@ -115,8 +119,12 @@ function GenreEditScreen() {
             accessibilityRole="button">
             <SaveText>
               {isSaving
-                ? '저장 중...'
-                : `저장하기${selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}`}
+                ? t('common.actions.saving')
+                : selectedIds.length > 0
+                  ? t('common.actions.saveWithCount', {
+                      count: selectedIds.length,
+                    })
+                  : t('common.actions.saveAction')}
             </SaveText>
           </SaveButton>
         </Content>

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, type RefObject } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
@@ -53,6 +54,7 @@ function ReviewForm({
   onReviewInputBlur,
   reviewInputWrapRef,
 }: ReviewFormProps) {
+  const { t } = useTranslation();
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const today = useMemo(() => startOfDay(new Date()), []);
   const showCollections = collections != null && onToggleCollection != null;
@@ -73,8 +75,8 @@ function ReviewForm({
       <ArchivePanel accent>
         <ArchiveSectionHeader
           overline="WATCHED"
-          title="시청일"
-          subtitle="언제 이 작품을 보셨나요?"
+          title={t('filmLog.form.watched.title')}
+          subtitle={t('filmLog.form.watched.subtitle')}
         />
 
         <QuickDateRow>
@@ -82,7 +84,7 @@ function ReviewForm({
             $active={isSameDay(watchedDate, today)}
             onPress={() => onWatchedDateChange(today)}>
             <QuickDateLabel $active={isSameDay(watchedDate, today)}>
-              오늘
+              {t('common.calendar.today')}
             </QuickDateLabel>
           </QuickDateButton>
           <QuickDateButton
@@ -90,7 +92,7 @@ function ReviewForm({
             onPress={() => onWatchedDateChange(addDays(today, -1))}>
             <QuickDateLabel
               $active={isSameDay(watchedDate, addDays(today, -1))}>
-              어제
+              {t('common.calendar.yesterday')}
             </QuickDateLabel>
           </QuickDateButton>
         </QuickDateRow>
@@ -98,7 +100,7 @@ function ReviewForm({
         <DatePickerRow>
           <DateShiftButton
             onPress={() => handleShiftWatchedDate(-1)}
-            accessibilityLabel="하루 전">
+            accessibilityLabel={t('common.accessibility.dayBefore')}>
             <Icon
               name="chevron-left"
               size={22}
@@ -116,7 +118,7 @@ function ReviewForm({
           <DateShiftButton
             onPress={() => handleShiftWatchedDate(1)}
             disabled={isSameDay(watchedDate, today)}
-            accessibilityLabel="하루 후">
+            accessibilityLabel={t('common.accessibility.dayAfter')}>
             <Icon
               name="chevron-right"
               size={22}
@@ -133,8 +135,8 @@ function ReviewForm({
       <ArchivePanel accent>
         <ArchiveSectionHeader
           overline="RATING"
-          title="평점"
-          subtitle="별 왼쪽은 0.5점, 오른쪽은 1점 단위예요."
+          title={t('filmLog.form.rating.title')}
+          subtitle={t('common.rating.starHint')}
         />
 
         <RatingRow>
@@ -146,11 +148,15 @@ function ReviewForm({
               <StarWrap key={star}>
                 <StarTapHalf
                   onPress={() => onRatingChange(star - 0.5)}
-                  accessibilityLabel={`${star - 0.5}점`}
+                  accessibilityLabel={t('common.movieMeta.ratingPoint', {
+                    star: star - 0.5,
+                  })}
                 />
                 <StarTapFull
                   onPress={() => onRatingChange(star)}
-                  accessibilityLabel={`${star}점`}
+                  accessibilityLabel={t('common.movieMeta.ratingPoint', {
+                    star,
+                  })}
                 />
                 <Icon
                   name={iconName}
@@ -164,15 +170,15 @@ function ReviewForm({
           })}
         </RatingRow>
         <RatingValue>
-          {rating > 0 ? formatRating(rating) : '평점을 선택하세요'}
+          {rating > 0 ? formatRating(rating) : t('common.rating.selectPrompt')}
         </RatingValue>
       </ArchivePanel>
 
       <ArchivePanel accent>
         <ArchiveSectionHeader
           overline="REVIEW"
-          title="한줄평 · 감상"
-          subtitle="짧은 메모도 좋아요."
+          title={t('filmLog.form.review.title')}
+          subtitle={t('filmLog.form.review.subtitle')}
         />
 
         <View ref={reviewInputWrapRef} collapsable={false}>
@@ -181,7 +187,7 @@ function ReviewForm({
             onChangeText={onContentChange}
             onFocus={onReviewInputFocus}
             onBlur={onReviewInputBlur}
-            placeholder="이 영화에 대한 생각을 적어보세요."
+            placeholder={t('filmLog.form.review.placeholder')}
             placeholderTextColor={theme.colors.placeholderText}
             multiline
             textAlignVertical="top"
@@ -194,8 +200,8 @@ function ReviewForm({
         <ArchivePanel accent>
           <ArchiveSectionHeader
             overline="COLLECTION"
-            title="컬렉션에 담기"
-            subtitle="선택한 컬렉션에 이 작품을 바로 추가해요."
+            title={t('filmLog.form.collection.title')}
+            subtitle={t('filmLog.form.collection.subtitle')}
           />
 
           {isCollectionsLoading ? (
@@ -203,10 +209,7 @@ function ReviewForm({
               <ActivityIndicator color={theme.colors.primary} />
             </CollectionState>
           ) : collections.length === 0 ? (
-            <ArchiveEmptyText>
-              아직 컬렉션이 없습니다. 기록만 저장하거나 컬렉션을 먼저
-              만들어주세요.
-            </ArchiveEmptyText>
+            <ArchiveEmptyText>{t('filmLog.form.collection.empty')}</ArchiveEmptyText>
           ) : (
             <CollectionList>
               {collections.map(collection => {

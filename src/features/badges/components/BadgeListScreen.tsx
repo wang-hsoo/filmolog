@@ -1,6 +1,7 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -9,7 +10,6 @@ import { RootStackParamList } from '../../../app/navigation/types';
 import {
   ALL_BADGE_IDS,
   BADGE_CATEGORY,
-  BADGE_CATEGORY_LABELS,
   BADGES,
   BADGES_BY_CATEGORY,
   type Badge,
@@ -17,12 +17,18 @@ import {
   type BadgeId,
 } from '../../../components/constants/badge.constants';
 import { ArchiveBannerAd, ArchiveEmptyText, ArchiveNativeAd, Header } from '../../../components';
+import {
+  getBadgeCategoryLabel,
+  getBadgeDescription,
+  getBadgeName,
+} from '../../../i18n/labels';
 import { useAuth, useGetUserBadges } from '../../../lib/supabase';
 import { AppScreen, theme } from '../../../theme';
 
 import BadgeUnlockOverlay from './BadgeUnlockOverlay';
 
 function BadgeListScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
@@ -61,7 +67,7 @@ function BadgeListScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <Content>
           <SummaryRow>
-            <SummaryLabel>획득</SummaryLabel>
+            <SummaryLabel>{t('common.stats.earned')}</SummaryLabel>
             <SummaryValue>
               {earnedBadges.length} / {ALL_BADGE_IDS.length}
             </SummaryValue>
@@ -72,12 +78,12 @@ function BadgeListScreen() {
               <ActivityIndicator color={theme.colors.primary} size="large" />
             </LoaderWrap>
           ) : isError ? (
-            <ArchiveEmptyText>배지를 불러오지 못했습니다.</ArchiveEmptyText>
+            <ArchiveEmptyText>{t('badges.list.loadFailed')}</ArchiveEmptyText>
           ) : (
             categories.map(category => (
               <CategoryBlock key={category}>
                 <CategoryTitle>
-                  {BADGE_CATEGORY_LABELS[category]}
+                  {getBadgeCategoryLabel(t, category)}
                 </CategoryTitle>
                 <BadgeGrid>
                   {BADGES_BY_CATEGORY[category].map((badgeId: BadgeId) => {
@@ -113,8 +119,12 @@ function BadgeListScreen() {
                             </LockOverlay>
                           ) : null}
                         </BadgeIconWrap>
-                        <BadgeName $earned={isEarned}>{badge.name}</BadgeName>
-                        <BadgeDesc numberOfLines={2}>{badge.description}</BadgeDesc>
+                        <BadgeName $earned={isEarned}>
+                          {getBadgeName(t, badgeId)}
+                        </BadgeName>
+                        <BadgeDesc numberOfLines={2}>
+                          {getBadgeDescription(t, badgeId)}
+                        </BadgeDesc>
                       </BadgeCard>
                     );
                   })}

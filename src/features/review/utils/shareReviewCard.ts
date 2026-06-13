@@ -4,6 +4,8 @@ import Share from 'react-native-share';
 import type { RefObject } from 'react';
 import type { View } from 'react-native';
 
+import { i18n } from '../../../i18n';
+
 import { formatRating } from '../../filmLog/utils/rating';
 import {
   SHARE_CARD_EXPORT_HEIGHT,
@@ -112,7 +114,7 @@ export async function shareReviewAsImage({
   });
 
   await Share.open({
-    title: 'Filmolog 기록 공유',
+    title: i18n.t('review.detail.shareTitle'),
     message: Platform.OS === 'android' ? message : undefined,
     url: uri,
     type: 'image/png',

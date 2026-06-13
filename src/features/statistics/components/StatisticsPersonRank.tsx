@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { useTranslation } from 'react-i18next';
 
 import { ArchiveEmptyText } from '../../../components';
 
@@ -12,14 +13,23 @@ type StatisticsPersonRankProps = {
 
 function StatisticsPersonRank({
   items,
-  emptyMessage = '표시할 데이터가 없습니다.',
-  valueSuffix = '편',
+  emptyMessage,
+  valueSuffix,
 }: StatisticsPersonRankProps) {
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? t('common.archive.noData');
+  const formatCount = (count: number) => {
+    if (valueSuffix !== undefined) {
+      return `${count}${valueSuffix}`;
+    }
+
+    return t('common.units.filmCount', { count });
+  };
   const maxValue = Math.max(...items.map(item => item.count), 1);
   const hasData = items.some(item => item.count > 0);
 
   if (!hasData) {
-    return <ArchiveEmptyText>{emptyMessage}</ArchiveEmptyText>;
+    return <ArchiveEmptyText>{resolvedEmptyMessage}</ArchiveEmptyText>;
   }
 
   return (
@@ -33,10 +43,7 @@ function StatisticsPersonRank({
             <RankBody>
               <RankHeader>
                 <RankName numberOfLines={1}>{item.name}</RankName>
-                <RankCount>
-                  {item.count}
-                  {valueSuffix}
-                </RankCount>
+                <RankCount>{formatCount(item.count)}</RankCount>
               </RankHeader>
               <RankTrack>
                 <RankFill style={{ width: `${widthPct}%` }} />

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Pressable } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/Feather';
 import styled, { useTheme } from 'styled-components/native';
 
@@ -24,6 +25,7 @@ function Header({
   rightIcon = 'more-horizontal',
   rightElement,
 }: HeaderProps) {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   const renderRight = () => {
@@ -61,7 +63,7 @@ function Header({
         <HeaderIconButton
           onPress={() => navigation.goBack()}
           accessibilityRole="button"
-          accessibilityLabel="뒤로">
+          accessibilityLabel={t('common.accessibility.back')}>
           <Icon name="arrow-left" size={20} color={theme.colors.primary} />
         </HeaderIconButton>
 

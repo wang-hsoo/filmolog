@@ -7,6 +7,7 @@ import {
 import type { StackNavigationProp } from '@react-navigation/stack';
 import FastImage from 'react-native-fast-image';
 import { ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import MciIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -30,6 +31,7 @@ const POSTER_MAT = 3;
 type CompleteRoute = RouteProp<RootStackParamList, 'FilmLogComplete'>;
 
 function FilmLogCompleteScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const route = useRoute<CompleteRoute>();
@@ -38,8 +40,8 @@ function FilmLogCompleteScreen() {
   const posterUri = getTmdbPosterUrl(posterPath);
   const headline =
     reviewNumber === 1
-      ? '첫 번째 기록 완료!'
-      : `${reviewNumber}번째 기록 완료!`;
+      ? t('filmLog.complete.firstLog')
+      : t('filmLog.complete.nthLog', { count: reviewNumber });
 
   const handleViewReview = () => {
     navigation.replace('ReviewDetail', { reviewId });
@@ -69,7 +71,10 @@ function FilmLogCompleteScreen() {
         <HeroPanel>
           <HeroTitle>{headline}</HeroTitle>
           <HeroMeta>
-            {reviewNumber}번째 영화 · ★ {formatRating(rating)}
+            {t('common.units.nthFilmWithRating', {
+              count: reviewNumber,
+              rating: formatRating(rating),
+            })}
           </HeroMeta>
 
           <PosterMat>
@@ -88,7 +93,7 @@ function FilmLogCompleteScreen() {
           <MovieTitle numberOfLines={2}>{title}</MovieTitle>
 
           <QuickLink onPress={handleViewReview} accessibilityRole="button">
-            <QuickLinkLabel>기록 보기</QuickLinkLabel>
+            <QuickLinkLabel>{t('common.actions.viewLog')}</QuickLinkLabel>
             <Icon name="chevron-right" size={18} color={theme.colors.primary} />
           </QuickLink>
         </HeroPanel>
@@ -106,7 +111,9 @@ function FilmLogCompleteScreen() {
 
       <FooterBar style={{ paddingBottom: insets.bottom + 12 }}>
         <FooterButton onPress={handleRecordAnother} accessibilityRole="button">
-          <FooterButtonLabel $muted>다른 기록하기</FooterButtonLabel>
+          <FooterButtonLabel $muted>
+            {t('filmLog.complete.recordAnother')}
+          </FooterButtonLabel>
         </FooterButton>
         <FooterButton $primary onPress={handleGoHome} accessibilityRole="button">
           <MciIcon
@@ -114,7 +121,7 @@ function FilmLogCompleteScreen() {
             size={18}
             color={theme.colors.appBackground}
           />
-          <FooterButtonLabel $primary>홈</FooterButtonLabel>
+          <FooterButtonLabel $primary>{t('common.actions.home')}</FooterButtonLabel>
         </FooterButton>
       </FooterBar>
     </ScreenRoot>

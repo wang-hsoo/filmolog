@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 
+import { i18n } from '../../../i18n';
 import {
   getGoogleIdFromAuthUser,
   getSupabaseClient,
@@ -20,7 +21,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
   const saveNickname = useCallback(
     async (nickname: string) => {
       if (!user) {
-        throw new Error('로그인이 필요합니다.');
+        throw new Error(i18n.t('auth.onboarding.loginRequired'));
       }
 
       setIsSaving(true);
@@ -55,11 +56,11 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
   const completeOnboarding = useCallback(
     async (preferredGenres: number[]) => {
       if (!user) {
-        throw new Error('로그인이 필요합니다.');
+        throw new Error(i18n.t('auth.onboarding.loginRequired'));
       }
 
       if (preferredGenres.length === 0) {
-        throw new Error('선호 장르를 하나 이상 선택하세요.');
+        throw new Error(i18n.t('auth.genre.selectAtLeastOne'));
       }
 
       setIsSaving(true);

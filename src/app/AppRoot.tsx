@@ -6,6 +6,7 @@ import {
   SPLASH_FADE_OUT_MS,
   SPLASH_MIN_DURATION_MS,
 } from '../features/splash';
+import { I18nProvider } from '../i18n/I18nProvider';
 import { configureTextAccessibility, ThemeProvider } from '../theme';
 import { runAppBootstrap } from './bootstrap';
 import { MainApp } from './MainApp';
@@ -84,7 +85,9 @@ function AppRootContent() {
 export function AppRoot() {
   return (
     <ThemeProvider>
-      <AppRootContent />
+      <I18nProvider>
+        <AppRootContent />
+      </I18nProvider>
     </ThemeProvider>
   );
 }

@@ -4,6 +4,7 @@ import type {
   ArchiveAlertButton,
   ArchiveDialogConfig,
 } from '../../components/ui/archiveDialog/types';
+import { i18n } from '../../i18n';
 
 type DialogHandler = (config: ArchiveDialogConfig) => void;
 
@@ -21,7 +22,12 @@ export function archiveAlert(
   const resolvedButtons =
     buttons && buttons.length > 0
       ? buttons
-      : [{ text: '확인', style: 'default' as const }];
+      : [
+          {
+            text: i18n.t('common.actions.confirm'),
+            style: 'default' as const,
+          },
+        ];
 
   if (dialogHandler) {
     dialogHandler({

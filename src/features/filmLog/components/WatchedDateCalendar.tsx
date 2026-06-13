@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Platform, Pressable, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
+import { getWeekdayLabels } from '../../../i18n/labels';
 import { theme } from '../../../theme';
 
 import {
@@ -13,8 +15,6 @@ import {
   isSameMonth,
   startOfDay,
 } from '../utils/date';
-
-const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 type WatchedDateCalendarProps = {
   visible: boolean;
@@ -31,6 +31,8 @@ function WatchedDateCalendar({
   onClose,
   onSelect,
 }: WatchedDateCalendarProps) {
+  const { t } = useTranslation();
+  const weekdayLabels = useMemo(() => getWeekdayLabels(t), [t]);
   const [visibleMonth, setVisibleMonth] = useState(() =>
     startOfDay(new Date(value.getFullYear(), value.getMonth(), 1)),
   );
@@ -78,7 +80,10 @@ function WatchedDateCalendar({
             </MonthShiftButton>
 
             <SheetTitle>
-              {visibleMonth.getFullYear()}년 {visibleMonth.getMonth() + 1}월
+              {t('common.calendar.yearMonth', {
+                year: visibleMonth.getFullYear(),
+                month: visibleMonth.getMonth() + 1,
+              })}
             </SheetTitle>
 
             <MonthShiftButton
@@ -101,7 +106,7 @@ function WatchedDateCalendar({
           </SheetHeader>
 
           <WeekdayRow>
-            {WEEKDAY_LABELS.map(label => (
+            {weekdayLabels.map(label => (
               <WeekdayLabel key={label}>{label}</WeekdayLabel>
             ))}
           </WeekdayRow>
@@ -133,7 +138,9 @@ function WatchedDateCalendar({
           </CalendarGrid>
 
           <SelectedHint>
-            선택일: {formatWatchedDateLabel(value)}
+            {t('common.calendar.selectedDate', {
+              date: formatWatchedDateLabel(value),
+            })}
           </SelectedHint>
         </Sheet>
       </ModalRoot>

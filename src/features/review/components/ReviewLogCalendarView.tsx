@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Platform } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
 import { ArchiveEmptyText } from '../../../components';
+import {
+  formatWatchedDateWithWeekdayLocalized,
+  getWeekdayLabels,
+} from '../../../i18n/labels';
 import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
-import { formatWatchedDateWithWeekday } from '../../../lib/tmdb/movieMeta';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 import { theme } from '../../../theme';
 import {
@@ -26,8 +30,6 @@ import {
   getReviewDateKey,
   indexReviewsByDate,
 } from '../utils/reviewLogUtils';
-
-const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
 type ReviewLogCalendarViewProps = {
   reviews: UserReviewedMovie[];
@@ -155,6 +157,8 @@ function ReviewLogCalendarView({
   reviews,
   onPressReview,
 }: ReviewLogCalendarViewProps) {
+  const { t } = useTranslation();
+  const weekdayLabels = useMemo(() => getWeekdayLabels(t), [t]);
   const today = useMemo(() => startOfDay(new Date()), []);
   const [visibleMonth, setVisibleMonth] = useState(() =>
     startOfDay(new Date(today.getFullYear(), today.getMonth(), 1)),
@@ -211,8 +215,11 @@ function ReviewLogCalendarView({
   };
 
   const sectionTitle = selectedDateKey
-    ? formatWatchedDateWithWeekday(selectedDateKey)
-    : `${visibleMonth.getFullYear()}년 ${visibleMonth.getMonth() + 1}월 포스터 벽`;
+    ? formatWatchedDateWithWeekdayLocalized(t, selectedDateKey)
+    : t('common.calendar.yearMonthPosterWall', {
+        year: visibleMonth.getFullYear(),
+        month: visibleMonth.getMonth() + 1,
+      });
 
   return (
     <CalendarRoot>
@@ -232,11 +239,17 @@ function ReviewLogCalendarView({
 
           <MonthTitleBlock>
             <MonthTitle>
-              {visibleMonth.getFullYear()}년 {visibleMonth.getMonth() + 1}월
+              {t('common.calendar.yearMonth', {
+                year: visibleMonth.getFullYear(),
+                month: visibleMonth.getMonth() + 1,
+              })}
             </MonthTitle>
             <MonthSubtitle>
-              {monthProgress.filledDays}/{monthProgress.eligibleDays}일 ·{' '}
-              {monthProgress.reviewCount}편
+              {t('common.units.monthProgress', {
+                filledDays: monthProgress.filledDays,
+                eligibleDays: monthProgress.eligibleDays,
+                reviewCount: monthProgress.reviewCount,
+              })}
             </MonthSubtitle>
           </MonthTitleBlock>
 
@@ -265,12 +278,12 @@ function ReviewLogCalendarView({
         </ProgressTrack>
         <ProgressCaption>
           {monthProgress.ratio >= 1
-            ? '이번 달 칸을 모두 채웠어요'
-            : '포스터로 채워지는 나만의 영화 달력'}
+            ? t('review.calendar.monthComplete')
+            : t('review.calendar.tagline')}
         </ProgressCaption>
 
         <WeekdayRow>
-          {WEEKDAY_LABELS.map(label => (
+          {weekdayLabels.map(label => (
             <WeekdayLabel key={label}>{label}</WeekdayLabel>
           ))}
         </WeekdayRow>
@@ -300,31 +313,35 @@ function ReviewLogCalendarView({
 
         <CalendarHint>
           {selectedDateKey
-            ? `선택: ${formatWatchedDateLabel(
-                startOfDay(
-                  new Date(
-                    Number.parseInt(selectedDateKey.slice(0, 4), 10),
-                    Number.parseInt(selectedDateKey.slice(5, 7), 10) - 1,
-                    Number.parseInt(selectedDateKey.slice(8, 10), 10),
+            ? t('review.calendar.selectedHint', {
+                date: formatWatchedDateLabel(
+                  startOfDay(
+                    new Date(
+                      Number.parseInt(selectedDateKey.slice(0, 4), 10),
+                      Number.parseInt(selectedDateKey.slice(5, 7), 10) - 1,
+                      Number.parseInt(selectedDateKey.slice(8, 10), 10),
+                    ),
                   ),
                 ),
-              )} · 다시 누르면 월 전체`
-            : '빈 칸을 눌러 그날 기록을, 포스터를 눌러 상세로 이동하세요.'}
+              })
+            : t('review.calendar.hint')}
         </CalendarHint>
       </CalendarPanel>
 
       <DaySection>
         <DaySectionHeader>
           <DaySectionTitle>{sectionTitle}</DaySectionTitle>
-          <DaySectionCount>{dayReviews.length}편</DaySectionCount>
+          <DaySectionCount>
+            {t('common.units.filmCount', { count: dayReviews.length })}
+          </DaySectionCount>
         </DaySectionHeader>
 
         {dayReviews.length === 0 ? (
           <DayEmpty>
             <ArchiveEmptyText>
               {selectedDateKey
-                ? '이 날은 아직 비어 있어요. 기록을 남기면 포스터가 채워집니다.'
-                : '이번 달에 남긴 기록이 없습니다.'}
+                ? t('review.calendar.emptyDay')
+                : t('review.calendar.emptyMonth')}
             </ArchiveEmptyText>
           </DayEmpty>
         ) : (

@@ -6,5 +6,4 @@ export {
   SPLASH_GLOW_BREATHE_MS,
   SPLASH_GLOW_PAUSE_MS,
   SPLASH_GLOW_SWEEP_MS,
-  SPLASH_TAGLINE,
 } from './constants';

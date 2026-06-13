@@ -1,18 +1,22 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
 import { RootStackParamList } from '../../../app/navigation/types';
-import { Header } from '../../../components';
+import { Header, TmdbAttribution } from '../../../components';
 import { resetToAppScreen } from '../../../app/navigation/navigationRef';
+import { useAppLocale } from '../../../i18n/I18nProvider';
+import type { AppLocale } from '../../../i18n/types';
 import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import {
   openFeedbackForm,
   type FeedbackFormType,
 } from '../../../lib/feedback/googleFeedbackForm';
+import { openPrivacyPolicy } from '../../../lib/links/legalLinks';
 import {
   DeleteAccountError,
   deleteUserAccount,
@@ -24,23 +28,28 @@ import { AppScreen, theme } from '../../../theme';
 const APP_VERSION = '0.0.1';
 
 function SettingsScreen() {
+  const { t } = useTranslation();
+  const { locale, setLocale } = useAppLocale();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleLogout = () => {
-    archiveAlert('로그아웃', '정말 로그아웃하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
+    archiveAlert(t('dialogs.logout.title'), t('dialogs.logout.message'), [
+      { text: t('common.actions.cancel'), style: 'cancel' },
       {
-        text: '로그아웃',
+        text: t('dialogs.logout.confirm'),
         style: 'destructive',
         onPress: () => {
           resetToAppScreen();
 
           void signOutFromApp().catch(error => {
             console.error('[SettingsScreen] signOut failed', error);
-            archiveAlert('로그아웃 실패', '잠시 후 다시 시도해주세요.');
+            archiveAlert(
+              t('errors.logoutFailed.title'),
+              t('errors.logoutFailed.message'),
+            );
           });
         },
       },
@@ -53,12 +62,12 @@ function SettingsScreen() {
     }
 
     archiveAlert(
-      '회원 탈퇴',
-      '탈퇴 시 작성한 리뷰, 컬렉션, 위시리스트 등 모든 기록이 삭제되며 복구할 수 없습니다.',
+      t('dialogs.deleteAccount.title'),
+      t('dialogs.deleteAccount.message'),
       [
-        { text: '취소', style: 'cancel' },
+        { text: t('common.actions.cancel'), style: 'cancel' },
         {
-          text: '탈퇴하기',
+          text: t('dialogs.deleteAccount.confirm'),
           style: 'destructive',
           onPress: () => {
             setIsDeleting(true);
@@ -71,9 +80,9 @@ function SettingsScreen() {
                 const message =
                   error instanceof DeleteAccountError
                     ? error.message
-                    : '회원 탈퇴 처리에 실패했습니다. 잠시 후 다시 시도해주세요.';
+                    : t('errors.deleteAccount.rpcFailedRetry');
 
-                archiveAlert('탈퇴 실패', message);
+                archiveAlert(t('dialogs.deleteAccount.failedTitle'), message);
               })
               .finally(() => {
                 setIsDeleting(false);
@@ -82,7 +91,7 @@ function SettingsScreen() {
         },
       ],
     );
-  }, [isDeleting, navigation, user?.id]);
+  }, [isDeleting, navigation, t, user?.id]);
 
   const handleOpenFeedback = useCallback(
     (type: FeedbackFormType) => {
@@ -93,12 +102,31 @@ function SettingsScreen() {
       }).catch(error => {
         console.error('[SettingsScreen] openFeedbackForm failed', error);
         archiveAlert(
-          '열기 실패',
-          'Google Form을 열 수 없습니다. 잠시 후 다시 시도해주세요.',
+          t('errors.openFailed.title'),
+          t('errors.openFailed.googleForm'),
         );
       });
     },
-    [user?.id],
+    [t, user?.id],
+  );
+
+  const handleOpenPrivacyPolicy = useCallback(() => {
+    void openPrivacyPolicy().catch(error => {
+      console.error('[SettingsScreen] openPrivacyPolicy failed', error);
+      archiveAlert(
+        t('errors.openFailed.title'),
+        t('errors.openFailed.privacyPolicy'),
+      );
+    });
+  }, [t]);
+
+  const handleSelectLocale = useCallback(
+    (nextLocale: AppLocale) => {
+      if (nextLocale !== locale) {
+        void setLocale(nextLocale);
+      }
+    },
+    [locale, setLocale],
   );
 
   return (
@@ -111,7 +139,7 @@ function SettingsScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <Content>
-          <SectionLabel>계정</SectionLabel>
+          <SectionLabel>{t('settings.sections.account')}</SectionLabel>
           <MenuPanel>
             <MenuRow
               onPress={() => navigation.navigate('GenreEdit')}
@@ -124,8 +152,10 @@ function SettingsScreen() {
                 />
               </MenuIconWrap>
               <MenuTextBlock>
-                <MenuLabel>선호 장르 변경</MenuLabel>
-                <MenuSubtitle>탐색 추천에 반영되는 장르</MenuSubtitle>
+                <MenuLabel>{t('settings.account.genreEdit.label')}</MenuLabel>
+                <MenuSubtitle>
+                  {t('settings.account.genreEdit.subtitle')}
+                </MenuSubtitle>
               </MenuTextBlock>
               <Icon
                 name="chevron-right"
@@ -135,11 +165,8 @@ function SettingsScreen() {
             </MenuRow>
           </MenuPanel>
 
-          <SectionLabel>지원</SectionLabel>
-          <SupportNotice>
-            Filmolog는 1인으로 운영 중이에요. 남겨주신 의견은 순차 검토하며,
-            반영 시점은 작업 규모에 따라 달라질 수 있어요.
-          </SupportNotice>
+          <SectionLabel>{t('settings.sections.support')}</SectionLabel>
+          <SupportNotice>{t('settings.support.notice')}</SupportNotice>
           <MenuPanel>
             <MenuRow
               onPress={() => handleOpenFeedback('feature')}
@@ -152,8 +179,10 @@ function SettingsScreen() {
                 />
               </MenuIconWrap>
               <MenuTextBlock>
-                <MenuLabel>기능 제안하기</MenuLabel>
-                <MenuSubtitle>아이디어를 남겨주시면 검토 후 반영해요</MenuSubtitle>
+                <MenuLabel>{t('settings.support.featureRequest.label')}</MenuLabel>
+                <MenuSubtitle>
+                  {t('settings.support.featureRequest.subtitle')}
+                </MenuSubtitle>
               </MenuTextBlock>
               <Icon
                 name="open-in-new"
@@ -175,8 +204,10 @@ function SettingsScreen() {
                 />
               </MenuIconWrap>
               <MenuTextBlock>
-                <MenuLabel>오류 제보하기</MenuLabel>
-                <MenuSubtitle>접수 후 순차 수정 · 버전·계정은 자동 입력</MenuSubtitle>
+                <MenuLabel>{t('settings.support.bugReport.label')}</MenuLabel>
+                <MenuSubtitle>
+                  {t('settings.support.bugReport.subtitle')}
+                </MenuSubtitle>
               </MenuTextBlock>
               <Icon
                 name="open-in-new"
@@ -186,18 +217,83 @@ function SettingsScreen() {
             </MenuRow>
           </MenuPanel>
 
-          <SectionLabel>앱</SectionLabel>
+          <SectionLabel>{t('settings.sections.legal')}</SectionLabel>
+          <MenuPanel>
+            <MenuRow
+              onPress={handleOpenPrivacyPolicy}
+              accessibilityRole="button">
+              <MenuIconWrap>
+                <Icon
+                  name="shield-account-outline"
+                  size={20}
+                  color={theme.colors.primary}
+                />
+              </MenuIconWrap>
+              <MenuTextBlock>
+                <MenuLabel>{t('settings.legal.privacyPolicy.label')}</MenuLabel>
+                <MenuSubtitle>
+                  {t('settings.legal.privacyPolicy.subtitle')}
+                </MenuSubtitle>
+              </MenuTextBlock>
+              <Icon
+                name="open-in-new"
+                size={18}
+                color={theme.colors.primaryMuted}
+              />
+            </MenuRow>
+          </MenuPanel>
+
+          <SectionLabel>{t('settings.sections.app')}</SectionLabel>
           <MenuPanel>
             <InfoRow>
               <MenuTextBlock>
-                <MenuLabel>버전</MenuLabel>
-                <MenuSubtitle>Filmolog</MenuSubtitle>
+                <MenuLabel>{t('settings.app.version.label')}</MenuLabel>
+                <MenuSubtitle>{t('settings.app.version.subtitle')}</MenuSubtitle>
               </MenuTextBlock>
               <VersionText>{APP_VERSION}</VersionText>
             </InfoRow>
+
+            <MenuDivider />
+
+            <InfoRow>
+              <MenuTextBlock>
+                <MenuLabel>{t('settings.language.label')}</MenuLabel>
+                <MenuSubtitle>{t('settings.language.subtitle')}</MenuSubtitle>
+              </MenuTextBlock>
+            </InfoRow>
+
+            <MenuDivider />
+
+            <MenuRow
+              onPress={() => handleSelectLocale('ko')}
+              accessibilityRole="button">
+              <MenuTextBlock>
+                <MenuLabel>{t('settings.language.ko')}</MenuLabel>
+              </MenuTextBlock>
+              {locale === 'ko' ? (
+                <Icon name="check" size={20} color={theme.colors.primary} />
+              ) : null}
+            </MenuRow>
+
+            <MenuDivider />
+
+            <MenuRow
+              onPress={() => handleSelectLocale('en')}
+              accessibilityRole="button">
+              <MenuTextBlock>
+                <MenuLabel>{t('settings.language.en')}</MenuLabel>
+              </MenuTextBlock>
+              {locale === 'en' ? (
+                <Icon name="check" size={20} color={theme.colors.primary} />
+              ) : null}
+            </MenuRow>
+
+            <MenuDivider />
+
+            <TmdbAttribution compact />
           </MenuPanel>
 
-          <SectionLabel>계정 관리</SectionLabel>
+          <SectionLabel>{t('settings.sections.accountManagement')}</SectionLabel>
           <MenuPanel>
             <MenuRow onPress={handleLogout} accessibilityRole="button">
               <MenuIconWrap>
@@ -208,8 +304,10 @@ function SettingsScreen() {
                 />
               </MenuIconWrap>
               <MenuTextBlock>
-                <MenuLabel>로그아웃</MenuLabel>
-                <MenuSubtitle>다시 로그인할 수 있어요</MenuSubtitle>
+                <MenuLabel>{t('settings.accountManagement.logout.label')}</MenuLabel>
+                <MenuSubtitle>
+                  {t('settings.accountManagement.logout.subtitle')}
+                </MenuSubtitle>
               </MenuTextBlock>
             </MenuRow>
 
@@ -227,8 +325,12 @@ function SettingsScreen() {
                 />
               </MenuIconWrap>
               <MenuTextBlock>
-                <MenuLabel $danger>회원 탈퇴</MenuLabel>
-                <MenuSubtitle>모든 기록이 영구 삭제됩니다</MenuSubtitle>
+                <MenuLabel $danger>
+                  {t('settings.accountManagement.deleteAccount.label')}
+                </MenuLabel>
+                <MenuSubtitle>
+                  {t('settings.accountManagement.deleteAccount.subtitle')}
+                </MenuSubtitle>
               </MenuTextBlock>
               {isDeleting ? (
                 <ActivityIndicator color={theme.colors.goldDim} size="small" />

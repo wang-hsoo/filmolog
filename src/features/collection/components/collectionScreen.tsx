@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -54,6 +55,7 @@ function toDisplayMovie(item: UserReviewedMovie): TmdbMovie {
 }
 
 function CollectionScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
@@ -92,7 +94,10 @@ function CollectionScreen() {
       return;
     }
     if (!trimmedName) {
-      archiveAlert('입력 확인', '컬렉션 이름을 입력해주세요.');
+      archiveAlert(
+        t('dialogs.validation.title'),
+        t('errors.validation.collectionNameRequired'),
+      );
       return;
     }
 
@@ -118,8 +123,8 @@ function CollectionScreen() {
       navigation.goBack();
     } catch {
       archiveAlert(
-        '생성 실패',
-        '컬렉션을 만들지 못했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.createFailed.generic'),
+        t('errors.createFailed.collection'),
       );
     }
   }, [
@@ -130,6 +135,7 @@ function CollectionScreen() {
     navigation,
     selectedMovieIds,
     selectedThemeId,
+    t,
     user?.id,
   ]);
 
@@ -146,27 +152,27 @@ function CollectionScreen() {
           <ArchivePanel accent>
             <ArchiveSectionHeader
               overline="INFO"
-              title="기본 정보"
-              subtitle="컬렉션의 이름과 설명을 적어주세요."
+              title={t('collection.create.basicInfo.title')}
+              subtitle={t('collection.create.basicInfo.subtitle')}
             />
 
             <FieldGroup>
-              <FieldLabel>이름</FieldLabel>
+              <FieldLabel>{t('collection.create.nameLabel')}</FieldLabel>
               <FieldInput
                 value={name}
                 onChangeText={setName}
-                placeholder="예: 우울할 때 보는 영화"
+                placeholder={t('collection.create.namePlaceholder')}
                 placeholderTextColor={theme.colors.placeholderText}
                 maxLength={40}
               />
             </FieldGroup>
 
             <FieldGroup>
-              <FieldLabel>설명</FieldLabel>
+              <FieldLabel>{t('collection.create.descriptionLabel')}</FieldLabel>
               <FieldTextArea
                 value={description}
                 onChangeText={setDescription}
-                placeholder="이 컬렉션에 담은 이유를 적어보세요."
+                placeholder={t('collection.create.descriptionPlaceholder')}
                 placeholderTextColor={theme.colors.placeholderText}
                 multiline
                 textAlignVertical="top"
@@ -178,8 +184,8 @@ function CollectionScreen() {
           <ArchivePanel accent>
             <ArchiveSectionHeader
               overline="THEME"
-              title="컬렉션 테마"
-              subtitle="아카이브 표지 분위기를 선택하세요."
+              title={t('collection.create.theme.title')}
+              subtitle={t('collection.create.theme.subtitle')}
             />
 
             <ThemePreview source={selectedTheme.bgImage} resizeMode="cover" />
@@ -203,8 +209,8 @@ function CollectionScreen() {
           <ArchivePanel accent compact>
             <ArchiveSectionHeader
               overline="FILMS"
-              title="영화 추가"
-              subtitle="기록한 영화 중 컬렉션에 담을 작품을 고르세요."
+              title={t('collection.create.films.title')}
+              subtitle={t('collection.create.films.subtitle')}
             />
 
             {isMoviesLoading ? (
@@ -212,9 +218,7 @@ function CollectionScreen() {
                 <ActivityIndicator color={theme.colors.primary} />
               </MovieState>
             ) : userMovies.length === 0 ? (
-              <ArchiveEmptyText>
-                아직 기록한 영화가 없습니다. 영화를 먼저 기록해주세요.
-              </ArchiveEmptyText>
+              <ArchiveEmptyText>{t('collection.create.films.empty')}</ArchiveEmptyText>
             ) : (
               <LegendList
                 data={userMovies}
@@ -253,7 +257,9 @@ function CollectionScreen() {
 
             {selectedMovieIds.length > 0 ? (
               <SelectedCount>
-                {selectedMovieIds.length}편 선택됨
+                {t('common.units.filmCountSelected', {
+                  count: selectedMovieIds.length,
+                })}
               </SelectedCount>
             ) : null}
           </ArchivePanel>
@@ -265,7 +271,7 @@ function CollectionScreen() {
             {isSubmitting ? (
               <ActivityIndicator color={theme.colors.appBackground} />
             ) : (
-              <SubmitLabel>컬렉션 만들기</SubmitLabel>
+              <SubmitLabel>{t('collection.create.submit')}</SubmitLabel>
             )}
           </SubmitButton>
         </FormContent>

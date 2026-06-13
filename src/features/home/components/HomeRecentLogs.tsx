@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/native';
 
 import {
@@ -27,6 +28,7 @@ function HomeRecentLogs({
   onViewAll,
   onPressReview,
 }: HomeRecentLogsProps) {
+  const { t } = useTranslation();
   const recentReviews = useMemo(
     () => reviews.slice(0, HOME_RECENT_LIMIT),
     [reviews],
@@ -40,13 +42,13 @@ function HomeRecentLogs({
         <HeaderFrame>
           <ArchiveSectionHeader
             overline="RECENT LOG"
-            title="최근 기록"
-            subtitle="가장 최근에 남긴 감상."
+            title={t('common.archive.recentLog.title')}
+            subtitle={t('common.archive.recentLog.subtitle')}
           />
         </HeaderFrame>
         {showViewAll ? (
           <ViewAllButton onPress={onViewAll}>
-            <ViewAllLabel>모두 보기</ViewAllLabel>
+            <ViewAllLabel>{t('common.actions.viewAll')}</ViewAllLabel>
             <ViewAllChevron>›</ViewAllChevron>
           </ViewAllButton>
         ) : null}
@@ -57,9 +59,7 @@ function HomeRecentLogs({
           <ActivityIndicator color={theme.colors.primary} />
         </LoadingState>
       ) : recentReviews.length === 0 ? (
-        <ArchiveEmptyText>
-          아직 남긴 기록이 없습니다. 첫 영화를 기록해보세요.
-        </ArchiveEmptyText>
+        <ArchiveEmptyText>{t('home.empty.noLogs')}</ArchiveEmptyText>
       ) : (
         <LogList>
           {recentReviews.map((review, index) => (

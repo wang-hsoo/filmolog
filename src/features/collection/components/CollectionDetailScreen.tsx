@@ -13,6 +13,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
@@ -44,10 +45,12 @@ type DetailRoute = RouteProp<RootStackParamList, 'CollectionDetail'>;
 
 type MovieSortKey = 'latest' | 'ratingDesc';
 
-const MOVIE_SORT_OPTIONS: { key: MovieSortKey; label: string }[] = [
-  { key: 'latest', label: '최신 등록순' },
-  { key: 'ratingDesc', label: '평점 높은순' },
-];
+function getMovieSortOptions(t: ReturnType<typeof useTranslation>['t']) {
+  return [
+    { key: 'latest' as const, label: t('common.sort.latestAdded') },
+    { key: 'ratingDesc' as const, label: t('common.sort.ratingDesc') },
+  ];
+}
 
 function getTheme(themeId: string) {
   return (
@@ -83,7 +86,10 @@ function formatRating(rating: number) {
   return rating.toFixed(1);
 }
 
-function formatMovieMeta(movie: CollectionMovieItem) {
+function formatMovieMeta(
+  t: ReturnType<typeof useTranslation>['t'],
+  movie: CollectionMovieItem,
+) {
   const dateSource =
     movie.watchedDate ?? movie.addedAt?.slice(0, 10) ?? null;
 
@@ -94,8 +100,8 @@ function formatMovieMeta(movie: CollectionMovieItem) {
   const formatted = dateSource.replace(/-/g, '.');
 
   return movie.watchedDate
-    ? `시청 · ${formatted}`
-    : `담음 · ${formatted}`;
+    ? t('common.movieMeta.watchedPrefix', { date: formatted })
+    : t('common.movieMeta.addedPrefix', { date: formatted });
 }
 
 function calcAverageRating(movies: CollectionMovieItem[]) {
@@ -122,8 +128,9 @@ function FilmListRow({
   onPress: () => void;
   onPressMore: () => void;
 }) {
+  const { t } = useTranslation();
   const posterUri = getTmdbPosterUrl(movie.posterPath);
-  const metaLabel = formatMovieMeta(movie);
+  const metaLabel = formatMovieMeta(t, movie);
 
 
   return (
@@ -162,7 +169,7 @@ function FilmListRow({
                 />
                 <RowRatingText>{formatRating(movie.rating)}</RowRatingText>
               </RowRatingValue>
-              <RowRatingLabel>내 평점</RowRatingLabel>
+              <RowRatingLabel>{t('common.movieMeta.myRating')}</RowRatingLabel>
             </>
           ) : (
             <RowRatingLabel>—</RowRatingLabel>
@@ -189,6 +196,7 @@ function FilmListRow({
 }
 
 function CollectionDetailScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<DetailRoute>();
@@ -219,6 +227,8 @@ function CollectionDetailScreen() {
     [collection?.theme_id],
   );
 
+  const movieSortOptions = useMemo(() => getMovieSortOptions(t), [t]);
+
   const sortedMovies = useMemo(
     () => sortMovies(collection?.movies ?? [], sortKey),
     [collection?.movies, sortKey],
@@ -230,8 +240,8 @@ function CollectionDetailScreen() {
   );
 
   const activeSortLabel =
-    MOVIE_SORT_OPTIONS.find(option => option.key === sortKey)?.label ??
-    '최신 등록순';
+    movieSortOptions.find(option => option.key === sortKey)?.label ??
+    t('common.sort.latestAdded');
 
   const handleSelectSort = useCallback((key: MovieSortKey) => {
     setSortKey(key);
@@ -277,11 +287,11 @@ function CollectionDetailScreen() {
       setActionMovie(null);
     } catch {
       archiveAlert(
-        '삭제 실패',
-        '영화를 컬렉션에서 제거하지 못했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.deleteFailed.generic'),
+        t('errors.deleteFailed.collectionMovie'),
       );
     }
-  }, [actionMovie, collectionId, removeCollectionMovie]);
+  }, [actionMovie, collectionId, removeCollectionMovie, t]);
 
   const handleDeleteCollection = useCallback(() => {
     if (!collection) {
@@ -291,12 +301,12 @@ function CollectionDetailScreen() {
     setIsCollectionMenuOpen(false);
 
     archiveAlert(
-      '컬렉션 삭제',
-      `"${collection.name}" 컬렉션을 삭제할까요?\n담긴 영화 목록도 함께 삭제됩니다. (영화 기록은 유지됩니다)`,
+      t('dialogs.deleteCollection.title'),
+      t('dialogs.deleteCollection.message', { name: collection.name }),
       [
-        { text: '취소', style: 'cancel' },
+        { text: t('common.actions.cancel'), style: 'cancel' },
         {
-          text: '삭제',
+          text: t('common.actions.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -304,15 +314,15 @@ function CollectionDetailScreen() {
               navigation.goBack();
             } catch {
               archiveAlert(
-                '삭제 실패',
-                '컬렉션을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.',
+                t('errors.deleteFailed.generic'),
+                t('errors.deleteFailed.collection'),
               );
             }
           },
         },
       ],
     );
-  }, [collection, collectionId, deleteCollection, navigation]);
+  }, [collection, collectionId, deleteCollection, navigation, t]);
 
   return (
     <ScreenRoot style={{ paddingTop: insets.top }}>
@@ -330,7 +340,7 @@ function CollectionDetailScreen() {
       ) : isError || !collection ? (
         <ErrorState>
           <ArchiveEmptyText>
-            컬렉션을 불러오지 못했습니다.
+            {t('collection.detail.loadFailed')}
           </ArchiveEmptyText>
         </ErrorState>
       ) : (
@@ -370,7 +380,7 @@ function CollectionDetailScreen() {
                 <StatsRow>
                   <StatBlock>
                     <StatValue>{collection.movies.length}</StatValue>
-                    <StatLabel>영화</StatLabel>
+                    <StatLabel>{t('common.stats.movies')}</StatLabel>
                   </StatBlock>
                   <StatDivider />
                   <StatBlock>
@@ -379,7 +389,7 @@ function CollectionDetailScreen() {
                         ? formatRating(averageRating)
                         : '—'}
                     </StatValue>
-                    <StatLabel>평균 평점</StatLabel>
+                    <StatLabel>{t('common.stats.avgRatingShort')}</StatLabel>
                   </StatBlock>
                 </StatsRow>
               </JournalBody>
@@ -389,10 +399,12 @@ function CollectionDetailScreen() {
               <FilmsPanelHeader>
                 <FilmsPanelTitles>
                   <FilmsPanelOverline>FILMS</FilmsPanelOverline>
-                  <FilmsPanelTitle>담긴 영화</FilmsPanelTitle>
+                  <FilmsPanelTitle>{t('collection.detail.filmsTitle')}</FilmsPanelTitle>
                 </FilmsPanelTitles>
                 <SortTrigger onPress={() => setIsSortOpen(true)}>
-                  <SortLabel>정렬: {activeSortLabel}</SortLabel>
+                  <SortLabel>
+                    {t('common.sort.sortPrefix', { label: activeSortLabel })}
+                  </SortLabel>
                   <Icon
                     name="chevron-down"
                     size={14}
@@ -404,7 +416,7 @@ function CollectionDetailScreen() {
               {sortedMovies.length === 0 ? (
                 <FilmsEmptyBody>
                   <ArchiveEmptyText>
-                    아직 담긴 영화가 없습니다.
+                    {t('collection.detail.emptyFilms')}
                   </ArchiveEmptyText>
                 </FilmsEmptyBody>
               ) : (
@@ -433,7 +445,7 @@ function CollectionDetailScreen() {
             navigation.navigate('CollectionAddMovies', { collectionId })
           }>
           <Icon name="plus" size={16} color={theme.colors.primary} />
-          <AddMovieFabLabel>영화 추가</AddMovieFabLabel>
+          <AddMovieFabLabel>{t('collection.detail.addFilm')}</AddMovieFabLabel>
         </AddMovieFab>
       ) : null}
 
@@ -445,9 +457,9 @@ function CollectionDetailScreen() {
         <SortModalRoot>
           <SortBackdrop onPress={() => setIsSortOpen(false)} />
           <SortMenu style={{ top: insets.top + 200, right: H_PAD }}>
-            {MOVIE_SORT_OPTIONS.map((option, index) => {
+            {movieSortOptions.map((option, index) => {
               const isActive = option.key === sortKey;
-              const isLast = index === MOVIE_SORT_OPTIONS.length - 1;
+              const isLast = index === movieSortOptions.length - 1;
 
               return (
                 <SortOption
@@ -494,7 +506,9 @@ function CollectionDetailScreen() {
                   size={18}
                   color={theme.colors.primary}
                 />
-                <ActionSheetButtonLabel>기록 보기</ActionSheetButtonLabel>
+                <ActionSheetButtonLabel>
+                  {t('common.actions.viewLog')}
+                </ActionSheetButtonLabel>
               </ActionSheetButton>
             ) : null}
 
@@ -512,7 +526,7 @@ function CollectionDetailScreen() {
                     color={DESTRUCTIVE_COLOR}
                   />
                   <ActionSheetButtonLabel $destructive>
-                    컬렉션에서 삭제
+                    {t('collection.detail.removeFromCollection')}
                   </ActionSheetButtonLabel>
                 </>
               )}
@@ -522,7 +536,9 @@ function CollectionDetailScreen() {
               $isLast
               disabled={isRemovingMovie}
               onPress={handleCloseActionModal}>
-              <ActionSheetButtonLabel>취소</ActionSheetButtonLabel>
+              <ActionSheetButtonLabel>
+                {t('common.actions.cancel')}
+              </ActionSheetButtonLabel>
             </ActionSheetButton>
           </ActionSheet>
         </ActionModalRoot>
@@ -553,7 +569,7 @@ function CollectionDetailScreen() {
                     color={DESTRUCTIVE_COLOR}
                   />
                   <CollectionMenuLabel $destructive>
-                    컬렉션 삭제
+                    {t('collection.detail.deleteCollection')}
                   </CollectionMenuLabel>
                 </>
               )}

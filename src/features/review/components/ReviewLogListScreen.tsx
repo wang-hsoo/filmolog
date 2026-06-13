@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -15,14 +16,16 @@ import { ArchiveBannerAd, ArchiveEmptyText, Header } from '../../../components';
 import { useAuth, useGetUserReviewedMovies } from '../../../lib/supabase';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 import { AppScreen, theme } from '../../../theme';
+import {
+  getReviewPeriodOptions,
+  getReviewSortOptions,
+  getReviewViewOptions,
+} from '../../../i18n/labels';
 
 import ReviewLogCalendarView from './ReviewLogCalendarView';
 import ReviewLogRow from './ReviewLogRow';
 import ReviewLogTimelineView from './ReviewLogTimelineView';
 import {
-  REVIEW_PERIOD_OPTIONS,
-  REVIEW_SORT_OPTIONS,
-  REVIEW_VIEW_OPTIONS,
   filterReviewsByPeriod,
   groupReviewsByDate,
   sortReviews,
@@ -35,6 +38,7 @@ const H_PAD = 20;
 const MIN_REVIEWS_FOR_BANNER = 15;
 
 function ReviewLogListScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
@@ -63,13 +67,17 @@ function ReviewLogListScreen() {
     [periodFilteredReviews, sortKey],
   );
 
+  const sortOptions = useMemo(() => getReviewSortOptions(t), [t]);
+  const viewOptions = useMemo(() => getReviewViewOptions(t), [t]);
+  const periodOptions = useMemo(() => getReviewPeriodOptions(t), [t]);
+
   const activeSortLabel =
-    REVIEW_SORT_OPTIONS.find(option => option.key === sortKey)?.label ??
-    '최신 기록순';
+    sortOptions.find(option => option.key === sortKey)?.label ??
+    t('common.sort.latestLog');
 
   const activePeriodLabel =
-    REVIEW_PERIOD_OPTIONS.find(option => option.key === periodKey)?.label ??
-    '전체 기간';
+    periodOptions.find(option => option.key === periodKey)?.label ??
+    t('common.period.all');
 
   const handlePressReview = useCallback(
     (review: UserReviewedMovie) => {
@@ -101,12 +109,14 @@ function ReviewLogListScreen() {
           flexGrow: 1,
         }}>
         <ToolbarRow>
-          <ToolbarTitle>나의 기록</ToolbarTitle>
-          <ToolbarMeta>{periodFilteredReviews.length}편</ToolbarMeta>
+          <ToolbarTitle>{t('review.list.title')}</ToolbarTitle>
+          <ToolbarMeta>
+            {t('common.units.filmCount', { count: periodFilteredReviews.length })}
+          </ToolbarMeta>
         </ToolbarRow>
 
         <ViewTabRow>
-          {REVIEW_VIEW_OPTIONS.map(option => {
+          {viewOptions.map(option => {
             const isActive = viewMode === option.key;
 
             return (
@@ -122,7 +132,9 @@ function ReviewLogListScreen() {
 
         <FilterRow>
           <FilterChip onPress={() => setIsPeriodOpen(true)}>
-            <FilterChipLabel>기간 · {activePeriodLabel}</FilterChipLabel>
+            <FilterChipLabel>
+              {t('common.sort.periodPrefix', { label: activePeriodLabel })}
+            </FilterChipLabel>
             <Icon
               name="chevron-down"
               size={14}
@@ -132,7 +144,9 @@ function ReviewLogListScreen() {
 
           {showSortControl ? (
             <FilterChip onPress={() => setIsSortOpen(true)}>
-              <FilterChipLabel>정렬 · {activeSortLabel}</FilterChipLabel>
+              <FilterChipLabel>
+                {t('common.sort.sortChipPrefix', { label: activeSortLabel })}
+              </FilterChipLabel>
               <Icon
                 name="chevron-down"
                 size={14}
@@ -150,8 +164,8 @@ function ReviewLogListScreen() {
           <EmptyState>
             <ArchiveEmptyText>
               {reviews.length === 0
-                ? '아직 남긴 기록이 없습니다. 첫 영화를 기록해보세요.'
-                : '선택한 기간에 해당하는 기록이 없습니다.'}
+                ? t('review.list.emptyAll')
+                : t('review.list.emptyPeriod')}
             </ArchiveEmptyText>
           </EmptyState>
         ) : (
@@ -200,10 +214,10 @@ function ReviewLogListScreen() {
         <SortModalRoot>
           <SortBackdrop onPress={() => setIsSortOpen(false)} />
           <SortSheet>
-            {REVIEW_SORT_OPTIONS.map((option, index) => (
+            {sortOptions.map((option, index) => (
               <SortOption
                 key={option.key}
-                $isLast={index === REVIEW_SORT_OPTIONS.length - 1}
+                $isLast={index === sortOptions.length - 1}
                 $active={sortKey === option.key}
                 onPress={() => handleSelectSort(option.key)}>
                 <SortOptionLabel $active={sortKey === option.key}>
@@ -226,10 +240,10 @@ function ReviewLogListScreen() {
         <SortModalRoot>
           <SortBackdrop onPress={() => setIsPeriodOpen(false)} />
           <SortSheet>
-            {REVIEW_PERIOD_OPTIONS.map((option, index) => (
+            {periodOptions.map((option, index) => (
               <SortOption
                 key={option.key}
-                $isLast={index === REVIEW_PERIOD_OPTIONS.length - 1}
+                $isLast={index === periodOptions.length - 1}
                 $active={periodKey === option.key}
                 onPress={() => handleSelectPeriod(option.key)}>
                 <SortOptionLabel $active={periodKey === option.key}>

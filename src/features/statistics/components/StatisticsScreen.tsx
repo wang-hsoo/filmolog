@@ -1,6 +1,7 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -54,12 +55,10 @@ import {
   getTopRatedReviews,
 } from '../utils/reviewStats';
 
-const TAGLINE =
-  '모든 기록은 한 편의 영화가 되어 당신이라는 필모그래피로 남습니다.';
-
 const H_PAD = 20;
 
 function StatisticsScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
   const { profile } = useProfileContext();
@@ -158,16 +157,19 @@ function StatisticsScreen() {
   const yearDelta = yearSummary.count - yearSummary.previousYearCount;
   const yearDeltaLabel =
     yearDelta > 0
-      ? `작년보다 +${yearDelta}`
+      ? t('statistics.insights.yearDeltaUp', { delta: yearDelta })
       : yearDelta < 0
-        ? `작년보다 ${yearDelta}`
+        ? t('statistics.insights.yearDeltaDown', { delta: yearDelta })
         : yearSummary.previousYearCount > 0
-          ? '작년과 동일'
+          ? t('statistics.insights.yearDeltaSame')
           : null;
 
   return (
     <Container isGetter={false}>
-      <ArchivePageHeader title="통계" subtitle={TAGLINE} />
+      <ArchivePageHeader
+        title={t('statistics.pageTitle')}
+        subtitle={t('statistics.tagline')}
+      />
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <Content>
@@ -180,26 +182,26 @@ function StatisticsScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="SUMMARY"
-                  title="나의 필모그래피"
-                  subtitle="숫자로 읽는 기록의 윤곽."
+                  title={t('statistics.sections.filmography.title')}
+                  subtitle={t('statistics.sections.filmography.subtitle')}
                 />
                 <SummaryGrid>
                   <SummaryItem>
-                    <SummaryLabel>총 기록</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.totalLogs')}</SummaryLabel>
                     <SummaryValue>{reviewCount}</SummaryValue>
                   </SummaryItem>
                   <SummaryItem>
-                    <SummaryLabel>평균 평점</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.avgRatingShort')}</SummaryLabel>
                     <SummaryValue>
                       {reviewCount > 0 ? formatRating(avgRating) : '—'}
                     </SummaryValue>
                   </SummaryItem>
                   <SummaryItem>
-                    <SummaryLabel>이번 달</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.thisMonth')}</SummaryLabel>
                     <SummaryValue>{thisMonthCount}</SummaryValue>
                   </SummaryItem>
                   <SummaryItem>
-                    <SummaryLabel>최근 30일</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.last30Days')}</SummaryLabel>
                     <SummaryValue>{last30DaysCount}</SummaryValue>
                   </SummaryItem>
                 </SummaryGrid>
@@ -209,16 +211,16 @@ function StatisticsScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline={`${yearSummary.year}`}
-                  title="올해의 기록"
-                  subtitle="한 해의 필모그래피 결산."
+                  title={t('statistics.sections.thisYear.title')}
+                  subtitle={t('statistics.sections.thisYear.subtitle')}
                 />
                 <SummaryGrid>
                   <SummaryItem>
-                    <SummaryLabel>올해 기록</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.thisYearLogs')}</SummaryLabel>
                     <SummaryValue>{yearSummary.count}</SummaryValue>
                   </SummaryItem>
                   <SummaryItem>
-                    <SummaryLabel>올해 평균</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.thisYearAvg')}</SummaryLabel>
                     <SummaryValue>
                       {yearSummary.count > 0
                         ? formatRating(yearSummary.avgRating)
@@ -226,11 +228,11 @@ function StatisticsScreen() {
                     </SummaryValue>
                   </SummaryItem>
                   <SummaryItem>
-                    <SummaryLabel>위시리스트</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.wishlistCount')}</SummaryLabel>
                     <SummaryValue>{wishlistCount}</SummaryValue>
                   </SummaryItem>
                   <SummaryItem>
-                    <SummaryLabel>컬렉션</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.collections')}</SummaryLabel>
                     <SummaryValue>{collectionCount}</SummaryValue>
                   </SummaryItem>
                 </SummaryGrid>
@@ -242,16 +244,16 @@ function StatisticsScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="JOURNAL"
-                  title="기록 습관"
-                  subtitle="평점과 함께 남긴 글의 온도."
+                  title={t('statistics.sections.journalHabit.title')}
+                  subtitle={t('statistics.sections.journalHabit.subtitle')}
                 />
                 <SummaryGrid>
                   <SummaryItem>
-                    <SummaryLabel>글 남긴 기록</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.withJournal')}</SummaryLabel>
                     <SummaryValue>{journalStats.contentRate}%</SummaryValue>
                   </SummaryItem>
                   <SummaryItem>
-                    <SummaryLabel>평균 글자 수</SummaryLabel>
+                    <SummaryLabel>{t('common.stats.avgChars')}</SummaryLabel>
                     <SummaryValue>
                       {journalStats.withContentCount > 0
                         ? journalStats.avgContentLength
@@ -261,38 +263,40 @@ function StatisticsScreen() {
                 </SummaryGrid>
                 <InsightText>
                   {journalStats.totalReviews === 0
-                    ? '첫 리뷰를 남기면 기록 습관이 집계됩니다.'
-                    : `${journalStats.withContentCount}편에 감상을 적었습니다.`}
+                    ? t('statistics.insights.journalEmpty')
+                    : t('statistics.insights.journalCount', {
+                        count: journalStats.withContentCount,
+                      })}
                 </InsightText>
               </ArchivePanel>
 
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="TIMELINE"
-                  title="월별 기록"
-                  subtitle="최근 6개월간 쌓인 장면 수."
+                  title={t('statistics.sections.monthly.title')}
+                  subtitle={t('statistics.sections.monthly.subtitle')}
                 />
                 <StatisticsBarChart
                   items={monthlyCounts.map(item => ({
                     label: item.label,
                     value: item.count,
                   }))}
-                  emptyMessage="기록이 쌓이면 월별 그래프가 표시됩니다."
+                  emptyMessage={t('statistics.sections.monthly.empty')}
                 />
               </ArchivePanel>
 
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="RATING"
-                  title="평점 분포"
-                  subtitle="별점별로 남긴 기록의 무게."
+                  title={t('statistics.sections.ratingDistribution.title')}
+                  subtitle={t('statistics.sections.ratingDistribution.subtitle')}
                 />
                 <StatisticsBarChart
                   items={ratingBuckets.map(item => ({
                     label: item.label,
                     value: item.count,
                   }))}
-                  emptyMessage="리뷰를 작성하면 평점 분포가 표시됩니다."
+                  emptyMessage={t('statistics.sections.ratingDistribution.empty')}
                 />
               </ArchivePanel>
 
@@ -305,17 +309,18 @@ function StatisticsScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="GENRE"
-                  title="장르 분포"
-                  subtitle="기록 속에서 드러나는 취향."
+                  title={t('statistics.sections.genreDistribution.title')}
+                  subtitle={t('statistics.sections.genreDistribution.subtitle')}
                 />
                 <StatisticsPieChart
                   slices={genreSlices}
-                  emptyMessage="장르 정보가 있는 기록이 쌓이면 파이 차트가 표시됩니다."
+                  emptyMessage={t('statistics.sections.genreDistribution.empty')}
                 />
                 {missingGenreReviewCount > 0 ? (
                   <GenreNote>
-                    장르 미등록 기록 {missingGenreReviewCount}편은 집계에서
-                    제외됩니다.
+                    {t('statistics.sections.genreDistribution.excludedNote', {
+                      count: missingGenreReviewCount,
+                    })}
                   </GenreNote>
                 ) : null}
               </ArchivePanel>
@@ -324,13 +329,13 @@ function StatisticsScreen() {
                 <ArchivePanel accent>
                   <ArchiveSectionHeader
                     overline="TASTE"
-                    title="선호 장르 vs 실제"
-                    subtitle="온보딩에서 고른 취향의 흔적."
+                    title={t('statistics.sections.preferredVsActual.title')}
+                    subtitle={t('statistics.sections.preferredVsActual.subtitle')}
                   />
                   <StatisticsPersonRank
                     items={preferredGenreRankings}
-                    valueSuffix="회"
-                    emptyMessage="선호 장르 기록이 없습니다."
+                    valueSuffix={t('common.units.times')}
+                    emptyMessage={t('statistics.sections.preferredVsActual.empty')}
                   />
                   {preferredGenreInsight ? (
                     <InsightText>{preferredGenreInsight}</InsightText>
@@ -341,32 +346,33 @@ function StatisticsScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="GENRE RATING"
-                  title="장르별 평균 평점"
-                  subtitle="2편 이상 기록한 장르만 표시."
+                  title={t('statistics.sections.genreRating.title')}
+                  subtitle={t('statistics.sections.genreRating.subtitle')}
                 />
                 <StatisticsGenreRating
                   items={genreRatingStats}
-                  emptyMessage="장르당 2편 이상 기록이 쌓이면 표시됩니다."
+                  emptyMessage={t('statistics.sections.genreRating.empty')}
                 />
               </ArchivePanel>
 
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="ERA"
-                  title="개봉 연대별"
-                  subtitle="어떤 시대의 영화를 주로 남겼는지."
+                  title={t('statistics.sections.decade.title')}
+                  subtitle={t('statistics.sections.decade.subtitle')}
                 />
                 <StatisticsBarChart
                   items={decadeCounts.map(item => ({
-                    label: item.label.replace('년대', ''),
+                    label: String(Number.parseInt(item.key, 10)),
                     value: item.count,
                   }))}
-                  emptyMessage="개봉 연도가 있는 기록이 쌓이면 표시됩니다."
+                  emptyMessage={t('statistics.sections.decade.empty')}
                 />
                 {missingReleaseYearCount > 0 ? (
                   <GenreNote>
-                    개봉 연도 미등록 기록 {missingReleaseYearCount}편은 집계에서
-                    제외됩니다.
+                    {t('statistics.sections.decade.excludedNote', {
+                      count: missingReleaseYearCount,
+                    })}
                   </GenreNote>
                 ) : null}
               </ArchivePanel>
@@ -374,17 +380,18 @@ function StatisticsScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="DIRECTOR"
-                  title="선호 감독"
-                  subtitle="기록 속에 자주 등장하는 연출."
+                  title={t('statistics.sections.directors.title')}
+                  subtitle={t('statistics.sections.directors.subtitle')}
                 />
                 <StatisticsPersonRank
                   items={directorRankings}
-                  emptyMessage="감독 정보가 있는 기록이 쌓이면 순위가 표시됩니다."
+                  emptyMessage={t('statistics.sections.directors.empty')}
                 />
                 {missingDirectorCount > 0 ? (
                   <GenreNote>
-                    감독 미등록 기록 {missingDirectorCount}편은 집계에서
-                    제외됩니다.
+                    {t('statistics.sections.directors.excludedNote', {
+                      count: missingDirectorCount,
+                    })}
                   </GenreNote>
                 ) : null}
               </ArchivePanel>
@@ -392,17 +399,18 @@ function StatisticsScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="CAST"
-                  title="선호 배우"
-                  subtitle="주연 billing top 5 기준."
+                  title={t('statistics.sections.cast.title')}
+                  subtitle={t('statistics.sections.cast.subtitle')}
                 />
                 <StatisticsPersonRank
                   items={castRankings}
-                  emptyMessage="배우 정보가 있는 기록이 쌓이면 순위가 표시됩니다."
+                  emptyMessage={t('statistics.sections.cast.empty')}
                 />
                 {missingCastCount > 0 ? (
                   <GenreNote>
-                    배우 미등록 기록 {missingCastCount}편은 집계에서
-                    제외됩니다.
+                    {t('statistics.sections.cast.excludedNote', {
+                      count: missingCastCount,
+                    })}
                   </GenreNote>
                 ) : null}
               </ArchivePanel>
@@ -410,12 +418,12 @@ function StatisticsScreen() {
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="HIGHLIGHTS"
-                  title="높은 평점 Top 3"
-                  subtitle="마음에 남은 장면들."
+                  title={t('statistics.sections.highlights.title')}
+                  subtitle={t('statistics.sections.highlights.subtitle')}
                 />
                 {topRated.length === 0 ? (
                   <ArchiveEmptyText>
-                    아직 기록된 작품이 없습니다.
+                    {t('statistics.sections.highlights.empty')}
                   </ArchiveEmptyText>
                 ) : (
                   <HighlightList>
@@ -446,7 +454,8 @@ function StatisticsScreen() {
                             {review.title}
                           </HighlightTitle>
                           <HighlightRating>
-                            {formatRating(review.rating)} / 5.0
+                            {formatRating(review.rating)}{' '}
+                            {t('common.rating.scaleSuffix')}
                           </HighlightRating>
                         </HighlightInfo>
                         <Icon
@@ -463,11 +472,11 @@ function StatisticsScreen() {
               <ArchivePanel>
                 <ArchiveSectionHeader
                   overline="BADGES"
-                  title="배지 진행"
-                  subtitle="필모그래피를 채워가는 업적."
+                  title={t('statistics.sections.badges.title')}
+                  subtitle={t('statistics.sections.badges.subtitle')}
                 />
                 <BadgeSummaryRow>
-                  <BadgeSummaryLabel>획득</BadgeSummaryLabel>
+                  <BadgeSummaryLabel>{t('common.stats.earned')}</BadgeSummaryLabel>
                   <BadgeSummaryValue>
                     {earnedBadges.length} / {ALL_BADGE_IDS.length}
                   </BadgeSummaryValue>
@@ -475,7 +484,9 @@ function StatisticsScreen() {
                 <BadgeLink
                   onPress={() => navigation.navigate('BadgeList')}
                   accessibilityRole="button">
-                  <BadgeLinkText>배지 전체 보기</BadgeLinkText>
+                  <BadgeLinkText>
+                    {t('statistics.sections.badges.viewAll')}
+                  </BadgeLinkText>
                   <Icon
                     name="chevron-right"
                     size={18}

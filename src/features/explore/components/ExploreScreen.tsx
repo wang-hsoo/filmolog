@@ -6,6 +6,7 @@ import {
 import { LegendList } from '@legendapp/list/react-native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
@@ -50,6 +51,7 @@ const SEARCH_AD_INTERVAL = 9;
 const SEARCH_MAX_ADS = 5;
 
 function ExploreScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
   const [feedKey, setFeedKey] = useState(0);
@@ -181,7 +183,7 @@ function ExploreScreen() {
       <ArchiveSearchInput
         value={searchQuery}
         onChangeText={setSearchQuery}
-        placeholder="컬렉션에서 작품 검색"
+        placeholder={t('explore.searchPlaceholder')}
         placeholderTextColor={theme.colors.placeholderText}
         returnKeyType="search"
         autoCorrect={false}
@@ -194,8 +196,8 @@ function ExploreScreen() {
       <ArchivePanel accent compact>
         <ArchiveSectionHeader
           overline="CURATION"
-          title="당신을 위한 큐레이션"
-          subtitle="선호 장르로 엄선한 작품을 아카이브에 담았습니다."
+          title={t('explore.curation.title')}
+          subtitle={t('explore.curation.subtitle')}
         />
 
         {isRecommendLoading ? (
@@ -203,11 +205,11 @@ function ExploreScreen() {
             <ActivityIndicator color={theme.colors.primary} />
           </ListPlaceholder>
         ) : genreIds.length === 0 ? (
-          <ArchiveEmptyText>선호 장르를 먼저 설정해주세요.</ArchiveEmptyText>
+          <ArchiveEmptyText>{t('explore.curation.setGenresFirst')}</ArchiveEmptyText>
         ) : isMoviesError ? (
-          <ArchiveEmptyText>영화 목록을 불러오지 못했습니다.</ArchiveEmptyText>
+          <ArchiveEmptyText>{t('explore.curation.loadFailed')}</ArchiveEmptyText>
         ) : recommendMovies.length === 0 ? (
-          <ArchiveEmptyText>조건에 맞는 작품이 없습니다.</ArchiveEmptyText>
+          <ArchiveEmptyText>{t('explore.curation.noMatches')}</ArchiveEmptyText>
         ) : (
           <LegendList
             data={curationListData}
@@ -234,8 +236,8 @@ function ExploreScreen() {
       {topDirector ? (
         <ExploreMovieShelf
           overline="YOUR TASTE"
-          title={`${topDirector.name}의 다른 작품`}
-          subtitle="Director’s Log · 당신의 리뷰로 다시 읽는 감독의 작품들."
+          title={t('explore.directorShelf.title', { name: topDirector.name })}
+          subtitle={t('explore.directorShelf.subtitle')}
           movies={directorRecommendMovies}
           isLoading={isDirectorCreditsLoading}
           isError={isDirectorCreditsError}
@@ -247,8 +249,8 @@ function ExploreScreen() {
       {topCast ? (
         <ExploreMovieShelf
           overline="YOUR TASTE"
-          title={`${topCast.name} 출연작`}
-          subtitle="당신의 페르소나 · 리뷰로 쌓아 올린 배우 아카이브."
+          title={t('explore.castShelf.title', { name: topCast.name })}
+          subtitle={t('explore.castShelf.subtitle')}
           movies={castRecommendMovies}
           isLoading={isCastCreditsLoading}
           isError={isCastCreditsError}
@@ -259,8 +261,8 @@ function ExploreScreen() {
 
       <ExploreMovieShelf
         overline="FILMOLOG PICKS"
-        title="커뮤니티 고평점"
-        subtitle="Filmolog 유저들이 높게 평가한 작품."
+        title={t('explore.communityTopRated.title')}
+        subtitle={t('explore.communityTopRated.subtitle')}
         movies={topRatedForMe}
         isLoading={isTopRatedLoading}
         isError={isTopRatedError}
@@ -272,13 +274,13 @@ function ExploreScreen() {
       {genreIds.length > 0 ? (
         <ExploreMovieShelf
           overline="YOUR GENRE"
-          title="내 장르, Filmolog 고평점"
-          subtitle="선호 장르 × 커뮤니티 평점."
+          title={t('explore.genreTopRated.title')}
+          subtitle={t('explore.genreTopRated.subtitle')}
           movies={topRatedByGenres}
           isLoading={isGenreTopRatedLoading}
           isError={isGenreTopRatedError}
           showRating
-          emptyMessage="장르 데이터가 쌓이면 추천이 표시됩니다. 리뷰를 작성해주세요."
+          emptyMessage={t('explore.genreTopRated.empty')}
           hideWhenEmpty
           onPressMovie={handlePressMovie}
         />
@@ -286,8 +288,8 @@ function ExploreScreen() {
 
       <ExploreMovieShelf
         overline="TRENDING LOGS"
-        title="많이 기록된 작품"
-        subtitle="Filmolog에서 가장 많이 리뷰된 영화."
+        title={t('explore.mostLogged.title')}
+        subtitle={t('explore.mostLogged.subtitle')}
         movies={mostReviewed}
         isLoading={isMostReviewedLoading}
         isError={isMostReviewedError}
@@ -297,8 +299,8 @@ function ExploreScreen() {
 
       <ExploreMovieShelf
         overline="COLLECTED"
-        title="많이 담긴 작품"
-        subtitle="컬렉션에 자주 담긴 영화."
+        title={t('explore.mostCollected.title')}
+        subtitle={t('explore.mostCollected.subtitle')}
         movies={mostCollected}
         isLoading={isMostCollectedLoading}
         isError={isMostCollectedError}
@@ -312,8 +314,8 @@ function ExploreScreen() {
   return (
     <Root>
       <ArchivePageHeader
-        title="탐색"
-        subtitle="기록되지 않은 걸작을, 나만의 아카이브에서 찾아보세요."
+        title={t('explore.header.title')}
+        subtitle={t('explore.header.subtitle')}
       />
 
       <ArchiveSearchPanel>{searchField}</ArchiveSearchPanel>
@@ -335,8 +337,10 @@ function ExploreScreen() {
                 <View style={{ marginBottom: 14 }}>
                   <ArchiveSectionHeader
                     overline="SEARCH"
-                    title="아카이브 검색"
-                    subtitle={`"${debouncedQuery.trim()}" 에 대한 기록`}
+                    title={t('explore.search.title')}
+                    subtitle={t('common.archive.searchResultsArchive', {
+                      query: debouncedQuery.trim(),
+                    })}
                   />
                 </View>
               }
@@ -347,11 +351,11 @@ function ExploreScreen() {
                   </SearchState>
                 ) : isSearchError ? (
                   <ArchiveEmptyText>
-                    검색 결과를 불러오지 못했습니다.
+                    {t('explore.search.loadFailed')}
                   </ArchiveEmptyText>
                 ) : (
                   <ArchiveEmptyText>
-                    아카이브에서 해당 작품을 찾지 못했습니다.
+                    {t('explore.search.notFound')}
                   </ArchiveEmptyText>
                 )
               }

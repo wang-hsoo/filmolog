@@ -1,4 +1,5 @@
 import { getSupabaseClient } from '../client';
+import { i18n } from '../../../i18n';
 import type { MoviePersonSnapshot } from '../../tmdb/creditsSnapshot';
 
 type MovieRow = {
@@ -89,7 +90,7 @@ export async function getUserReviewedMovies(
       content: review.content,
       watchedDate: review.watched_date,
       createdAt: review.created_at,
-      title: movie?.title ?? `영화 #${review.tmdb_id}`,
+      title: movie?.title ?? i18n.t('common.movieMeta.fallbackMovieTitle', { id: review.tmdb_id }),
       posterPath: movie?.poster_path ?? null,
       genreIds: movie?.genre_ids ?? [],
       releaseYear: movie?.release_year ?? null,

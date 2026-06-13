@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { useTranslation } from 'react-i18next';
 
 import { ArchiveEmptyText } from '../../../components';
 
@@ -15,14 +16,16 @@ type StatisticsBarChartProps = {
 
 function StatisticsBarChart({
   items,
-  emptyMessage = '표시할 데이터가 없습니다.',
+  emptyMessage,
   valueSuffix = '',
 }: StatisticsBarChartProps) {
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? t('common.archive.noData');
   const maxValue = Math.max(...items.map(item => item.value), 1);
   const hasData = items.some(item => item.value > 0);
 
   if (!hasData) {
-    return <ArchiveEmptyText>{emptyMessage}</ArchiveEmptyText>;
+    return <ArchiveEmptyText>{resolvedEmptyMessage}</ArchiveEmptyText>;
   }
 
   return (

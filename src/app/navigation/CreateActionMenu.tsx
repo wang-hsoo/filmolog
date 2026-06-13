@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
@@ -13,18 +14,14 @@ type CreateActionMenuProps = {
   onCollection: () => void;
 };
 
-const ACTION_BUTTON = [
-  {
-    icon: 'movie-open',
-    title: '영화기록',
-    subTitle: '평점, 한줄평, 감상작성',
-  },
-  {
-    icon: 'folder-outline',
-    title: '컬렉션 생성',
-    subTitle: '나만의 영화 모음 만들기',
-  },
-] as const;
+type CreateActionKey = 'filmLog' | 'collection';
+
+const ACTION_KEYS: CreateActionKey[] = ['filmLog', 'collection'];
+
+const ACTION_ICONS: Record<CreateActionKey, string> = {
+  filmLog: 'movie-open',
+  collection: 'folder-outline',
+};
 
 export function CreateActionMenu({
   visible,
@@ -33,6 +30,7 @@ export function CreateActionMenu({
   onFilmLog,
   onCollection,
 }: CreateActionMenuProps) {
+  const { t } = useTranslation();
   const backdropOpacity = useRef(new Animated.Value(0)).current;
   const actionsOpacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(12)).current;
@@ -65,12 +63,12 @@ export function CreateActionMenu({
     ]).start();
   }, [actionsOpacity, backdropOpacity, translateY, visible]);
 
-  const handleActionPress = (title: string) => {
-    switch (title) {
-      case '영화기록':
+  const handleActionPress = (key: CreateActionKey) => {
+    switch (key) {
+      case 'filmLog':
         onFilmLog();
         break;
-      case '컬렉션 생성':
+      case 'collection':
         onCollection();
         break;
     }
@@ -93,14 +91,20 @@ export function CreateActionMenu({
           transform: [{ translateY }],
         }}
         pointerEvents="box-none">
-        {ACTION_BUTTON.map(action => (
-          <ActionButton
-            key={action.title}
-            onPress={() => handleActionPress(action.title)}>
-            <Icon name={action.icon} size={32} color={theme.colors.primary} />
+        {ACTION_KEYS.map(key => (
+          <ActionButton key={key} onPress={() => handleActionPress(key)}>
+            <Icon
+              name={ACTION_ICONS[key]}
+              size={32}
+              color={theme.colors.primary}
+            />
             <ActionButtonColumn>
-              <ActionButtonText>{action.title}</ActionButtonText>
-              <ActionButtonSubText>{action.subTitle}</ActionButtonSubText>
+              <ActionButtonText>
+                {t(`tabs.createMenu.${key}.title`)}
+              </ActionButtonText>
+              <ActionButtonSubText>
+                {t(`tabs.createMenu.${key}.subtitle`)}
+              </ActionButtonSubText>
             </ActionButtonColumn>
           </ActionButton>
         ))}

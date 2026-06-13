@@ -1,5 +1,7 @@
 import { Linking, Platform } from 'react-native';
 
+import { i18n } from '../../i18n';
+
 export type FeedbackFormType = 'feature' | 'bug';
 
 const FEEDBACK_FORM_BASE =
@@ -12,10 +14,9 @@ const FEEDBACK_FORM_ENTRIES = {
   userId: '45843641',
 } as const;
 
-const FEEDBACK_TYPE_LABELS: Record<FeedbackFormType, string> = {
-  feature: '기능제안',
-  bug: '오류/버그 제보하기',
-};
+function getFeedbackTypeLabel(type: FeedbackFormType) {
+  return i18n.t(`settings.support.feedbackForm.${type}`);
+}
 
 type BuildFeedbackFormUrlInput = {
   type: FeedbackFormType;
@@ -31,7 +32,7 @@ export function buildFeedbackFormUrl({
   const platform = Platform.OS;
   const params = new URLSearchParams({
     usp: 'pp_url',
-    [`entry.${FEEDBACK_FORM_ENTRIES.type}`]: FEEDBACK_TYPE_LABELS[type],
+    [`entry.${FEEDBACK_FORM_ENTRIES.type}`]: getFeedbackTypeLabel(type),
     [`entry.${FEEDBACK_FORM_ENTRIES.version}`]: `${appVersion} (${platform})`,
     [`entry.${FEEDBACK_FORM_ENTRIES.userId}`]:
       userId ?? `guest (${platform})`,

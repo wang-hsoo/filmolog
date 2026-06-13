@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
@@ -13,6 +14,7 @@ import { useGetGenres } from '../../../lib/tmdb';
 const MAX_GENRE_SELECTION = 3;
 
 function GenreScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { profile } = useProfileContext();
   const { data, isLoading, isError } = useGetGenres();
@@ -46,8 +48,8 @@ function GenreScreen() {
       await completeOnboarding(selectedIds);
     } catch {
       archiveAlert(
-        '저장 실패',
-        '선호 장르 저장에 실패했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.saveFailed.generic'),
+        t('errors.saveFailed.genres'),
       );
     }
   };
@@ -65,13 +67,17 @@ function GenreScreen() {
       <Container>
         {nickname ? (
           <AnimatedEnter delay={80}>
-            <Greeting>{nickname}님, 거의 다 왔어요.</Greeting>
+            <Greeting>
+              {t('auth.genre.greeting', { nickname })}
+            </Greeting>
           </AnimatedEnter>
         ) : null}
 
         <AnimatedEnter delay={nickname ? 180 : 80}>
-          <Title>선호 장르를 선택해주세요.</Title>
-          <Subtitle>최대 {MAX_GENRE_SELECTION}개까지 선택할 수 있어요.</Subtitle>
+          <Title>{t('auth.genre.title')}</Title>
+          <Subtitle>
+            {t('auth.genre.subtitle', { count: MAX_GENRE_SELECTION })}
+          </Subtitle>
         </AnimatedEnter>
 
         <AnimatedEnter delay={nickname ? 280 : 180} style={styles.genreWrap}>
@@ -80,7 +86,7 @@ function GenreScreen() {
               <ActivityIndicator color={theme.colors.primary} size="large" />
             </LoaderWrap>
           ) : isError ? (
-            <ErrorText>장르 목록을 불러오지 못했습니다.</ErrorText>
+            <ErrorText>{t('auth.genre.loadFailed')}</ErrorText>
           ) : (
             <ScrollView
               showsVerticalScrollIndicator={false}
@@ -111,8 +117,12 @@ function GenreScreen() {
             $disabled={selectedIds.length === 0 || isSaving || isLoading}>
             <SubmitText>
               {isSaving
-                ? '저장 중...'
-                : `시작하기${selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}`}
+                ? t('common.actions.saving')
+                : selectedIds.length > 0
+                  ? t('auth.genre.startWithCount', {
+                      count: selectedIds.length,
+                    })
+                  : t('auth.genre.start')}
             </SubmitText>
           </SubmitButton>
         </AnimatedEnter>

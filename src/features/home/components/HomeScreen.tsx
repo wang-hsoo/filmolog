@@ -1,5 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { Image } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -10,8 +11,8 @@ import {
   ArchiveSectionHeader,
   Container,
   STATS_ICONS,
-  STATS_LABELS,
 } from '../../../components';
+import { getStatsLabel } from '../../../i18n/labels';
 import { useAuth, useGetUserStats, useGetUserReviewedMovies } from '../../../lib/supabase';
 import { useGetCollections } from '../../../lib/supabase/collection';
 import { theme } from '../../../theme';
@@ -21,6 +22,7 @@ import HomeCollectionShelf from './HomeCollectionShelf';
 import HomeRecentLogs from './HomeRecentLogs';
 
 function HomeScreen() {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
 
@@ -46,8 +48,8 @@ function HomeScreen() {
         <ArchivePanel accent>
           <ArchiveSectionHeader
             overline="MY ARCHIVE"
-            title="나의 기록"
-            subtitle="쌓아온 영화의 흔적을 한눈에."
+            title={t('common.archive.myArchive.title')}
+            subtitle={t('common.archive.myArchive.subtitle')}
           />
 
           <StatsRow>
@@ -63,7 +65,7 @@ function HomeScreen() {
                   color={theme.colors.dashboardIcon}
                 />
                 <StatItemLabel numberOfLines={2}>
-                  {STATS_LABELS[key as keyof typeof STATS_LABELS]}
+                  {getStatsLabel(t, key as keyof typeof STATS_ICONS)}
                 </StatItemLabel>
                 <StatItemValue>{value}</StatItemValue>
               </StatItem>

@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "build:apk": "cd android && gradlew.bat assembleRelease"
+    "build:apk": "cd android && gradlew.bat assembleRelease",
+    "android:sha1": "cd android && gradlew.bat signingReport"
   },
   "dependencies": {
     "@legendapp/list": "^3.0.3",
@@ -22,8 +23,10 @@
     "@tanstack/react-query": "^5.101.0",
     "axios": "^1.17.0",
     "css-to-react-native": "^3.2.0",
+    "i18next": "^26.3.1",
     "qs": "^6.15.2",
     "react": "19.2.3",
+    "react-i18next": "^17.0.8",
     "react-native": "0.85.3",
     "react-native-elements": "^3.4.3",
     "react-native-fast-image": "^8.6.3",

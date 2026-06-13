@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/native';
 
 import {
@@ -41,6 +42,7 @@ function HomeCollectionShelf({
   onViewAll,
   onPressCollection,
 }: HomeCollectionShelfProps) {
+  const { t } = useTranslation();
   const previewCollections = useMemo(
     () => collections.slice(0, HOME_PREVIEW_LIMIT),
     [collections],
@@ -52,13 +54,13 @@ function HomeCollectionShelf({
         <HeaderFrame>
           <ArchiveSectionHeader
             overline="MY COLLECTION"
-            title="나의 컬렉션"
-            subtitle="취향대로 묶어둔 아카이브."
+            title={t('common.archive.myCollection.title')}
+            subtitle={t('common.archive.myCollection.subtitle')}
           />
         </HeaderFrame>
         {onViewAll ? (
           <ViewAllButton onPress={onViewAll}>
-            <ViewAllLabel>모두 보기</ViewAllLabel>
+            <ViewAllLabel>{t('common.actions.viewAll')}</ViewAllLabel>
             <ViewAllChevron>›</ViewAllChevron>
           </ViewAllButton>
         ) : null}
@@ -69,9 +71,7 @@ function HomeCollectionShelf({
           <ActivityIndicator color={theme.colors.primary} />
         </LoadingState>
       ) : previewCollections.length === 0 ? (
-        <ArchiveEmptyText>
-          아직 컬렉션이 없습니다. 첫 아카이브를 만들어보세요.
-        </ArchiveEmptyText>
+        <ArchiveEmptyText>{t('home.empty.noCollections')}</ArchiveEmptyText>
       ) : (
         <ShelfFrame>
           <ScrollView

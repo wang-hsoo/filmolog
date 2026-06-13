@@ -7,10 +7,12 @@ import {
   Pressable,
   StyleSheet,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import LinearGradient from 'react-native-linear-gradient';
 import styled from 'styled-components/native';
 
 import type { Badge } from '../../../components/constants/badge.constants';
+import { getBadgeDescription, getBadgeName } from '../../../i18n/labels';
 import { brandLetterSpacing } from '../../../theme/typography';
 
 const AUTO_DISMISS_MS = 4200;
@@ -22,6 +24,7 @@ type BadgeUnlockOverlayProps = {
 };
 
 function BadgeUnlockOverlay({ badge, onDismiss }: BadgeUnlockOverlayProps) {
+  const { t } = useTranslation();
   const backdrop = useRef(new Animated.Value(0)).current;
   const cardScale = useRef(new Animated.Value(0.72)).current;
   const cardOpacity = useRef(new Animated.Value(0)).current;
@@ -250,7 +253,7 @@ function BadgeUnlockOverlay({ badge, onDismiss }: BadgeUnlockOverlayProps) {
             </SparkleLayer>
 
             <Overline>BADGE UNLOCKED</Overline>
-            <Title>뱃지 획득!</Title>
+            <Title>{t('badges.unlock.title')}</Title>
 
             <IconFrame>
               <AnimatedShimmer style={{ opacity: shimmerOpacity }} />
@@ -259,9 +262,9 @@ function BadgeUnlockOverlay({ badge, onDismiss }: BadgeUnlockOverlayProps) {
               </AnimatedIconWrap>
             </IconFrame>
 
-            <BadgeName>{badge.name}</BadgeName>
-            <BadgeDescription>{badge.description}</BadgeDescription>
-            <DismissHint>탭하여 닫기</DismissHint>
+            <BadgeName>{getBadgeName(t, badge.id)}</BadgeName>
+            <BadgeDescription>{getBadgeDescription(t, badge.id)}</BadgeDescription>
+            <DismissHint>{t('badges.unlock.dismissHint')}</DismissHint>
           </CardGradient>
         </AnimatedCard>
       </OverlayPressable>

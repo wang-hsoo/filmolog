@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { useTranslation } from 'react-i18next';
 
 import { ArchiveEmptyText } from '../../../components';
 import { formatRating } from '../../filmLog/utils/rating';
@@ -12,10 +13,13 @@ type StatisticsGenreRatingProps = {
 
 function StatisticsGenreRating({
   items,
-  emptyMessage = '표시할 데이터가 없습니다.',
+  emptyMessage,
 }: StatisticsGenreRatingProps) {
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? t('common.archive.noData');
+
   if (items.length === 0) {
-    return <ArchiveEmptyText>{emptyMessage}</ArchiveEmptyText>;
+    return <ArchiveEmptyText>{resolvedEmptyMessage}</ArchiveEmptyText>;
   }
 
   return (
@@ -30,7 +34,8 @@ function StatisticsGenreRating({
               <RankHeader>
                 <RankName numberOfLines={1}>{item.label}</RankName>
                 <RankMeta>
-                  {formatRating(item.avgRating)} · {item.count}편
+                  {formatRating(item.avgRating)} ·{' '}
+                  {t('common.units.filmCount', { count: item.count })}
                 </RankMeta>
               </RankHeader>
               <RankTrack>

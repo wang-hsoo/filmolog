@@ -1,3 +1,9 @@
+import { i18n } from '../../i18n';
+import {
+  formatRuntimeLocalized,
+  formatWatchedDateWithWeekdayLocalized,
+} from '../../i18n/labels';
+
 import type { TmdbMovieDetail } from './types';
 
 export function getReleaseYear(releaseDate: string) {
@@ -23,22 +29,7 @@ export function getCast(detail: TmdbMovieDetail, limit = 4) {
 }
 
 export function formatRuntime(minutes: number | null | undefined) {
-  if (!minutes || minutes <= 0) {
-    return null;
-  }
-
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-
-  if (hours === 0) {
-    return `${mins}분`;
-  }
-
-  if (mins === 0) {
-    return `${hours}시간`;
-  }
-
-  return `${hours}시간 ${mins}분`;
+  return formatRuntimeLocalized(i18n.t.bind(i18n), minutes);
 }
 
 export function getGenres(detail: TmdbMovieDetail) {
@@ -65,18 +56,5 @@ export function formatReleaseDate(value: string) {
 }
 
 export function formatWatchedDateWithWeekday(dateStr: string | null) {
-  if (!dateStr) {
-    return null;
-  }
-
-  const [year, month, day] = dateStr.split('-').map(Number);
-
-  if (!year || !month || !day) {
-    return dateStr.replace(/-/g, '.');
-  }
-
-  const date = new Date(year, month - 1, day);
-  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-
-  return `${String(year).padStart(4, '0')}.${String(month).padStart(2, '0')}.${String(day).padStart(2, '0')} (${weekdays[date.getDay()]})`;
+  return formatWatchedDateWithWeekdayLocalized(i18n.t.bind(i18n), dateStr);
 }

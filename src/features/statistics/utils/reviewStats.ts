@@ -1,4 +1,5 @@
 import { normalizeReviewRating } from '../../filmLog/utils/rating';
+import { i18n } from '../../../i18n';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 
 export type MonthlyCount = {
@@ -51,7 +52,9 @@ function formatMonthKey(date: Date) {
 
 function formatMonthLabel(key: string) {
   const [, month] = key.split('-');
-  return `${Number.parseInt(month, 10)}월`;
+  return i18n.t('common.movieMeta.monthLabel', {
+    month: Number.parseInt(month, 10),
+  });
 }
 
 export function buildMonthlyCounts(
@@ -95,7 +98,7 @@ export function buildRatingBuckets(reviews: UserReviewedMovie[]): RatingBucket[]
   }
 
   return stars.map(star => ({
-    label: `${star}점`,
+    label: i18n.t('common.movieMeta.ratingPoint', { star }),
     count: counts.get(star) ?? 0,
   }));
 }
@@ -131,7 +134,7 @@ export function buildGenreSlices(
     .slice(0, limit)
     .map(([genreId, count], index) => ({
       genreId,
-      label: genreNameById.get(genreId) ?? `장르 #${genreId}`,
+      label: genreNameById.get(genreId) ?? i18n.t('common.movieMeta.fallbackGenre', { id: genreId }),
       count,
       color: GENRE_CHART_COLORS[index % GENRE_CHART_COLORS.length],
       percent: Math.round((count / total) * 100),
@@ -261,7 +264,7 @@ function hasReviewContent(content: string | null): boolean {
 }
 
 function formatDecadeLabel(decadeStart: number) {
-  return `${decadeStart}년대`;
+  return i18n.t('common.movieMeta.decadeLabel', { decade: decadeStart });
 }
 
 export function buildDecadeCounts(
@@ -331,7 +334,7 @@ export function buildGenreRatingStats(
     .filter(([, { count }]) => count >= minCount)
     .map(([genreId, { sum, count }]) => ({
       genreId,
-      label: genreNameById.get(genreId) ?? `장르 #${genreId}`,
+      label: genreNameById.get(genreId) ?? i18n.t('common.movieMeta.fallbackGenre', { id: genreId }),
       avgRating: sum / count,
       count,
     }))
@@ -359,7 +362,7 @@ export function buildPreferredGenreStats(
   return preferredGenreIds
     .map(genreId => ({
       genreId,
-      label: genreNameById.get(genreId) ?? `장르 #${genreId}`,
+      label: genreNameById.get(genreId) ?? i18n.t('common.movieMeta.fallbackGenre', { id: genreId }),
       actualCount: actualCounts.get(genreId) ?? 0,
     }))
     .sort((a, b) => b.actualCount - a.actualCount);
@@ -374,11 +377,11 @@ export function getPreferredGenreInsight(
 
   const watched = preferredStats.filter(stat => stat.actualCount > 0);
   if (watched.length === 0) {
-    return '선호 장르의 기록이 아직 없습니다. 첫 장면을 남겨보세요.';
+    return i18n.t('statistics.insights.preferredGenreEmpty');
   }
 
   const top = watched[0];
-  return `선호 장르 중 「${top.label}」 기록이 가장 많습니다.`;
+  return i18n.t('statistics.insights.preferredGenreTop', { genre: top.label });
 }
 
 export function buildJournalStats(reviews: UserReviewedMovie[]): JournalStats {
@@ -431,16 +434,16 @@ export function buildYearSummary(reviews: UserReviewedMovie[]): YearSummary {
 
 export function getRaterInsight(avgRating: number, reviewCount: number): string {
   if (reviewCount === 0) {
-    return '첫 기록을 남기면 취향의 윤곽이 드러납니다.';
+    return i18n.t('statistics.insights.raterEmpty');
   }
 
   if (avgRating >= 4.2) {
-    return '관대한 평론가 — 좋은 장면을 넉넉히 기억하는 타입.';
+    return i18n.t('statistics.insights.raterGenerous');
   }
 
   if (avgRating <= 2.8) {
-    return '깐깐한 평론가 — 엄선한 장면만 필모그래피에 담습니다.';
+    return i18n.t('statistics.insights.raterStrict');
   }
 
-  return '균형 잡힌 시선 — 기록마다 장면의 온도가 고르게 남아 있습니다.';
+  return i18n.t('statistics.insights.raterBalanced');
 }

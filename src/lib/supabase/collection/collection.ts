@@ -1,4 +1,5 @@
 import { getSupabaseClient } from '../client';
+import { i18n } from '../../../i18n';
 
 import type {
   Collection,
@@ -339,7 +340,7 @@ export async function getCollectionDetail(
       return {
         tmdbId: row.tmdb_id,
         reviewId: review?.reviewId ?? null,
-        title: movie?.title ?? `영화 #${row.tmdb_id}`,
+        title: movie?.title ?? i18n.t('common.movieMeta.fallbackMovieTitle', { id: row.tmdb_id }),
         posterPath: movie?.poster_path ?? null,
         rating: review?.rating ?? null,
         watchedDate: review?.watchedDate ?? null,

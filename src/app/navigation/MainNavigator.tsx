@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useCallback, useState, type ComponentType } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HomeIcon from 'react-native-vector-icons/Entypo';
@@ -31,7 +32,6 @@ type TabKey = 'Home' | 'Explore' | 'Create' | 'Statistics' | 'Profile';
 
 type TabConfig = {
   key: TabKey;
-  name: string;
   component: ComponentType;
   isCenter?: boolean;
 };
@@ -39,28 +39,23 @@ type TabConfig = {
 const screens: TabConfig[] = [
   {
     key: 'Home',
-    name: '홈',
     component: HomeScreen,
   },
   {
     key: 'Explore',
-    name: '탐색',
     component: ExploreScreen,
   },
   {
     key: 'Create',
-    name: 'Create',
     component: () => null,
     isCenter: true,
   },
   {
     key: 'Statistics',
-    name: '통계',
     component: StatisticsScreen,
   },
   {
     key: 'Profile',
-    name: '마이페이지',
     component: ProfileScreen,
   },
 ];
@@ -84,7 +79,15 @@ function getTabBarHeight(bottomInset: number) {
   return TAB_BAR_HEIGHT + TAB_BAR_BOTTOM_PADDING + bottomInset;
 }
 
+const tabLabelKey: Record<Exclude<TabKey, 'Create'>, string> = {
+  Home: 'tabs.home',
+  Explore: 'tabs.explore',
+  Statistics: 'tabs.statistics',
+  Profile: 'tabs.profile',
+};
+
 function MainNavigator() {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
@@ -138,7 +141,7 @@ function MainNavigator() {
               return (
                 <Tab.Screen
                   key={screen.key}
-                  name={screen.name}
+                  name={screen.key}
                   component={screen.component}
                   listeners={{
                     tabPress: event => {
@@ -163,7 +166,7 @@ function MainNavigator() {
             return (
               <Tab.Screen
                 key={screen.key}
-                name={screen.name}
+                name={screen.key}
                 component={screen.component}
                 listeners={{
                   tabPress: () => {
@@ -175,7 +178,9 @@ function MainNavigator() {
                 options={{
                   tabBarIcon: ({ color }) =>
                     tabBarIcon(screen.key, color, TAB_ICON_SIZE),
-                  tabBarLabel: screen.name,
+                  tabBarLabel: t(
+                    tabLabelKey[screen.key as Exclude<TabKey, 'Create'>],
+                  ),
                 }}
               />
             );

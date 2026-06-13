@@ -2,6 +2,7 @@ import { LegendList } from '@legendapp/list/react-native';
 import { ActivityIndicator } from 'react-native';
 import { useMemo } from 'react';
 import styled from 'styled-components/native';
+import { useTranslation } from 'react-i18next';
 
 import {
   ArchiveEmptyText,
@@ -39,11 +40,14 @@ function ExploreMovieShelf({
   isLoading,
   isError,
   showRating = false,
-  emptyMessage = '아직 표시할 작품이 없습니다.',
+  emptyMessage,
   hideWhenEmpty = false,
   showNativeAd = true,
   onPressMovie,
 }: ExploreMovieShelfProps) {
+  const { t } = useTranslation();
+  const resolvedEmptyMessage =
+    emptyMessage ?? t('common.archive.noItems');
   const isInitialLoading = isLoading && movies.length === 0;
 
   const shelfData = useMemo(() => {
@@ -83,9 +87,9 @@ function ExploreMovieShelf({
           <ActivityIndicator color={theme.colors.primary} />
         </ListPlaceholder>
       ) : isError ? (
-        <ArchiveEmptyText>목록을 불러오지 못했습니다.</ArchiveEmptyText>
+        <ArchiveEmptyText>{t('common.archive.loadListFailed')}</ArchiveEmptyText>
       ) : movies.length === 0 ? (
-        <ArchiveEmptyText>{emptyMessage}</ArchiveEmptyText>
+        <ArchiveEmptyText>{resolvedEmptyMessage}</ArchiveEmptyText>
       ) : (
         <LegendList
           data={shelfData}

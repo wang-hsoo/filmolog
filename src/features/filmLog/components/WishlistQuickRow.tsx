@@ -1,5 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -48,6 +49,7 @@ function WishlistQuickRow({
   isError,
   onSelectMovie,
 }: WishlistQuickRowProps) {
+  const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const visibleItems = items.slice(0, QUICK_LIMIT);
   const hasMore = items.length > QUICK_LIMIT;
@@ -60,8 +62,8 @@ function WishlistQuickRow({
     <ArchivePanel accent compact>
       <ArchiveSectionHeader
         overline="WISHLIST"
-        title="위시리스트"
-        subtitle="담아둔 영화 중, 보신 작품이 있으신가요?"
+        title={t('filmLog.wishlist.title')}
+        subtitle={t('filmLog.wishlist.subtitle')}
       />
 
       {isLoading ? (
@@ -69,7 +71,7 @@ function WishlistQuickRow({
           <ActivityIndicator color={theme.colors.primary} size="small" />
         </LoaderWrap>
       ) : isError ? (
-        <ArchiveEmptyText>위시리스트를 불러오지 못했습니다.</ArchiveEmptyText>
+        <ArchiveEmptyText>{t('filmLog.wishlist.loadFailed')}</ArchiveEmptyText>
       ) : (
         <>
           <ChipScroll
@@ -103,8 +105,12 @@ function WishlistQuickRow({
               <MoreChip
                 onPress={() => navigation.navigate('WishlistList')}
                 accessibilityRole="button"
-                accessibilityLabel="위시리스트 전체 보기">
-                <MoreLabel>+{items.length - QUICK_LIMIT}</MoreLabel>
+                accessibilityLabel={t('common.accessibility.wishlistViewAll')}>
+                <MoreLabel>
+                  {t('common.units.moreItems', {
+                    count: items.length - QUICK_LIMIT,
+                  })}
+                </MoreLabel>
               </MoreChip>
             ) : null}
           </ChipScroll>
@@ -112,7 +118,7 @@ function WishlistQuickRow({
           <SeeAllLink
             onPress={() => navigation.navigate('WishlistList')}
             accessibilityRole="button">
-            <SeeAllText>위시리스트 전체 보기</SeeAllText>
+            <SeeAllText>{t('filmLog.wishlist.viewAll')}</SeeAllText>
             <Icon
               name="chevron-right"
               size={16}

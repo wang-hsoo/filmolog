@@ -1,0 +1,2000 @@
+{
+  "common": {
+    "brand": {
+      "filmolog": {
+        "ko": "FILMOLOG",
+        "en": "FILMOLOG"
+      },
+      "filmographer": {
+        "ko": "필모그래퍼",
+        "en": "Filmographer"
+      }
+    },
+    "actions": {
+      "confirm": {
+        "ko": "확인",
+        "en": "OK"
+      },
+      "cancel": {
+        "ko": "취소",
+        "en": "Cancel"
+      },
+      "delete": {
+        "ko": "삭제",
+        "en": "Delete"
+      },
+      "save": {
+        "ko": "저장",
+        "en": "Save"
+      },
+      "edit": {
+        "ko": "수정",
+        "en": "Edit"
+      },
+      "share": {
+        "ko": "공유",
+        "en": "Share"
+      },
+      "sharing": {
+        "ko": "공유 중…",
+        "en": "Sharing…"
+      },
+      "remove": {
+        "ko": "제거",
+        "en": "Remove"
+      },
+      "add": {
+        "ko": "담기",
+        "en": "Add"
+      },
+      "next": {
+        "ko": "다음",
+        "en": "Next"
+      },
+      "viewAll": {
+        "ko": "모두 보기",
+        "en": "View all"
+      },
+      "viewLog": {
+        "ko": "기록 보기",
+        "en": "View log"
+      },
+      "home": {
+        "ko": "홈",
+        "en": "Home"
+      },
+      "saving": {
+        "ko": "저장 중...",
+        "en": "Saving…"
+      },
+      "saveAction": {
+        "ko": "저장하기",
+        "en": "Save"
+      },
+      "saveWithCount": {
+        "ko": "저장하기 ({{count}})",
+        "en": "Save ({{count}})"
+      }
+    },
+    "accessibility": {
+      "back": {
+        "ko": "뒤로",
+        "en": "Go back"
+      },
+      "settings": {
+        "ko": "설정",
+        "en": "Settings"
+      },
+      "openCreateMenu": {
+        "ko": "기록 추가",
+        "en": "Add log"
+      },
+      "closeCreateMenu": {
+        "ko": "메뉴 닫기",
+        "en": "Close menu"
+      },
+      "dayBefore": {
+        "ko": "하루 전",
+        "en": "Previous day"
+      },
+      "dayAfter": {
+        "ko": "하루 후",
+        "en": "Next day"
+      },
+      "starHalf": {
+        "ko": "{{rating}}점",
+        "en": "{{rating}} stars"
+      },
+      "starFull": {
+        "ko": "{{rating}}점",
+        "en": "{{rating}} stars"
+      },
+      "wishlistViewAll": {
+        "ko": "위시리스트 전체 보기",
+        "en": "View full wishlist"
+      }
+    },
+    "calendar": {
+      "weekdays": {
+        "sun": {
+          "ko": "일",
+          "en": "Sun"
+        },
+        "mon": {
+          "ko": "월",
+          "en": "Mon"
+        },
+        "tue": {
+          "ko": "화",
+          "en": "Tue"
+        },
+        "wed": {
+          "ko": "수",
+          "en": "Wed"
+        },
+        "thu": {
+          "ko": "목",
+          "en": "Thu"
+        },
+        "fri": {
+          "ko": "금",
+          "en": "Fri"
+        },
+        "sat": {
+          "ko": "토",
+          "en": "Sat"
+        }
+      },
+      "yearMonth": {
+        "ko": "{{year}}년 {{month}}월",
+        "en": "{{month}}/{{year}}"
+      },
+      "yearMonthPosterWall": {
+        "ko": "{{year}}년 {{month}}월 포스터 벽",
+        "en": "{{month}} {{year}} poster wall"
+      },
+      "selectedDate": {
+        "ko": "선택일: {{date}}",
+        "en": "Selected: {{date}}"
+      },
+      "today": {
+        "ko": "오늘",
+        "en": "Today"
+      },
+      "yesterday": {
+        "ko": "어제",
+        "en": "Yesterday"
+      }
+    },
+    "units": {
+      "filmCount": {
+        "ko": "{{count}}편",
+        "en": "{{count}} films"
+      },
+      "filmCountSelected": {
+        "ko": "{{count}}편 선택됨",
+        "en": "{{count}} selected"
+      },
+      "filmCountAdd": {
+        "ko": "{{count}}편 추가",
+        "en": "Add {{count}} films"
+      },
+      "movieCount": {
+        "ko": "{{count}}개 영화",
+        "en": "{{count}} movies"
+      },
+      "times": {
+        "ko": "회",
+        "en": " times"
+      },
+      "peopleRated": {
+        "ko": "{{count}}명이 평가함",
+        "en": "Rated by {{count}} people"
+      },
+      "nthLog": {
+        "ko": "{{count}}번째",
+        "en": "{{count}}th"
+      },
+      "nthFilmWithRating": {
+        "ko": "{{count}}번째 영화 · ★ {{rating}}",
+        "en": "{{count}}th film · ★ {{rating}}"
+      },
+      "monthProgress": {
+        "ko": "{{filledDays}}/{{eligibleDays}}일 · {{reviewCount}}편",
+        "en": "{{filledDays}}/{{eligibleDays}} days · {{reviewCount}} films"
+      },
+      "joinedAt": {
+        "ko": "{{date}} 가입",
+        "en": "Joined {{date}}"
+      },
+      "maxGenres": {
+        "ko": "최대 {{count}}개",
+        "en": "Up to {{count}}"
+      },
+      "preferredGenresMax": {
+        "ko": "선호 장르 (최대 {{count}}개)",
+        "en": "Preferred genres (up to {{count}})"
+      },
+      "moreItems": {
+        "ko": "+{{count}}",
+        "en": "+{{count}}"
+      }
+    },
+    "movieMeta": {
+      "releaseDate": {
+        "ko": "출시일",
+        "en": "Release date"
+      },
+      "runtime": {
+        "ko": "러닝타임",
+        "en": "Runtime"
+      },
+      "genre": {
+        "ko": "장르",
+        "en": "Genre"
+      },
+      "genres": {
+        "ko": "장르",
+        "en": "Genres"
+      },
+      "director": {
+        "ko": "감독",
+        "en": "Director"
+      },
+      "cast": {
+        "ko": "배우",
+        "en": "Cast"
+      },
+      "castShort": {
+        "ko": "출연",
+        "en": "Cast"
+      },
+      "watchedDate": {
+        "ko": "관람일",
+        "en": "Watched on"
+      },
+      "watchedPrefix": {
+        "ko": "시청 · {{date}}",
+        "en": "Watched · {{date}}"
+      },
+      "addedPrefix": {
+        "ko": "담음 · {{date}}",
+        "en": "Added · {{date}}"
+      },
+      "myRating": {
+        "ko": "내 평점",
+        "en": "My rating"
+      },
+      "runtimeMinutes": {
+        "ko": "{{minutes}}분",
+        "en": "{{minutes}} min"
+      },
+      "runtimeHours": {
+        "ko": "{{hours}}시간",
+        "en": "{{hours}} hr"
+      },
+      "runtimeHoursMinutes": {
+        "ko": "{{hours}}시간 {{minutes}}분",
+        "en": "{{hours}} hr {{minutes}} min"
+      },
+      "fallbackMovieTitle": {
+        "ko": "영화 #{{id}}",
+        "en": "Movie #{{id}}"
+      },
+      "fallbackGenre": {
+        "ko": "장르 #{{id}}",
+        "en": "Genre #{{id}}"
+      },
+      "ratingPoint": {
+        "ko": "{{star}}점",
+        "en": "{{star}} stars"
+      },
+      "monthLabel": {
+        "ko": "{{month}}월",
+        "en": "Month {{month}}"
+      },
+      "decadeLabel": {
+        "ko": "{{decade}}년대",
+        "en": "{{decade}}s"
+      }
+    },
+    "stats": {
+      "avgRating": {
+        "ko": "평균 평점",
+        "en": "Avg. rating"
+      },
+      "reviewCount": {
+        "ko": "평가한 영화",
+        "en": "Films rated"
+      },
+      "wishlistCount": {
+        "ko": "위시리스트",
+        "en": "Wishlist"
+      },
+      "collectionCount": {
+        "ko": "나의 컬렉션",
+        "en": "My collections"
+      },
+      "totalLogs": {
+        "ko": "총 기록",
+        "en": "Total logs"
+      },
+      "thisMonth": {
+        "ko": "이번 달",
+        "en": "This month"
+      },
+      "last30Days": {
+        "ko": "최근 30일",
+        "en": "Last 30 days"
+      },
+      "thisYearLogs": {
+        "ko": "올해 기록",
+        "en": "This year's logs"
+      },
+      "thisYearAvg": {
+        "ko": "올해 평균",
+        "en": "This year's avg."
+      },
+      "collections": {
+        "ko": "컬렉션",
+        "en": "Collections"
+      },
+      "withJournal": {
+        "ko": "글 남긴 기록",
+        "en": "Logs with notes"
+      },
+      "avgChars": {
+        "ko": "평균 글자 수",
+        "en": "Avg. characters"
+      },
+      "movies": {
+        "ko": "영화",
+        "en": "Films"
+      },
+      "avgRatingShort": {
+        "ko": "평균 평점",
+        "en": "Avg. rating"
+      },
+      "earned": {
+        "ko": "획득",
+        "en": "Earned"
+      }
+    },
+    "sort": {
+      "latest": {
+        "ko": "최신순",
+        "en": "Newest"
+      },
+      "oldest": {
+        "ko": "오래된순",
+        "en": "Oldest"
+      },
+      "nameAsc": {
+        "ko": "이름순",
+        "en": "Name A–Z"
+      },
+      "moviesDesc": {
+        "ko": "영화 많은순",
+        "en": "Most films"
+      },
+      "moviesAsc": {
+        "ko": "영화 적은순",
+        "en": "Fewest films"
+      },
+      "latestAdded": {
+        "ko": "최신 등록순",
+        "en": "Recently added"
+      },
+      "ratingDesc": {
+        "ko": "평점 높은순",
+        "en": "Highest rating"
+      },
+      "latestLog": {
+        "ko": "최신 기록순",
+        "en": "Latest logged"
+      },
+      "oldestLog": {
+        "ko": "오래된 기록순",
+        "en": "Oldest logged"
+      },
+      "ratingAsc": {
+        "ko": "평점 낮은순",
+        "en": "Lowest rating"
+      },
+      "watchedDesc": {
+        "ko": "관람일 최신순",
+        "en": "Latest watched"
+      },
+      "sortPrefix": {
+        "ko": "정렬: {{label}}",
+        "en": "Sort: {{label}}"
+      },
+      "periodPrefix": {
+        "ko": "기간 · {{label}}",
+        "en": "Period · {{label}}"
+      },
+      "sortChipPrefix": {
+        "ko": "정렬 · {{label}}",
+        "en": "Sort · {{label}}"
+      }
+    },
+    "period": {
+      "all": {
+        "ko": "전체 기간",
+        "en": "All time"
+      },
+      "thisMonth": {
+        "ko": "이번 달",
+        "en": "This month"
+      },
+      "last30": {
+        "ko": "최근 30일",
+        "en": "Last 30 days"
+      },
+      "last90": {
+        "ko": "최근 3개월",
+        "en": "Last 3 months"
+      },
+      "thisYear": {
+        "ko": "올해",
+        "en": "This year"
+      }
+    },
+    "viewMode": {
+      "list": {
+        "ko": "목록",
+        "en": "List"
+      },
+      "timeline": {
+        "ko": "타임라인",
+        "en": "Timeline"
+      },
+      "calendar": {
+        "ko": "캘린더",
+        "en": "Calendar"
+      }
+    },
+    "archive": {
+      "myArchive": {
+        "title": {
+          "ko": "나의 기록",
+          "en": "My archive"
+        },
+        "subtitle": {
+          "ko": "쌓아온 영화의 흔적을 한눈에.",
+          "en": "Your film trail at a glance."
+        }
+      },
+      "recentLog": {
+        "title": {
+          "ko": "최근 기록",
+          "en": "Recent logs"
+        },
+        "subtitle": {
+          "ko": "가장 최근에 남긴 감상.",
+          "en": "Your most recent impressions."
+        }
+      },
+      "myCollection": {
+        "title": {
+          "ko": "나의 컬렉션",
+          "en": "My collections"
+        },
+        "subtitle": {
+          "ko": "취향대로 묶어둔 아카이브.",
+          "en": "Curated archives by taste."
+        }
+      },
+      "searchResults": {
+        "ko": "\"{{query}}\" 검색 결과",
+        "en": "Results for \"{{query}}\""
+      },
+      "searchResultsFor": {
+        "ko": "\"{{query}}\" 결과",
+        "en": "Results for \"{{query}}\""
+      },
+      "searchResultsArchive": {
+        "ko": "\"{{query}}\" 에 대한 기록",
+        "en": "Logs for \"{{query}}\""
+      },
+      "recentlyAdded": {
+        "ko": "최근 추가: {{title}}",
+        "en": "Recently added: {{title}}"
+      },
+      "noData": {
+        "ko": "표시할 데이터가 없습니다.",
+        "en": "No data to display."
+      },
+      "loadListFailed": {
+        "ko": "목록을 불러오지 못했습니다.",
+        "en": "Couldn't load the list."
+      },
+      "noItems": {
+        "ko": "아직 표시할 작품이 없습니다.",
+        "en": "No titles to show yet."
+      }
+    },
+    "attribution": {
+      "movieInfoProvider": {
+        "ko": "영화 정보 제공",
+        "en": "Movie data provided by"
+      }
+    },
+    "splash": {
+      "tagline": {
+        "ko": "영화를 기억하는 가장 아름다운 방법",
+        "en": "The most beautiful way to remember film"
+      }
+    },
+    "rating": {
+      "selectPrompt": {
+        "ko": "평점을 선택하세요",
+        "en": "Select a rating"
+      },
+      "scaleSuffix": {
+        "ko": "/ 5.0",
+        "en": "/ 5.0"
+      },
+      "starHint": {
+        "ko": "별 왼쪽은 0.5점, 오른쪽은 1점 단위예요.",
+        "en": "Tap left for half stars, right for full stars."
+      }
+    },
+    "collectionFallback": {
+      "ko": "컬렉션",
+      "en": "Collection"
+    }
+  },
+  "tabs": {
+    "home": {
+      "ko": "홈",
+      "en": "Home"
+    },
+    "explore": {
+      "ko": "탐색",
+      "en": "Explore"
+    },
+    "statistics": {
+      "ko": "통계",
+      "en": "Stats"
+    },
+    "profile": {
+      "ko": "마이페이지",
+      "en": "Profile"
+    },
+    "createMenu": {
+      "filmLog": {
+        "title": {
+          "ko": "영화기록",
+          "en": "Log a film"
+        },
+        "subtitle": {
+          "ko": "평점, 한줄평, 감상작성",
+          "en": "Rating, quick note, review"
+        }
+      },
+      "collection": {
+        "title": {
+          "ko": "컬렉션 생성",
+          "en": "New collection"
+        },
+        "subtitle": {
+          "ko": "나만의 영화 모음 만들기",
+          "en": "Build your own film set"
+        }
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "google": {
+        "ko": "구글로 로그인",
+        "en": "Sign in with Google"
+      },
+      "loading": {
+        "ko": "로그인 중...",
+        "en": "Signing in…"
+      }
+    },
+    "nickname": {
+      "greeting": {
+        "ko": "{{name}}님, 환영해요.",
+        "en": "Welcome, {{name}}."
+      },
+      "title": {
+        "ko": "닉네임을 설정해주세요.",
+        "en": "Choose a nickname."
+      },
+      "placeholder": {
+        "ko": "닉네임을 입력해주세요",
+        "en": "Enter a nickname"
+      }
+    },
+    "genre": {
+      "greeting": {
+        "ko": "{{nickname}}님, 거의 다 왔어요.",
+        "en": "Almost there, {{nickname}}."
+      },
+      "title": {
+        "ko": "선호 장르를 선택해주세요.",
+        "en": "Pick your favorite genres."
+      },
+      "subtitle": {
+        "ko": "최대 {{count}}개까지 선택할 수 있어요.",
+        "en": "You can select up to {{count}}."
+      },
+      "loadFailed": {
+        "ko": "장르 목록을 불러오지 못했습니다.",
+        "en": "Couldn't load genres."
+      },
+      "start": {
+        "ko": "시작하기",
+        "en": "Get started"
+      },
+      "startWithCount": {
+        "ko": "시작하기 ({{count}})",
+        "en": "Get started ({{count}})"
+      }
+    }
+  },
+  "home": {
+    "empty": {
+      "noLogs": {
+        "ko": "아직 남긴 기록이 없습니다. 첫 영화를 기록해보세요.",
+        "en": "No logs yet. Record your first film."
+      },
+      "noCollections": {
+        "ko": "아직 컬렉션이 없습니다. 첫 아카이브를 만들어보세요.",
+        "en": "No collections yet. Create your first archive."
+      }
+    }
+  },
+  "explore": {
+    "searchPlaceholder": {
+      "ko": "컬렉션에서 작품 검색",
+      "en": "Search titles in your archive"
+    },
+    "header": {
+      "title": {
+        "ko": "탐색",
+        "en": "Explore"
+      },
+      "subtitle": {
+        "ko": "기록되지 않은 걸작을, 나만의 아카이브에서 찾아보세요.",
+        "en": "Discover unlogged gems in your archive."
+      }
+    },
+    "curation": {
+      "title": {
+        "ko": "당신을 위한 큐레이션",
+        "en": "Curated for you"
+      },
+      "subtitle": {
+        "ko": "선호 장르로 엄선한 작품을 아카이브에 담았습니다.",
+        "en": "Handpicked from your preferred genres."
+      },
+      "setGenresFirst": {
+        "ko": "선호 장르를 먼저 설정해주세요.",
+        "en": "Set your preferred genres first."
+      },
+      "loadFailed": {
+        "ko": "영화 목록을 불러오지 못했습니다.",
+        "en": "Couldn't load films."
+      },
+      "noMatches": {
+        "ko": "조건에 맞는 작품이 없습니다.",
+        "en": "No matching titles."
+      }
+    },
+    "directorShelf": {
+      "title": {
+        "ko": "{{name}}의 다른 작품",
+        "en": "More from {{name}}"
+      },
+      "subtitle": {
+        "ko": "Director’s Log · 당신의 리뷰로 다시 읽는 감독의 작품들.",
+        "en": "Director’s Log · Revisit this director through your reviews."
+      }
+    },
+    "castShelf": {
+      "title": {
+        "ko": "{{name}} 출연작",
+        "en": "Films with {{name}}"
+      },
+      "subtitle": {
+        "ko": "당신의 페르소나 · 리뷰로 쌓아 올린 배우 아카이브.",
+        "en": "Your persona · An actor archive built from your reviews."
+      }
+    },
+    "communityTopRated": {
+      "title": {
+        "ko": "커뮤니티 고평점",
+        "en": "Community favorites"
+      },
+      "subtitle": {
+        "ko": "Filmolog 유저들이 높게 평가한 작품.",
+        "en": "Highly rated by Filmolog users."
+      }
+    },
+    "genreTopRated": {
+      "title": {
+        "ko": "내 장르, Filmolog 고평점",
+        "en": "Top rated in your genres"
+      },
+      "subtitle": {
+        "ko": "선호 장르 × 커뮤니티 평점.",
+        "en": "Your genres × community ratings."
+      },
+      "empty": {
+        "ko": "장르 데이터가 쌓이면 추천이 표시됩니다. 리뷰를 작성해주세요.",
+        "en": "Recommendations appear as genre data grows. Write a review."
+      }
+    },
+    "mostLogged": {
+      "title": {
+        "ko": "많이 기록된 작품",
+        "en": "Most logged films"
+      },
+      "subtitle": {
+        "ko": "Filmolog에서 가장 많이 리뷰된 영화.",
+        "en": "The most reviewed films on Filmolog."
+      }
+    },
+    "mostCollected": {
+      "title": {
+        "ko": "많이 담긴 작품",
+        "en": "Most collected films"
+      },
+      "subtitle": {
+        "ko": "컬렉션에 자주 담긴 영화.",
+        "en": "Films often added to collections."
+      }
+    },
+    "search": {
+      "title": {
+        "ko": "아카이브 검색",
+        "en": "Archive search"
+      },
+      "loadFailed": {
+        "ko": "검색 결과를 불러오지 못했습니다.",
+        "en": "Couldn't load search results."
+      },
+      "notFound": {
+        "ko": "아카이브에서 해당 작품을 찾지 못했습니다.",
+        "en": "Couldn't find that title in your archive."
+      }
+    }
+  },
+  "filmLog": {
+    "search": {
+      "placeholder": {
+        "ko": "기록할 영화를 검색하세요",
+        "en": "Search a film to log"
+      },
+      "title": {
+        "ko": "영화 검색",
+        "en": "Search films"
+      },
+      "hint": {
+        "ko": "영화 제목을 2자 이상 입력해 검색하세요.",
+        "en": "Enter at least 2 characters to search."
+      },
+      "loadFailed": {
+        "ko": "검색 결과를 불러오지 못했습니다.",
+        "en": "Couldn't load search results."
+      },
+      "noResults": {
+        "ko": "검색 결과가 없습니다.",
+        "en": "No search results."
+      }
+    },
+    "selected": {
+      "title": {
+        "ko": "기본 정보",
+        "en": "Basic info"
+      },
+      "subtitle": {
+        "ko": "선택한 작품의 정보를 확인하세요.",
+        "en": "Review the selected title."
+      },
+      "loadFailed": {
+        "ko": "영화 정보를 불러오지 못했습니다.",
+        "en": "Couldn't load film info."
+      },
+      "changeMovie": {
+        "ko": "다른 영화 선택",
+        "en": "Choose another film"
+      }
+    },
+    "form": {
+      "watched": {
+        "title": {
+          "ko": "시청일",
+          "en": "Watched on"
+        },
+        "subtitle": {
+          "ko": "언제 이 작품을 보셨나요?",
+          "en": "When did you watch this?"
+        }
+      },
+      "rating": {
+        "title": {
+          "ko": "평점",
+          "en": "Rating"
+        }
+      },
+      "review": {
+        "title": {
+          "ko": "한줄평 · 감상",
+          "en": "Quick note · Review"
+        },
+        "subtitle": {
+          "ko": "짧은 메모도 좋아요.",
+          "en": "Even a short note is fine."
+        },
+        "placeholder": {
+          "ko": "이 영화에 대한 생각을 적어보세요.",
+          "en": "Write your thoughts about this film."
+        }
+      },
+      "collection": {
+        "title": {
+          "ko": "컬렉션에 담기",
+          "en": "Add to collection"
+        },
+        "subtitle": {
+          "ko": "선택한 컬렉션에 이 작품을 바로 추가해요.",
+          "en": "Add this title to selected collections."
+        },
+        "empty": {
+          "ko": "아직 컬렉션이 없습니다. 기록만 저장하거나 컬렉션을 먼저 만들어주세요.",
+          "en": "No collections yet. Save the log only, or create a collection first."
+        }
+      },
+      "submit": {
+        "ko": "기록 저장",
+        "en": "Save log"
+      }
+    },
+    "wishlist": {
+      "title": {
+        "ko": "위시리스트",
+        "en": "Wishlist"
+      },
+      "subtitle": {
+        "ko": "담아둔 영화 중, 보신 작품이 있으신가요?",
+        "en": "Did you watch any saved films?"
+      },
+      "loadFailed": {
+        "ko": "위시리스트를 불러오지 못했습니다.",
+        "en": "Couldn't load wishlist."
+      },
+      "viewAll": {
+        "ko": "위시리스트 전체 보기",
+        "en": "View full wishlist"
+      }
+    },
+    "complete": {
+      "firstLog": {
+        "ko": "첫 번째 기록 완료!",
+        "en": "First log complete!"
+      },
+      "nthLog": {
+        "ko": "{{count}}번째 기록 완료!",
+        "en": "{{count}}th log complete!"
+      },
+      "recordAnother": {
+        "ko": "다른 기록하기",
+        "en": "Log another film"
+      }
+    }
+  },
+  "review": {
+    "list": {
+      "title": {
+        "ko": "나의 기록",
+        "en": "My logs"
+      },
+      "emptyAll": {
+        "ko": "아직 남긴 기록이 없습니다. 첫 영화를 기록해보세요.",
+        "en": "No logs yet. Record your first film."
+      },
+      "emptyPeriod": {
+        "ko": "선택한 기간에 해당하는 기록이 없습니다.",
+        "en": "No logs in the selected period."
+      }
+    },
+    "calendar": {
+      "monthComplete": {
+        "ko": "이번 달 칸을 모두 채웠어요",
+        "en": "You filled every slot this month"
+      },
+      "tagline": {
+        "ko": "포스터로 채워지는 나만의 영화 달력",
+        "en": "Your personal film calendar filled with posters"
+      },
+      "selectedHint": {
+        "ko": "선택: {{date}} · 다시 누르면 월 전체",
+        "en": "Selected: {{date}} · Tap again for full month"
+      },
+      "hint": {
+        "ko": "빈 칸을 눌러 그날 기록을, 포스터를 눌러 상세로 이동하세요.",
+        "en": "Tap an empty cell for that day, or a poster for details."
+      },
+      "emptyDay": {
+        "ko": "이 날은 아직 비어 있어요. 기록을 남기면 포스터가 채워집니다.",
+        "en": "This day is empty. Log a film to fill it with a poster."
+      },
+      "emptyMonth": {
+        "ko": "이번 달에 남긴 기록이 없습니다.",
+        "en": "No logs this month."
+      }
+    },
+    "detail": {
+      "loadFailed": {
+        "ko": "기록을 불러오지 못했습니다.",
+        "en": "Couldn't load this log."
+      },
+      "catalog": {
+        "title": {
+          "ko": "작품 카드",
+          "en": "Title card"
+        },
+        "subtitle": {
+          "ko": "아카이브에 등록된 영화 정보.",
+          "en": "Film info in your archive."
+        }
+      },
+      "rating": {
+        "title": {
+          "ko": "내 평점",
+          "en": "My rating"
+        },
+        "subtitle": {
+          "ko": "이 작품에 남긴 점수.",
+          "en": "The score you gave this title."
+        }
+      },
+      "journal": {
+        "title": {
+          "ko": "감상 기록",
+          "en": "Journal"
+        },
+        "subtitle": {
+          "ko": "남긴 메모와 생각.",
+          "en": "Notes and thoughts you left."
+        },
+        "empty": {
+          "ko": "아직 감상을 적지 않았습니다.",
+          "en": "No review text yet."
+        }
+      },
+      "menu": {
+        "movieInfo": {
+          "ko": "작품 정보",
+          "en": "Title info"
+        }
+      },
+      "shareTitle": {
+        "ko": "Filmolog 기록 공유",
+        "en": "Share Filmolog log"
+      }
+    },
+    "share": {
+      "footer": {
+        "ko": "filmolog archive",
+        "en": "filmolog archive"
+      }
+    }
+  },
+  "collection": {
+    "create": {
+      "basicInfo": {
+        "title": {
+          "ko": "기본 정보",
+          "en": "Basic info"
+        },
+        "subtitle": {
+          "ko": "컬렉션의 이름과 설명을 적어주세요.",
+          "en": "Name and describe your collection."
+        }
+      },
+      "nameLabel": {
+        "ko": "이름",
+        "en": "Name"
+      },
+      "namePlaceholder": {
+        "ko": "예: 우울할 때 보는 영화",
+        "en": "e.g. Films for a rainy mood"
+      },
+      "descriptionLabel": {
+        "ko": "설명",
+        "en": "Description"
+      },
+      "descriptionPlaceholder": {
+        "ko": "이 컬렉션에 담은 이유를 적어보세요.",
+        "en": "Why did you put these films together?"
+      },
+      "theme": {
+        "title": {
+          "ko": "컬렉션 테마",
+          "en": "Collection theme"
+        },
+        "subtitle": {
+          "ko": "아카이브 표지 분위기를 선택하세요.",
+          "en": "Choose the cover mood."
+        }
+      },
+      "films": {
+        "title": {
+          "ko": "영화 추가",
+          "en": "Add films"
+        },
+        "subtitle": {
+          "ko": "기록한 영화 중 컬렉션에 담을 작품을 고르세요.",
+          "en": "Pick logged films to add."
+        },
+        "empty": {
+          "ko": "아직 기록한 영화가 없습니다. 영화를 먼저 기록해주세요.",
+          "en": "No logged films yet. Log a film first."
+        }
+      },
+      "submit": {
+        "ko": "컬렉션 만들기",
+        "en": "Create collection"
+      }
+    },
+    "list": {
+      "title": {
+        "ko": "나의 컬렉션",
+        "en": "My collections"
+      },
+      "empty": {
+        "ko": "아직 컬렉션이 없습니다. 첫 컬렉션을 만들어보세요.",
+        "en": "No collections yet. Create your first one."
+      },
+      "createNew": {
+        "ko": "새 컬렉션 만들기",
+        "en": "Create new collection"
+      }
+    },
+    "detail": {
+      "loadFailed": {
+        "ko": "컬렉션을 불러오지 못했습니다.",
+        "en": "Couldn't load collection."
+      },
+      "filmsTitle": {
+        "ko": "담긴 영화",
+        "en": "Films inside"
+      },
+      "emptyFilms": {
+        "ko": "아직 담긴 영화가 없습니다.",
+        "en": "No films added yet."
+      },
+      "addFilm": {
+        "ko": "영화 추가",
+        "en": "Add films"
+      },
+      "removeFromCollection": {
+        "ko": "컬렉션에서 삭제",
+        "en": "Remove from collection"
+      },
+      "deleteCollection": {
+        "ko": "컬렉션 삭제",
+        "en": "Delete collection"
+      }
+    },
+    "addMovies": {
+      "searchPlaceholder": {
+        "ko": "기록한 영화 검색",
+        "en": "Search logged films"
+      },
+      "subtitleDefault": {
+        "ko": "기록한 영화 중 아직 담지 않은 작품을 고르세요.",
+        "en": "Pick logged films not yet in this collection."
+      },
+      "selectPrompt": {
+        "ko": "영화를 선택해주세요",
+        "en": "Select films"
+      },
+      "empty": {
+        "noLogs": {
+          "ko": "아직 기록한 영화가 없습니다. 영화를 먼저 기록해주세요.",
+          "en": "No logged films yet. Log a film first."
+        },
+        "allAdded": {
+          "ko": "추가할 수 있는 영화가 없습니다. 이미 모두 담았어요.",
+          "en": "Nothing left to add. All logged films are already here."
+        },
+        "noSearchMatch": {
+          "ko": "\"{{query}}\"에 맞는 영화가 없습니다.",
+          "en": "No films match \"{{query}}\"."
+        },
+        "noneToShow": {
+          "ko": "표시할 영화가 없습니다.",
+          "en": "No films to show."
+        }
+      }
+    }
+  },
+  "profile": {
+    "pageTitle": {
+      "ko": "마이페이지",
+      "en": "Profile"
+    },
+    "tagline": {
+      "ko": "오늘 당신의 마음을 움직인 단 하나의 장면은 무엇인가요?",
+      "en": "What single scene moved you today?"
+    },
+    "menu": {
+      "myLogs": {
+        "label": {
+          "ko": "내 기록",
+          "en": "My logs"
+        },
+        "subtitle": {
+          "ko": "작성한 리뷰 전체 보기",
+          "en": "View all your reviews"
+        }
+      },
+      "myCollections": {
+        "label": {
+          "ko": "내 컬렉션",
+          "en": "My collections"
+        },
+        "subtitle": {
+          "ko": "큐레이션한 영화 목록",
+          "en": "Your curated film lists"
+        }
+      },
+      "wishlist": {
+        "label": {
+          "ko": "위시리스트",
+          "en": "Wishlist"
+        },
+        "subtitle": {
+          "ko": "담아둔 영화",
+          "en": "Saved films"
+        }
+      },
+      "badges": {
+        "label": {
+          "ko": "배지",
+          "en": "Badges"
+        },
+        "subtitle": {
+          "ko": "획득한 업적 확인",
+          "en": "See earned achievements"
+        }
+      }
+    },
+    "edit": {
+      "title": {
+        "ko": "프로필 수정",
+        "en": "Edit profile"
+      },
+      "subtitle": {
+        "ko": "닉네임과 선호 장르를 변경할 수 있어요.",
+        "en": "Update your nickname and preferred genres."
+      },
+      "nicknameLabel": {
+        "ko": "닉네임",
+        "en": "Nickname"
+      },
+      "nicknamePlaceholder": {
+        "ko": "닉네임",
+        "en": "Nickname"
+      }
+    },
+    "genreEdit": {
+      "title": {
+        "ko": "선호 장르 변경",
+        "en": "Edit preferred genres"
+      },
+      "subtitle": {
+        "ko": "최대 {{count}}개까지 선택할 수 있어요.",
+        "en": "You can select up to {{count}}."
+      }
+    },
+    "wishlist": {
+      "loadFailed": {
+        "ko": "위시리스트를 불러오지 못했습니다.",
+        "en": "Couldn't load wishlist."
+      },
+      "empty": {
+        "ko": "담아둔 영화가 없습니다.",
+        "en": "No saved films."
+      }
+    }
+  },
+  "settings": {
+    "sections": {
+      "account": {
+        "ko": "계정",
+        "en": "Account"
+      },
+      "support": {
+        "ko": "지원",
+        "en": "Support"
+      },
+      "legal": {
+        "ko": "법적 고지",
+        "en": "Legal"
+      },
+      "app": {
+        "ko": "앱",
+        "en": "App"
+      },
+      "accountManagement": {
+        "ko": "계정 관리",
+        "en": "Account management"
+      }
+    },
+    "account": {
+      "genreEdit": {
+        "label": {
+          "ko": "선호 장르 변경",
+          "en": "Edit preferred genres"
+        },
+        "subtitle": {
+          "ko": "탐색 추천에 반영되는 장르",
+          "en": "Genres used for Explore recommendations"
+        }
+      }
+    },
+    "support": {
+      "notice": {
+        "ko": "Filmolog는 1인으로 운영 중이에요. 남겨주신 의견은 순차 검토하며, 반영 시점은 작업 규모에 따라 달라질 수 있어요.",
+        "en": "Filmolog is run solo. Feedback is reviewed in order, and timing depends on scope."
+      },
+      "featureRequest": {
+        "label": {
+          "ko": "기능 제안하기",
+          "en": "Suggest a feature"
+        },
+        "subtitle": {
+          "ko": "아이디어를 남겨주시면 검토 후 반영해요",
+          "en": "Share an idea and we'll review it"
+        }
+      },
+      "bugReport": {
+        "label": {
+          "ko": "오류 제보하기",
+          "en": "Report a bug"
+        },
+        "subtitle": {
+          "ko": "접수 후 순차 수정 · 버전·계정은 자동 입력",
+          "en": "Reviewed in order · version and account auto-filled"
+        }
+      }
+    },
+    "legal": {
+      "privacyPolicy": {
+        "label": {
+          "ko": "개인정보처리방침",
+          "en": "Privacy policy"
+        },
+        "subtitle": {
+          "ko": "수집·이용·보관에 관한 안내",
+          "en": "How we collect, use, and store data"
+        }
+      }
+    },
+    "app": {
+      "version": {
+        "label": {
+          "ko": "버전",
+          "en": "Version"
+        },
+        "subtitle": {
+          "ko": "Filmolog",
+          "en": "Filmolog"
+        }
+      }
+    },
+    "accountManagement": {
+      "logout": {
+        "label": {
+          "ko": "로그아웃",
+          "en": "Log out"
+        },
+        "subtitle": {
+          "ko": "다시 로그인할 수 있어요",
+          "en": "You can sign in again anytime"
+        }
+      },
+      "deleteAccount": {
+        "label": {
+          "ko": "회원 탈퇴",
+          "en": "Delete account"
+        },
+        "subtitle": {
+          "ko": "모든 기록이 영구 삭제됩니다",
+          "en": "All data will be permanently deleted"
+        }
+      }
+    },
+    "language": {
+      "label": {
+        "ko": "언어",
+        "en": "Language"
+      },
+      "subtitle": {
+        "ko": "앱 표시 언어",
+        "en": "App display language"
+      },
+      "ko": {
+        "ko": "한국어",
+        "en": "Korean"
+      },
+      "en": {
+        "ko": "English",
+        "en": "English"
+      }
+    }
+  },
+  "statistics": {
+    "pageTitle": {
+      "ko": "통계",
+      "en": "Statistics"
+    },
+    "tagline": {
+      "ko": "모든 기록은 한 편의 영화가 되어 당신이라는 필모그래피로 남습니다.",
+      "en": "Every log becomes a film in the filmography that is you."
+    },
+    "sections": {
+      "filmography": {
+        "title": {
+          "ko": "나의 필모그래피",
+          "en": "My filmography"
+        },
+        "subtitle": {
+          "ko": "숫자로 읽는 기록의 윤곽.",
+          "en": "The shape of your logs in numbers."
+        }
+      },
+      "thisYear": {
+        "title": {
+          "ko": "올해의 기록",
+          "en": "This year's logs"
+        },
+        "subtitle": {
+          "ko": "한 해의 필모그래피 결산.",
+          "en": "Your year in review."
+        }
+      },
+      "journalHabit": {
+        "title": {
+          "ko": "기록 습관",
+          "en": "Logging habits"
+        },
+        "subtitle": {
+          "ko": "평점과 함께 남긴 글의 온도.",
+          "en": "How often you write with your ratings."
+        }
+      },
+      "monthly": {
+        "title": {
+          "ko": "월별 기록",
+          "en": "Monthly logs"
+        },
+        "subtitle": {
+          "ko": "최근 6개월간 쌓인 장면 수.",
+          "en": "Scenes logged over the last 6 months."
+        },
+        "empty": {
+          "ko": "기록이 쌓이면 월별 그래프가 표시됩니다.",
+          "en": "Monthly chart appears as you log more."
+        }
+      },
+      "ratingDistribution": {
+        "title": {
+          "ko": "평점 분포",
+          "en": "Rating distribution"
+        },
+        "subtitle": {
+          "ko": "별점별로 남긴 기록의 무게.",
+          "en": "How your ratings are weighted."
+        },
+        "empty": {
+          "ko": "리뷰를 작성하면 평점 분포가 표시됩니다.",
+          "en": "Rating distribution appears after you log films."
+        }
+      },
+      "genreDistribution": {
+        "title": {
+          "ko": "장르 분포",
+          "en": "Genre distribution"
+        },
+        "subtitle": {
+          "ko": "기록 속에서 드러나는 취향.",
+          "en": "Taste revealed in your logs."
+        },
+        "empty": {
+          "ko": "장르 정보가 있는 기록이 쌓이면 파이 차트가 표시됩니다.",
+          "en": "Genre chart appears when enough genre data exists."
+        },
+        "excludedNote": {
+          "ko": "장르 미등록 기록 {{count}}편은 집계에서 제외됩니다.",
+          "en": "{{count}} logs without genre data are excluded."
+        }
+      },
+      "preferredVsActual": {
+        "title": {
+          "ko": "선호 장르 vs 실제",
+          "en": "Preferred vs. actual genres"
+        },
+        "subtitle": {
+          "ko": "온보딩에서 고른 취향의 흔적.",
+          "en": "Traces of the taste you picked at onboarding."
+        },
+        "empty": {
+          "ko": "선호 장르 기록이 없습니다.",
+          "en": "No preferred-genre logs yet."
+        }
+      },
+      "genreRating": {
+        "title": {
+          "ko": "장르별 평균 평점",
+          "en": "Average rating by genre"
+        },
+        "subtitle": {
+          "ko": "2편 이상 기록한 장르만 표시.",
+          "en": "Only genres with 2+ logs."
+        },
+        "empty": {
+          "ko": "장르당 2편 이상 기록이 쌓이면 표시됩니다.",
+          "en": "Shown after 2+ logs per genre."
+        },
+        "reviewsLabel": {
+          "ko": "리뷰",
+          "en": "reviews"
+        },
+        "avgLabel": {
+          "ko": "평균",
+          "en": "avg."
+        }
+      },
+      "decade": {
+        "title": {
+          "ko": "개봉 연대별",
+          "en": "By release decade"
+        },
+        "subtitle": {
+          "ko": "어떤 시대의 영화를 주로 남겼는지.",
+          "en": "Which eras you log most."
+        },
+        "empty": {
+          "ko": "개봉 연도가 있는 기록이 쌓이면 표시됩니다.",
+          "en": "Shown when enough release-year data exists."
+        },
+        "excludedNote": {
+          "ko": "개봉 연도 미등록 기록 {{count}}편은 집계에서 제외됩니다.",
+          "en": "{{count}} logs without release year are excluded."
+        }
+      },
+      "directors": {
+        "title": {
+          "ko": "선호 감독",
+          "en": "Favorite directors"
+        },
+        "subtitle": {
+          "ko": "기록 속에 자주 등장하는 연출.",
+          "en": "Directors who appear most in your logs."
+        },
+        "empty": {
+          "ko": "감독 정보가 있는 기록이 쌓이면 순위가 표시됩니다.",
+          "en": "Rankings appear with enough director data."
+        },
+        "excludedNote": {
+          "ko": "감독 미등록 기록 {{count}}편은 집계에서 제외됩니다.",
+          "en": "{{count}} logs without director data are excluded."
+        }
+      },
+      "cast": {
+        "title": {
+          "ko": "선호 배우",
+          "en": "Favorite actors"
+        },
+        "subtitle": {
+          "ko": "주연 billing top 5 기준.",
+          "en": "Based on top 5 billing."
+        },
+        "empty": {
+          "ko": "배우 정보가 있는 기록이 쌓이면 순위가 표시됩니다.",
+          "en": "Rankings appear with enough cast data."
+        },
+        "excludedNote": {
+          "ko": "배우 미등록 기록 {{count}}편은 집계에서 제외됩니다.",
+          "en": "{{count}} logs without cast data are excluded."
+        }
+      },
+      "highlights": {
+        "title": {
+          "ko": "높은 평점 Top 3",
+          "en": "Top 3 highest ratings"
+        },
+        "subtitle": {
+          "ko": "마음에 남은 장면들.",
+          "en": "Scenes that stayed with you."
+        },
+        "empty": {
+          "ko": "아직 기록된 작품이 없습니다.",
+          "en": "No logged titles yet."
+        }
+      },
+      "badges": {
+        "title": {
+          "ko": "배지 진행",
+          "en": "Badge progress"
+        },
+        "subtitle": {
+          "ko": "필모그래피를 채워가는 업적.",
+          "en": "Achievements as you build your filmography."
+        },
+        "viewAll": {
+          "ko": "배지 전체 보기",
+          "en": "View all badges"
+        }
+      }
+    },
+    "insights": {
+      "yearDeltaUp": {
+        "ko": "작년보다 +{{delta}}",
+        "en": "+{{delta}} vs last year"
+      },
+      "yearDeltaDown": {
+        "ko": "작년보다 {{delta}}",
+        "en": "{{delta}} vs last year"
+      },
+      "yearDeltaSame": {
+        "ko": "작년과 동일",
+        "en": "Same as last year"
+      },
+      "journalEmpty": {
+        "ko": "첫 리뷰를 남기면 기록 습관이 집계됩니다.",
+        "en": "Logging habits appear after your first review."
+      },
+      "journalCount": {
+        "ko": "{{count}}편에 감상을 적었습니다.",
+        "en": "You wrote notes on {{count}} films."
+      },
+      "preferredGenreEmpty": {
+        "ko": "선호 장르의 기록이 아직 없습니다. 첫 장면을 남겨보세요.",
+        "en": "No logs in your preferred genres yet. Log your first scene."
+      },
+      "preferredGenreTop": {
+        "ko": "선호 장르 중 「{{genre}}」 기록이 가장 많습니다.",
+        "en": "Among preferred genres, {{genre}} has the most logs."
+      },
+      "raterEmpty": {
+        "ko": "첫 기록을 남기면 취향의 윤곽이 드러납니다.",
+        "en": "Your taste profile appears after your first log."
+      },
+      "raterGenerous": {
+        "ko": "관대한 평론가 — 좋은 장면을 넉넉히 기억하는 타입.",
+        "en": "Generous critic — you remember the good scenes generously."
+      },
+      "raterStrict": {
+        "ko": "깐깐한 평론가 — 엄선한 장면만 필모그래피에 담습니다.",
+        "en": "Strict critic — only chosen scenes make your filmography."
+      },
+      "raterBalanced": {
+        "ko": "균형 잡힌 시선 — 기록마다 장면의 온도가 고르게 남아 있습니다.",
+        "en": "Balanced eye — each log keeps a steady emotional temperature."
+      }
+    }
+  },
+  "badges": {
+    "list": {
+      "loadFailed": {
+        "ko": "배지를 불러오지 못했습니다.",
+        "en": "Couldn't load badges."
+      }
+    },
+    "unlock": {
+      "title": {
+        "ko": "뱃지 획득!",
+        "en": "Badge unlocked!"
+      },
+      "dismissHint": {
+        "ko": "탭하여 닫기",
+        "en": "Tap to close"
+      }
+    },
+    "categories": {
+      "activity": {
+        "ko": "활동량",
+        "en": "Activity"
+      },
+      "taste": {
+        "ko": "취향 · 장르",
+        "en": "Taste · Genre"
+      },
+      "curation": {
+        "ko": "큐레이션",
+        "en": "Curation"
+      }
+    },
+    "items": {
+      "first_ticket": {
+        "name": {
+          "ko": "첫 발권",
+          "en": "First Ticket"
+        },
+        "description": {
+          "ko": "첫 리뷰 작성",
+          "en": "Write your first review"
+        }
+      },
+      "short_film": {
+        "name": {
+          "ko": "단편 필름",
+          "en": "Short Film"
+        },
+        "description": {
+          "ko": "리뷰 10개 작성",
+          "en": "Write 10 reviews"
+        }
+      },
+      "indie_director": {
+        "name": {
+          "ko": "독립 영화 감독",
+          "en": "Indie Director"
+        },
+        "description": {
+          "ko": "리뷰 50개 작성",
+          "en": "Write 50 reviews"
+        }
+      },
+      "blockbuster": {
+        "name": {
+          "ko": "블록버스터",
+          "en": "Blockbuster"
+        },
+        "description": {
+          "ko": "리뷰 100개 작성",
+          "en": "Write 100 reviews"
+        }
+      },
+      "masterpiece": {
+        "name": {
+          "ko": "마스터피스",
+          "en": "Masterpiece"
+        },
+        "description": {
+          "ko": "리뷰 500개 작성",
+          "en": "Write 500 reviews"
+        }
+      },
+      "popcorn_tears": {
+        "name": {
+          "ko": "눈물의 팝콘",
+          "en": "Popcorn Tears"
+        },
+        "description": {
+          "ko": "로맨스·드라마 영화 리뷰 20개 작성",
+          "en": "Write 20 romance/drama reviews"
+        }
+      },
+      "brave_heart": {
+        "name": {
+          "ko": "강심장",
+          "en": "Brave Heart"
+        },
+        "description": {
+          "ko": "공포·스릴러 영화 리뷰 20개 작성",
+          "en": "Write 20 horror/thriller reviews"
+        }
+      },
+      "couch_critic": {
+        "name": {
+          "ko": "방구석 평론가",
+          "en": "Couch Critic"
+        },
+        "description": {
+          "ko": "50편 이상 평균 평점 2.5 이하 유지",
+          "en": "Keep avg. rating ≤ 2.5 across 50+ logs"
+        }
+      },
+      "rotten_collector": {
+        "name": {
+          "ko": "로튼 토마토 수집가",
+          "en": "Rotten Collector"
+        },
+        "description": {
+          "ko": "다른 사람 평점 2.0 이하 영화에 4.0 이상 평점 3회",
+          "en": "Rate 4.0+ on community ≤2.0 films 3 times"
+        }
+      },
+      "chief_curator": {
+        "name": {
+          "ko": "수석 큐레이터",
+          "en": "Chief Curator"
+        },
+        "description": {
+          "ko": "영화 10편 이상 담은 컬렉션 3개 생성",
+          "en": "Create 3 collections with 10+ films each"
+        }
+      },
+      "treasure_hunter": {
+        "name": {
+          "ko": "보물 사냥꾼",
+          "en": "Treasure Hunter"
+        },
+        "description": {
+          "ko": "위시리스트에 담았던 영화 리뷰 10개 작성",
+          "en": "Review 10 films from your wishlist"
+        }
+      }
+    }
+  },
+  "movie": {
+    "detail": {
+      "catalog": {
+        "title": {
+          "ko": "작품 정보",
+          "en": "Title info"
+        },
+        "subtitle": {
+          "ko": "아카이브에 등록된 영화 메타데이터.",
+          "en": "Film metadata in your archive."
+        }
+      },
+      "community": {
+        "title": {
+          "ko": "커뮤니티 평가",
+          "en": "Community rating"
+        },
+        "subtitle": {
+          "ko": "Filmolog 유저들의 평균 평점과 기록 수.",
+          "en": "Average rating and log count from Filmolog users."
+        },
+        "loadFailed": {
+          "ko": "커뮤니티 평가를 불러오지 못했습니다.",
+          "en": "Couldn't load community rating."
+        },
+        "empty": {
+          "ko": "아직 Filmolog에 기록된 평가가 없습니다.",
+          "en": "No Filmolog ratings yet."
+        }
+      },
+      "synopsis": {
+        "title": {
+          "ko": "줄거리",
+          "en": "Synopsis"
+        },
+        "subtitle": {
+          "ko": "작품 소개.",
+          "en": "About this title."
+        },
+        "empty": {
+          "ko": "등록된 줄거리가 없습니다.",
+          "en": "No synopsis available."
+        }
+      },
+      "loadFailed": {
+        "ko": "영화 정보를 불러오지 못했습니다.",
+        "en": "Couldn't load film info."
+      },
+      "writeReview": {
+        "ko": "리뷰 작성",
+        "en": "Write review"
+      }
+    }
+  },
+  "errors": {
+    "saveFailed": {
+      "generic": {
+        "ko": "저장 실패",
+        "en": "Save failed"
+      },
+      "nickname": {
+        "ko": "닉네임 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't save nickname. Try again later."
+      },
+      "genres": {
+        "ko": "선호 장르 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't save preferred genres. Try again later."
+      },
+      "profile": {
+        "ko": "프로필 저장에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't save profile. Try again later."
+      },
+      "reviewUpdate": {
+        "ko": "기록을 수정하지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't update log. Try again later."
+      },
+      "reviewCreate": {
+        "ko": "영화 기록을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't save film log. Try again later."
+      },
+      "wishlist": {
+        "ko": "위시리스트를 업데이트하지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't update wishlist. Try again later."
+      }
+    },
+    "deleteFailed": {
+      "generic": {
+        "ko": "삭제 실패",
+        "en": "Delete failed"
+      },
+      "review": {
+        "ko": "기록을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't delete log. Try again later."
+      },
+      "collectionMovie": {
+        "ko": "영화를 컬렉션에서 제거하지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't remove film from collection. Try again later."
+      },
+      "collection": {
+        "ko": "컬렉션을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't delete collection. Try again later."
+      }
+    },
+    "createFailed": {
+      "collection": {
+        "ko": "컬렉션을 만들지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't create collection. Try again later."
+      }
+    },
+    "addFailed": {
+      "collectionMovies": {
+        "ko": "영화를 컬렉션에 담지 못했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't add films to collection. Try again later."
+      }
+    },
+    "openFailed": {
+      "title": {
+        "ko": "열기 실패",
+        "en": "Couldn't open"
+      },
+      "googleForm": {
+        "ko": "Google Form을 열 수 없습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't open Google Form. Try again later."
+      },
+      "privacyPolicy": {
+        "ko": "개인정보처리방침 페이지를 열 수 없습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Couldn't open privacy policy. Try again later."
+      }
+    },
+    "logoutFailed": {
+      "title": {
+        "ko": "로그아웃 실패",
+        "en": "Log out failed"
+      },
+      "message": {
+        "ko": "잠시 후 다시 시도해주세요.",
+        "en": "Try again later."
+      }
+    },
+    "deleteAccount": {
+      "verifyFailed": {
+        "ko": "탈퇴 확인 중 오류가 발생했습니다.",
+        "en": "Error verifying account deletion."
+      },
+      "dataNotRemoved": {
+        "ko": "계정 데이터가 삭제되지 않았습니다. delete_user_account RPC를 적용했는지 확인해주세요.",
+        "en": "Account data was not removed. Check that delete_user_account RPC is deployed."
+      },
+      "rpcMissing": {
+        "ko": "탈퇴 기능이 아직 서버에 설정되지 않았습니다.",
+        "en": "Account deletion is not configured on the server yet."
+      },
+      "rpcFailed": {
+        "ko": "회원 탈퇴 처리에 실패했습니다.",
+        "en": "Account deletion failed."
+      },
+      "rpcFailedRetry": {
+        "ko": "회원 탈퇴 처리에 실패했습니다. 잠시 후 다시 시도해주세요.",
+        "en": "Account deletion failed. Try again later."
+      },
+      "signOutAfterDelete": {
+        "ko": "데이터는 삭제됐지만 로그아웃에 실패했습니다. 앱을 다시 실행해주세요.",
+        "en": "Data was deleted, but sign-out failed. Restart the app."
+      }
+    },
+    "auth": {
+      "googleConfig": {
+        "title": {
+          "ko": "Google 로그인 설정 오류",
+          "en": "Google sign-in configuration error"
+        },
+        "message": {
+          "ko": "앱 서명(SHA-1)이 Google Cloud에 등록되지 않았을 수 있습니다. debug/release 빌드에 맞는 SHA-1을 Android OAuth 클라이언트(com.filmolog)에 추가한 뒤 5~10분 후 다시 시도해주세요.",
+          "en": "Your app SHA-1 may not be registered in Google Cloud. Add the debug/release SHA-1 to the Android OAuth client (com.filmolog), then try again in 5–10 minutes."
+        }
+      }
+    },
+    "validation": {
+      "selectRating": {
+        "ko": "평점을 선택해주세요.",
+        "en": "Select a rating."
+      },
+      "collectionNameRequired": {
+        "ko": "컬렉션 이름을 입력해주세요.",
+        "en": "Enter a collection name."
+      },
+      "selectFilmsToAdd": {
+        "ko": "추가할 영화를 선택해주세요.",
+        "en": "Select films to add."
+      }
+    },
+    "duplicateReview": {
+      "title": {
+        "ko": "이미 기록됨",
+        "en": "Already logged"
+      },
+      "message": {
+        "ko": "이미 리뷰를 작성한 영화입니다.",
+        "en": "You already reviewed this film."
+      }
+    }
+  },
+  "dialogs": {
+    "validation": {
+      "title": {
+        "ko": "입력 확인",
+        "en": "Check your input"
+      }
+    },
+    "selection": {
+      "title": {
+        "ko": "선택 확인",
+        "en": "Confirm selection"
+      }
+    },
+    "logout": {
+      "title": {
+        "ko": "로그아웃",
+        "en": "Log out"
+      },
+      "message": {
+        "ko": "정말 로그아웃하시겠습니까?",
+        "en": "Are you sure you want to log out?"
+      },
+      "confirm": {
+        "ko": "로그아웃",
+        "en": "Log out"
+      }
+    },
+    "deleteAccount": {
+      "title": {
+        "ko": "회원 탈퇴",
+        "en": "Delete account"
+      },
+      "message": {
+        "ko": "탈퇴 시 작성한 리뷰, 컬렉션, 위시리스트 등 모든 기록이 삭제되며 복구할 수 없습니다.",
+        "en": "Deleting your account permanently removes reviews, collections, wishlist, and all other data."
+      },
+      "confirm": {
+        "ko": "탈퇴하기",
+        "en": "Delete account"
+      },
+      "failedTitle": {
+        "ko": "탈퇴 실패",
+        "en": "Deletion failed"
+      }
+    },
+    "deleteReview": {
+      "title": {
+        "ko": "기록 삭제",
+        "en": "Delete log"
+      },
+      "message": {
+        "ko": "\"{{title}}\" 기록을 삭제할까요?",
+        "en": "Delete the log for \"{{title}}\"?"
+      }
+    },
+    "deleteCollection": {
+      "title": {
+        "ko": "컬렉션 삭제",
+        "en": "Delete collection"
+      },
+      "message": {
+        "ko": "\"{{name}}\" 컬렉션을 삭제할까요?\n담긴 영화 목록도 함께 삭제됩니다. (영화 기록은 유지됩니다)",
+        "en": "Delete \"{{name}}\"?\nIts film list will be removed too. (Your film logs stay.)"
+      }
+    }
+  }
+}

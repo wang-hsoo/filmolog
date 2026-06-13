@@ -25,4 +25,5 @@ export {
   ArchiveNativeAd,
   MoviePosterNativeAd,
 } from './ads';
+export { TmdbAttribution } from './attribution';
 export * from './constants';

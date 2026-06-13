@@ -6,6 +6,7 @@ import {
 } from '@react-navigation/native';
 import { useCallback, useMemo } from 'react';
 import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MciIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -67,6 +68,7 @@ function CatalogMetaRow({ label, value, isLast }: CatalogMetaRowProps) {
 }
 
 function MovieDetailScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<MovieDetailRoute>();
@@ -144,11 +146,11 @@ function MovieDetailScreen() {
       });
     } catch {
       archiveAlert(
-        '저장 실패',
-        '위시리스트를 업데이트하지 못했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.saveFailed.generic'),
+        t('errors.saveFailed.wishlist'),
       );
     }
-  }, [isInWishlist, tmdbId, toggleWishlist, user?.id, wishlistMovieInput]);
+  }, [isInWishlist, t, tmdbId, toggleWishlist, user?.id, wishlistMovieInput]);
 
   const handleWriteReview = useCallback(() => {
     navigation.navigate('FilmLog', { tmdbId });
@@ -166,7 +168,7 @@ function MovieDetailScreen() {
         </LoadingState>
       ) : isError || !movieDetail ? (
         <ErrorState>
-          <ArchiveEmptyText>영화 정보를 불러오지 못했습니다.</ArchiveEmptyText>
+          <ArchiveEmptyText>{t('movie.detail.loadFailed')}</ArchiveEmptyText>
         </ErrorState>
       ) : (
         <>
@@ -180,8 +182,8 @@ function MovieDetailScreen() {
               <CatalogHeader>
                 <ArchiveSectionHeader
                   overline="FILM CATALOG"
-                  title="작품 정보"
-                  subtitle="아카이브에 등록된 영화 메타데이터."
+                  title={t('movie.detail.catalog.title')}
+                  subtitle={t('movie.detail.catalog.subtitle')}
                 />
               </CatalogHeader>
 
@@ -220,23 +222,23 @@ function MovieDetailScreen() {
 
               <CatalogMetaBlock>
                 <CatalogMetaRow
-                  label="출시일"
+                  label={t('common.movieMeta.releaseDate')}
                   value={resolveMeta(formatReleaseDate(movieDetail.release_date))}
                 />
                 <CatalogMetaRow
-                  label="러닝타임"
+                  label={t('common.movieMeta.runtime')}
                   value={resolveMeta(formatRuntime(movieDetail.runtime))}
                 />
                 <CatalogMetaRow
-                  label="장르"
+                  label={t('common.movieMeta.genres')}
                   value={resolveMeta(getGenres(movieDetail))}
                 />
                 <CatalogMetaRow
-                  label="감독"
+                  label={t('common.movieMeta.director')}
                   value={resolveMeta(getDirectors(movieDetail))}
                 />
                 <CatalogMetaRow
-                  label="출연"
+                  label={t('common.movieMeta.castShort')}
                   value={resolveMeta(getCast(movieDetail, 5))}
                   isLast
                 />
@@ -246,8 +248,8 @@ function MovieDetailScreen() {
             <ArchivePanel accent>
               <ArchiveSectionHeader
                 overline="FILMOLOG"
-                title="커뮤니티 평가"
-                subtitle="Filmolog 유저들의 평균 평점과 기록 수."
+                title={t('movie.detail.community.title')}
+                subtitle={t('movie.detail.community.subtitle')}
               />
 
               {isStatsLoading ? (
@@ -256,7 +258,7 @@ function MovieDetailScreen() {
                 </StatsLoading>
               ) : isStatsError ? (
                 <ArchiveEmptyText>
-                  커뮤니티 평가를 불러오지 못했습니다.
+                  {t('movie.detail.community.loadFailed')}
                 </ArchiveEmptyText>
               ) : reviewCount === 0 ? (
                 <StatsEmpty>
@@ -266,7 +268,7 @@ function MovieDetailScreen() {
                     color={theme.colors.goldDim}
                   />
                   <ArchiveEmptyText>
-                    아직 Filmolog에 기록된 평가가 없습니다.
+                    {t('movie.detail.community.empty')}
                   </ArchiveEmptyText>
                 </StatsEmpty>
               ) : (
@@ -308,7 +310,9 @@ function MovieDetailScreen() {
                       color={theme.colors.dashboardText}
                     />
                     <ReviewCountText>
-                      {reviewCount.toLocaleString()}명이 평가함
+                      {t('common.units.peopleRated', {
+                        count: reviewCount,
+                      })}
                     </ReviewCountText>
                   </ReviewCountRow>
                 </CommunityStatsCard>
@@ -318,14 +322,14 @@ function MovieDetailScreen() {
             <ArchivePanel accent>
               <ArchiveSectionHeader
                 overline="SYNOPSIS"
-                title="줄거리"
-                subtitle="작품 소개."
+                title={t('movie.detail.synopsis.title')}
+                subtitle={t('movie.detail.synopsis.subtitle')}
               />
 
               {movieDetail.overview?.trim() ? (
                 <OverviewText>{movieDetail.overview.trim()}</OverviewText>
               ) : (
-                <ArchiveEmptyText>등록된 줄거리가 없습니다.</ArchiveEmptyText>
+                <ArchiveEmptyText>{t('movie.detail.synopsis.empty')}</ArchiveEmptyText>
               )}
             </ArchivePanel>
           </Content>
@@ -339,7 +343,7 @@ function MovieDetailScreen() {
                   size={18}
                   color={theme.colors.appBackground}
                 />
-                <ReviewLabel>리뷰 작성</ReviewLabel>
+                <ReviewLabel>{t('movie.detail.writeReview')}</ReviewLabel>
               </ReviewButton>
 
               <WishlistButton
@@ -367,7 +371,9 @@ function MovieDetailScreen() {
                       }
                     />
                     <WishlistLabel $active={isInWishlist}>
-                      {isInWishlist ? '제거' : '담기'}
+                      {isInWishlist
+                        ? t('common.actions.remove')
+                        : t('common.actions.add')}
                     </WishlistLabel>
                   </>
                 )}

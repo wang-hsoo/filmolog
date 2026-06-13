@@ -21,29 +21,6 @@ export type ReviewLogPeriodKey =
   | 'last90'
   | 'thisYear';
 
-export const REVIEW_SORT_OPTIONS: { key: ReviewSortKey; label: string }[] = [
-  { key: 'latest', label: '최신 기록순' },
-  { key: 'oldest', label: '오래된 기록순' },
-  { key: 'ratingDesc', label: '평점 높은순' },
-  { key: 'ratingAsc', label: '평점 낮은순' },
-  { key: 'watchedDesc', label: '관람일 최신순' },
-];
-
-export const REVIEW_VIEW_OPTIONS: { key: ReviewLogViewMode; label: string }[] = [
-  { key: 'list', label: '목록' },
-  { key: 'timeline', label: '타임라인' },
-  { key: 'calendar', label: '캘린더' },
-];
-
-export const REVIEW_PERIOD_OPTIONS: { key: ReviewLogPeriodKey; label: string }[] =
-  [
-    { key: 'all', label: '전체 기간' },
-    { key: 'thisMonth', label: '이번 달' },
-    { key: 'last30', label: '최근 30일' },
-    { key: 'last90', label: '최근 3개월' },
-    { key: 'thisYear', label: '올해' },
-  ];
-
 export type ReviewLogDateGroup = {
   dateKey: string;
   reviews: UserReviewedMovie[];

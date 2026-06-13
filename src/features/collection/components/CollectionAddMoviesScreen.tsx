@@ -7,6 +7,7 @@ import {
 } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -55,12 +56,17 @@ function isDuplicateError(error: unknown) {
   );
 }
 
-function formatWatchedDate(date: string | null) {
+function formatWatchedDate(
+  t: ReturnType<typeof useTranslation>['t'],
+  date: string | null,
+) {
   if (!date) {
     return null;
   }
 
-  return `시청 · ${date.replace(/-/g, '.')}`;
+  return t('common.movieMeta.watchedPrefix', {
+    date: date.replace(/-/g, '.'),
+  });
 }
 
 function SelectableMovieRow({
@@ -74,8 +80,9 @@ function SelectableMovieRow({
   isLast: boolean;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   const posterUri = getTmdbPosterUrl(movie.posterPath);
-  const metaLabel = formatWatchedDate(movie.watchedDate);
+  const metaLabel = formatWatchedDate(t, movie.watchedDate);
 
   return (
     <>
@@ -108,7 +115,7 @@ function SelectableMovieRow({
             <Icon name="star" size={12} color={theme.colors.primary} />
             <RowRatingText>{movie.rating.toFixed(1)}</RowRatingText>
           </RowRatingValue>
-          <RowRatingLabel>내 평점</RowRatingLabel>
+          <RowRatingLabel>{t('common.movieMeta.myRating')}</RowRatingLabel>
         </RowRatingCol>
 
         <SelectionBadge $selected={isSelected}>
@@ -127,6 +134,7 @@ function SelectableMovieRow({
 }
 
 function CollectionAddMoviesScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<AddMoviesRoute>();
@@ -200,7 +208,10 @@ function CollectionAddMoviesScreen() {
 
   const handleSubmit = useCallback(async () => {
     if (selectedMovieIds.length === 0) {
-      archiveAlert('선택 확인', '추가할 영화를 선택해주세요.');
+      archiveAlert(
+        t('dialogs.selection.title'),
+        t('errors.validation.selectFilmsToAdd'),
+      );
       return;
     }
 
@@ -227,11 +238,11 @@ function CollectionAddMoviesScreen() {
       navigation.goBack();
     } catch {
       archiveAlert(
-        '추가 실패',
-        '영화를 컬렉션에 담지 못했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.addFailed.generic'),
+        t('errors.addFailed.collectionMovies'),
       );
     }
-  }, [addCollectionMovie, collectionId, navigation, selectedMovieIds]);
+  }, [addCollectionMovie, collectionId, navigation, selectedMovieIds, t]);
 
   const isLoading = isCollectionLoading || isMoviesLoading;
   const isSubmitting = isAdding;
@@ -240,19 +251,22 @@ function CollectionAddMoviesScreen() {
   const listEmptyMessage = useMemo(() => {
     if (availableMovies.length === 0) {
       return userMovies.length === 0
-        ? '아직 기록한 영화가 없습니다. 영화를 먼저 기록해주세요.'
-        : '추가할 수 있는 영화가 없습니다. 이미 모두 담았어요.';
+        ? t('collection.addMovies.empty.noLogs')
+        : t('collection.addMovies.empty.allAdded');
     }
 
     if (isSearching) {
-      return `"${debouncedQuery.trim()}"에 맞는 영화가 없습니다.`;
+      return t('collection.addMovies.empty.noSearchMatch', {
+        query: debouncedQuery.trim(),
+      });
     }
 
-    return '표시할 영화가 없습니다.';
+    return t('collection.addMovies.empty.noneToShow');
   }, [
     availableMovies.length,
     debouncedQuery,
     isSearching,
+    t,
     userMovies.length,
   ]);
 
@@ -266,7 +280,7 @@ function CollectionAddMoviesScreen() {
           <ArchiveSearchInput
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="기록한 영화 검색"
+            placeholder={t('collection.addMovies.searchPlaceholder')}
             placeholderTextColor={theme.colors.placeholderText}
             returnKeyType="search"
             autoCorrect={false}
@@ -302,16 +316,20 @@ function CollectionAddMoviesScreen() {
                 <ListHeader>
                   <ArchiveSectionHeader
                     overline="MY LOGS"
-                    title={collection?.name ?? '컬렉션'}
+                    title={collection?.name ?? t('common.collectionFallback')}
                     subtitle={
                       isSearching
-                        ? `"${debouncedQuery.trim()}" 검색 결과`
-                        : '기록한 영화 중 아직 담지 않은 작품을 고르세요.'
+                        ? t('common.archive.searchResults', {
+                            query: debouncedQuery.trim(),
+                          })
+                        : t('collection.addMovies.subtitleDefault')
                     }
                   />
                   {selectedMovieIds.length > 0 ? (
                     <SelectedCount>
-                      {selectedMovieIds.length}편 선택됨
+                      {t('common.units.filmCountSelected', {
+                        count: selectedMovieIds.length,
+                      })}
                     </SelectedCount>
                   ) : null}
                 </ListHeader>
@@ -323,10 +341,13 @@ function CollectionAddMoviesScreen() {
               }
               renderItem={({ item, index }) => {
                 if (!isListItemEntry(item)) {
+                  const isLast = index === listData.length - 1;
+
                   return (
-                    <AdRowSlot>
-                      <MoviePosterNativeAd variant="row" />
-                    </AdRowSlot>
+                    <>
+                      <MoviePosterNativeAd variant="listRow" />
+                      {!isLast ? <RowDivider /> : null}
+                    </>
                   );
                 }
 
@@ -361,8 +382,10 @@ function CollectionAddMoviesScreen() {
           ) : (
             <SubmitLabel>
               {selectedMovieIds.length > 0
-                ? `${selectedMovieIds.length}편 추가`
-                : '영화를 선택해주세요'}
+                ? t('common.units.filmCountAdd', {
+                    count: selectedMovieIds.length,
+                  })
+                : t('collection.addMovies.selectPrompt')}
             </SubmitLabel>
           )}
         </SubmitButton>
@@ -501,11 +524,6 @@ const RowDivider = styled.View`
   height: 1px;
   margin: 0 16px;
   background-color: ${({ theme }) => theme.colors.dashbordItemBorder};
-`;
-
-const AdRowSlot = styled.View`
-  align-items: center;
-  padding: 18px 16px;
 `;
 
 const SelectedCount = styled.Text`

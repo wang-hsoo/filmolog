@@ -1,5 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { Pressable, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled, { useTheme } from 'styled-components/native';
 
@@ -10,8 +11,8 @@ import {
   ArchiveSectionHeader,
   Container,
   STATS_ICONS,
-  STATS_LABELS,
 } from '../../../components';
+import { getStatsLabel } from '../../../i18n/labels';
 import {
   useAuth,
   useGetUserStats,
@@ -20,10 +21,7 @@ import {
 import { useGetGenres } from '../../../lib/tmdb';
 import { theme } from '../../../theme';
 
-const TAGLINE =
-  '오늘 당신의 마음을 움직인 단 하나의 장면은 무엇인가요?';
-
-type StatKey = keyof typeof STATS_LABELS;
+type StatKey = keyof typeof STATS_ICONS;
 
 const STAT_ORDER: StatKey[] = [
   'reviewCount',
@@ -40,7 +38,10 @@ type MenuItem = {
   onPress: () => void;
 };
 
-function formatJoinedAt(createdAt: string | null): string | null {
+function formatJoinedAt(
+  createdAt: string | null,
+  t: ReturnType<typeof useTranslation>['t'],
+): string | null {
   if (!createdAt) {
     return null;
   }
@@ -53,10 +54,11 @@ function formatJoinedAt(createdAt: string | null): string | null {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
-  return `${y}.${m}.${d} 가입`;
+  return t('common.units.joinedAt', { date: `${y}.${m}.${d}` });
 }
 
 function ProfileScreen() {
+  const { t } = useTranslation();
   const themeHook = useTheme();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const tabNavigation = navigation.getParent();
@@ -71,8 +73,9 @@ function ProfileScreen() {
     .map(id => genreData?.genres.find(genre => genre.id === id)?.name)
     .filter((name): name is string => Boolean(name));
 
-  const joinedLabel = formatJoinedAt(profile?.created_at ?? null);
-  const nickname = profile?.nickname?.trim() || '필모그래퍼';
+  const joinedLabel = formatJoinedAt(profile?.created_at ?? null, t);
+  const nickname =
+    profile?.nickname?.trim() || t('common.brand.filmographer');
 
   const handleStatPress = (key: StatKey) => {
     switch (key) {
@@ -86,7 +89,7 @@ function ProfileScreen() {
         navigation.navigate('WishlistList');
         break;
       case 'avgRating':
-        tabNavigation?.navigate('통계' as never);
+        tabNavigation?.navigate('Statistics' as never);
         break;
       default:
         break;
@@ -96,29 +99,29 @@ function ProfileScreen() {
   const menuItems: MenuItem[] = [
     {
       key: 'reviews',
-      label: '내 기록',
-      subtitle: '작성한 리뷰 전체 보기',
+      label: t('profile.menu.myLogs.label'),
+      subtitle: t('profile.menu.myLogs.subtitle'),
       icon: 'notebook-outline',
       onPress: () => navigation.navigate('ReviewLogList'),
     },
     {
       key: 'collections',
-      label: '내 컬렉션',
-      subtitle: '큐레이션한 영화 목록',
+      label: t('profile.menu.myCollections.label'),
+      subtitle: t('profile.menu.myCollections.subtitle'),
       icon: 'folder-outline',
       onPress: () => navigation.navigate('CollectionList'),
     },
     {
       key: 'wishlist',
-      label: '위시리스트',
-      subtitle: '담아둔 영화',
+      label: t('profile.menu.wishlist.label'),
+      subtitle: t('profile.menu.wishlist.subtitle'),
       icon: 'bookmark-outline',
       onPress: () => navigation.navigate('WishlistList'),
     },
     {
       key: 'badges',
-      label: '배지',
-      subtitle: '획득한 업적 확인',
+      label: t('profile.menu.badges.label'),
+      subtitle: t('profile.menu.badges.subtitle'),
       icon: 'medal-outline',
       onPress: () => navigation.navigate('BadgeList'),
     },
@@ -128,13 +131,13 @@ function ProfileScreen() {
     <Container isGetter={false}>
       <PageTopBar>
         <PageTopText>
-          <PageTitle>마이페이지</PageTitle>
+          <PageTitle>{t('profile.pageTitle')}</PageTitle>
           <PageOverline>MY FILMOGRAPHY</PageOverline>
         </PageTopText>
         <SettingsButton
           onPress={() => navigation.navigate('Settings')}
           accessibilityRole="button"
-          accessibilityLabel="설정">
+          accessibilityLabel={t('common.accessibility.settings')}>
           <Icon name="cog-outline" size={20} color={themeHook.colors.primary} />
         </SettingsButton>
       </PageTopBar>
@@ -155,15 +158,15 @@ function ProfileScreen() {
                   ))}
                 </GenreRow>
               ) : null}
-              <Tagline>{TAGLINE}</Tagline>
+              <Tagline>{t('profile.tagline')}</Tagline>
             </ProfileBlock>
           </ArchivePanel>
 
           <ArchivePanel>
             <ArchiveSectionHeader
               overline="MY ARCHIVE"
-              title="나의 기록"
-              subtitle="쌓아온 영화의 흔적을 한눈에."
+              title={t('common.archive.myArchive.title')}
+              subtitle={t('common.archive.myArchive.subtitle')}
             />
             <StatsRow>
               {STAT_ORDER.map((key, index) => (
@@ -178,7 +181,7 @@ function ProfileScreen() {
                       color={theme.colors.dashboardIcon}
                     />
                     <StatItemLabel numberOfLines={2}>
-                      {STATS_LABELS[key]}
+                      {getStatsLabel(t, key)}
                     </StatItemLabel>
                     <StatItemValue>
                       {userStats?.[key] ?? '—'}
@@ -215,7 +218,7 @@ function ProfileScreen() {
               </MenuRow>
             ))}
           </MenuPanel>
-          
+
           <ArchivePanel>
             <ArchiveNativeAd />
           </ArchivePanel>

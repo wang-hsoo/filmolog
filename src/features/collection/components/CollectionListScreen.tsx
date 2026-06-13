@@ -8,6 +8,7 @@ import {
   Pressable,
   ScrollView,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
@@ -35,13 +36,20 @@ type CollectionSortKey =
   | 'moviesDesc'
   | 'moviesAsc';
 
-const SORT_OPTIONS: { key: CollectionSortKey; label: string }[] = [
-  { key: 'latest', label: '최신순' },
-  { key: 'oldest', label: '오래된순' },
-  { key: 'nameAsc', label: '이름순' },
-  { key: 'moviesDesc', label: '영화 많은순' },
-  { key: 'moviesAsc', label: '영화 적은순' },
-];
+const SORT_I18N: Record<CollectionSortKey, string> = {
+  latest: 'common.sort.latest',
+  oldest: 'common.sort.oldest',
+  nameAsc: 'common.sort.nameAsc',
+  moviesDesc: 'common.sort.moviesDesc',
+  moviesAsc: 'common.sort.moviesAsc',
+};
+
+function getSortOptions(t: ReturnType<typeof useTranslation>['t']) {
+  return (Object.keys(SORT_I18N) as CollectionSortKey[]).map(key => ({
+    key,
+    label: t(SORT_I18N[key]),
+  }));
+}
 
 function getTheme(themeId: string) {
   return (
@@ -93,10 +101,11 @@ function CollectionCard({
   item: CollectionListItem;
   onPress?: () => void;
 }) {
+  const { t } = useTranslation();
   const collectionTheme = getTheme(item.theme_id);
-  const countLabel = `${item.movieCount}개 영화`;
+  const countLabel = t('common.units.movieCount', { count: item.movieCount });
   const latestLabel = item.latestMovieTitle
-    ? `최근 추가: ${item.latestMovieTitle}`
+    ? t('common.archive.recentlyAdded', { title: item.latestMovieTitle })
     : null;
 
   return (
@@ -126,6 +135,7 @@ function CollectionCard({
 }
 
 function CollectionListScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
@@ -136,13 +146,16 @@ function CollectionListScreen() {
     user?.id ?? '',
   );
 
+  const sortOptions = useMemo(() => getSortOptions(t), [t]);
+
   const sortedCollections = useMemo(
     () => sortCollections(collections, sortKey),
     [collections, sortKey],
   );
 
   const activeSortLabel =
-    SORT_OPTIONS.find(option => option.key === sortKey)?.label ?? '최신순';
+    sortOptions.find(option => option.key === sortKey)?.label ??
+    t('common.sort.latest');
 
   const handleCreateCollection = useCallback(() => {
     navigation.navigate('Collection');
@@ -171,9 +184,11 @@ function CollectionListScreen() {
           flexGrow: 1,
         }}>
         <ToolbarRow>
-          <ToolbarTitle>나의 컬렉션</ToolbarTitle>
+          <ToolbarTitle>{t('collection.list.title')}</ToolbarTitle>
           <SortTrigger onPress={() => setIsSortOpen(true)}>
-            <SortLabel>정렬: {activeSortLabel}</SortLabel>
+            <SortLabel>
+              {t('common.sort.sortPrefix', { label: activeSortLabel })}
+            </SortLabel>
             <Icon
               name="chevron-down"
               size={16}
@@ -188,9 +203,7 @@ function CollectionListScreen() {
           </LoadingState>
         ) : sortedCollections.length === 0 ? (
           <EmptyState>
-            <ArchiveEmptyText>
-              아직 컬렉션이 없습니다. 첫 컬렉션을 만들어보세요.
-            </ArchiveEmptyText>
+            <ArchiveEmptyText>{t('collection.list.empty')}</ArchiveEmptyText>
           </EmptyState>
         ) : (
           <ListContent>
@@ -209,7 +222,7 @@ function CollectionListScreen() {
 
         <CreateButton onPress={handleCreateCollection}>
           <Icon name="plus" size={18} color={theme.colors.primary} />
-          <CreateLabel>새 컬렉션 만들기</CreateLabel>
+          <CreateLabel>{t('collection.list.createNew')}</CreateLabel>
         </CreateButton>
       </ScrollView>
 
@@ -221,9 +234,9 @@ function CollectionListScreen() {
         <SortModalRoot>
           <SortBackdrop onPress={() => setIsSortOpen(false)} />
           <SortMenu style={{ top: insets.top + 96, right: H_PAD }}>
-            {SORT_OPTIONS.map((option, index) => {
+            {sortOptions.map((option, index) => {
               const isActive = option.key === sortKey;
-              const isLast = index === SORT_OPTIONS.length - 1;
+              const isLast = index === sortOptions.length - 1;
 
               return (
                 <SortOption

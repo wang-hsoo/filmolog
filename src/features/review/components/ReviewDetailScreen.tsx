@@ -13,6 +13,7 @@ import {
   Share,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import MciIcon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -97,6 +98,7 @@ function CatalogMetaRow({ label, value, isLast }: CatalogMetaRowProps) {
 }
 
 function ReviewDetailScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<ReviewDetailRoute>();
@@ -189,7 +191,10 @@ function ReviewDetailScreen() {
     }
 
     if (rating === 0) {
-      archiveAlert('입력 확인', '평점을 선택해주세요.');
+      archiveAlert(
+        t('dialogs.validation.title'),
+        t('errors.validation.selectRating'),
+      );
       return;
     }
 
@@ -203,11 +208,11 @@ function ReviewDetailScreen() {
       setIsEditing(false);
     } catch {
       archiveAlert(
-        '저장 실패',
-        '기록을 수정하지 못했습니다. 잠시 후 다시 시도해주세요.',
+        t('errors.saveFailed.generic'),
+        t('errors.saveFailed.reviewUpdate'),
       );
     }
-  }, [content, rating, review, updateReview, watchedDate]);
+  }, [content, rating, review, t, updateReview, watchedDate]);
 
   const handleDelete = useCallback(() => {
     if (!review) {
@@ -217,12 +222,12 @@ function ReviewDetailScreen() {
     setIsMenuOpen(false);
 
     archiveAlert(
-      '기록 삭제',
-      `"${review.title}" 기록을 삭제할까요?`,
+      t('dialogs.deleteReview.title'),
+      t('dialogs.deleteReview.message', { title: review.title }),
       [
-        { text: '취소', style: 'cancel' },
+        { text: t('common.actions.cancel'), style: 'cancel' },
         {
-          text: '삭제',
+          text: t('common.actions.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -230,15 +235,15 @@ function ReviewDetailScreen() {
               navigation.goBack();
             } catch {
               archiveAlert(
-                '삭제 실패',
-                '기록을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.',
+                t('errors.deleteFailed.generic'),
+                t('errors.deleteFailed.review'),
               );
             }
           },
         },
       ],
     );
-  }, [deleteReview, navigation, review]);
+  }, [deleteReview, navigation, review, t]);
 
   const handleShare = useCallback(async () => {
     if (!review) {
@@ -303,7 +308,7 @@ function ReviewDetailScreen() {
         </LoadingState>
       ) : isError || !review ? (
         <ErrorState>
-          <ArchiveEmptyText>기록을 불러오지 못했습니다.</ArchiveEmptyText>
+          <ArchiveEmptyText>{t('review.detail.loadFailed')}</ArchiveEmptyText>
         </ErrorState>
       ) : (
         <>
@@ -317,8 +322,8 @@ function ReviewDetailScreen() {
                 <CatalogHeader>
                   <ArchiveSectionHeader
                     overline="FILM CATALOG"
-                    title="작품 카드"
-                    subtitle="아카이브에 등록된 영화 정보."
+                    title={t('review.detail.catalog.title')}
+                    subtitle={t('review.detail.catalog.subtitle')}
                   />
                   {catalogRef ? <CatalogStamp>{catalogRef}</CatalogStamp> : null}
                 </CatalogHeader>
@@ -371,19 +376,19 @@ function ReviewDetailScreen() {
 
                 <CatalogMetaBlock>
                   <CatalogMetaRow
-                    label="감독"
+                    label={t('common.movieMeta.director')}
                     value={resolveMovieMeta(directors)}
                   />
                   <CatalogMetaRow
-                    label="러닝타임"
+                    label={t('common.movieMeta.runtime')}
                     value={resolveMovieMeta(runtimeLabel)}
                   />
                   <CatalogMetaRow
-                    label="관람일"
+                    label={t('common.movieMeta.watchedDate')}
                     value={watchedLabel ?? '—'}
                   />
                   <CatalogMetaRow
-                    label="배우"
+                    label={t('common.movieMeta.cast')}
                     value={resolveMovieMeta(castLabel)}
                     isLast
                   />
@@ -404,8 +409,8 @@ function ReviewDetailScreen() {
                   <ArchivePanel accent>
                     <ArchiveSectionHeader
                       overline="MY RATING"
-                      title="내 평점"
-                      subtitle="이 작품에 남긴 점수."
+                      title={t('review.detail.rating.title')}
+                      subtitle={t('review.detail.rating.subtitle')}
                     />
                     <RatingCard>
                       <RatingStars>
@@ -437,8 +442,8 @@ function ReviewDetailScreen() {
                     <JournalHeader>
                       <ArchiveSectionHeader
                         overline="JOURNAL"
-                        title="감상 기록"
-                        subtitle="남긴 메모와 생각."
+                        title={t('review.detail.journal.title')}
+                        subtitle={t('review.detail.journal.subtitle')}
                       />
                       <JournalCount>
                         {reviewLength} / {REVIEW_MAX_LENGTH}
@@ -456,7 +461,7 @@ function ReviewDetailScreen() {
                             color={theme.colors.goldDim}
                           />
                           <ArchiveEmptyText>
-                            아직 감상을 적지 않았습니다.
+                            {t('review.detail.journal.empty')}
                           </ArchiveEmptyText>
                         </JournalEmpty>
                       )}
@@ -474,7 +479,7 @@ function ReviewDetailScreen() {
                   disabled={isBusy}
                   onPress={handleCancelEdit}
                   $flex>
-                  <ActionLabel>취소</ActionLabel>
+                  <ActionLabel>{t('common.actions.cancel')}</ActionLabel>
                 </ActionButton>
                 <ActionButton
                   disabled={isBusy}
@@ -487,7 +492,7 @@ function ReviewDetailScreen() {
                       size="small"
                     />
                   ) : (
-                    <ActionLabel $primary>저장</ActionLabel>
+                    <ActionLabel $primary>{t('common.actions.save')}</ActionLabel>
                   )}
                 </ActionButton>
               </ActionRow>
@@ -499,7 +504,7 @@ function ReviewDetailScreen() {
                     size={17}
                     color={theme.colors.primary}
                   />
-                  <ActionLabel>수정</ActionLabel>
+                  <ActionLabel>{t('common.actions.edit')}</ActionLabel>
                 </ActionButton>
                 <ActionButton
                   disabled={isBusy}
@@ -515,7 +520,9 @@ function ReviewDetailScreen() {
                         size={17}
                         color={DESTRUCTIVE_COLOR}
                       />
-                      <ActionLabel $destructive>삭제</ActionLabel>
+                      <ActionLabel $destructive>
+                        {t('common.actions.delete')}
+                      </ActionLabel>
                     </>
                   )}
                 </ActionButton>
@@ -525,7 +532,7 @@ function ReviewDetailScreen() {
                     size={17}
                     color={theme.colors.primary}
                   />
-                  <ActionLabel>공유</ActionLabel>
+                  <ActionLabel>{t('common.actions.share')}</ActionLabel>
                 </ActionButton>
               </ActionRow>
             )}
@@ -545,7 +552,7 @@ function ReviewDetailScreen() {
                     size={18}
                     color={theme.colors.primary}
                   />
-                  <MenuLabel>작품 정보</MenuLabel>
+                  <MenuLabel>{t('review.detail.menu.movieInfo')}</MenuLabel>
                 </MenuButton>
                 <MenuButton onPress={handleStartEdit}>
                   <MciIcon
@@ -553,7 +560,7 @@ function ReviewDetailScreen() {
                     size={18}
                     color={theme.colors.primary}
                   />
-                  <MenuLabel>수정</MenuLabel>
+                  <MenuLabel>{t('common.actions.edit')}</MenuLabel>
                 </MenuButton>
                 <MenuButton disabled={isSharing} onPress={handleShare}>
                   {isSharing ? (
@@ -568,7 +575,11 @@ function ReviewDetailScreen() {
                       color={theme.colors.primary}
                     />
                   )}
-                  <MenuLabel>{isSharing ? '공유 중…' : '공유'}</MenuLabel>
+                  <MenuLabel>
+                    {isSharing
+                      ? t('common.actions.sharing')
+                      : t('common.actions.share')}
+                  </MenuLabel>
                 </MenuButton>
                 <MenuButton $isLast $destructive onPress={handleDelete}>
                   <MciIcon
@@ -576,7 +587,7 @@ function ReviewDetailScreen() {
                     size={18}
                     color={DESTRUCTIVE_COLOR}
                   />
-                  <MenuLabel $destructive>삭제</MenuLabel>
+                  <MenuLabel $destructive>{t('common.actions.delete')}</MenuLabel>
                 </MenuButton>
               </MenuSheet>
             </MenuModalRoot>

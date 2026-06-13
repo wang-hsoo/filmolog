@@ -1,7 +1,5 @@
 export const SPLASH_BRAND_NAME = 'FILMOLOG';
 
-export const SPLASH_TAGLINE = '영화를 기억하는 가장 아름다운 방법';
-
 export const SPLASH_IMAGE = require('../../../assets/splash/splash.png');
 
 export const SPLASH_FADE_OUT_MS = 420;

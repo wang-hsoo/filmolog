@@ -1,5 +1,6 @@
 import Svg, { Path } from 'react-native-svg';
 import styled from 'styled-components/native';
+import { useTranslation } from 'react-i18next';
 
 import { ArchiveEmptyText } from '../../../components';
 
@@ -56,12 +57,14 @@ function describeDonutSlice(
 
 function StatisticsPieChart({
   slices,
-  emptyMessage = '표시할 데이터가 없습니다.',
+  emptyMessage,
 }: StatisticsPieChartProps) {
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? t('common.archive.noData');
   const total = slices.reduce((sum, slice) => sum + slice.count, 0);
 
   if (total === 0 || slices.length === 0) {
-    return <ArchiveEmptyText>{emptyMessage}</ArchiveEmptyText>;
+    return <ArchiveEmptyText>{resolvedEmptyMessage}</ArchiveEmptyText>;
   }
 
   const cx = SIZE / 2;

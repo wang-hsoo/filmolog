@@ -11,6 +11,8 @@ import {
   prepareGoogleAccountPicker,
 } from '../../../lib/google/googleAuth';
 import { getSupabaseClient } from '../../../lib/supabase';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
+import { i18n } from '../../../i18n';
 
 export function useLogin() {
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +38,7 @@ export function useLogin() {
 
       const idToken = googleResponse.data.idToken;
       if (!idToken) {
-        throw new Error('Google idToken이 없습니다.');
+        throw new Error(i18n.t('errors.auth.googleIdTokenMissing'));
       }
 
       const { error } = await getSupabaseClient().auth.signInWithIdToken({
@@ -54,6 +56,20 @@ export function useLogin() {
       ) {
         return;
       }
+
+      if (
+        isErrorWithCode(error) &&
+        (error.code === '10' ||
+          String(error.message ?? '').includes('DEVELOPER_ERROR'))
+      ) {
+        console.error('[useLogin]', error);
+        archiveAlert(
+          i18n.t('errors.auth.googleConfig.title'),
+          i18n.t('errors.auth.googleConfig.message'),
+        );
+        return;
+      }
+
       console.error('[useLogin]', error);
     } finally {
       setIsLoading(false);

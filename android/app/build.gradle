@@ -90,6 +90,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        ndk {
+            // 실기기 배포: arm64-v8a만으로 충분 (Windows 경로 260자 제한 회피)
+            abiFilters "arm64-v8a"
+        }
     }
     signingConfigs {
         debug {

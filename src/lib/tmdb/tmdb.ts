@@ -1,4 +1,7 @@
 import ApiClient from '../api/client';
+import { i18n } from '../../i18n';
+import { getTmdbLanguage } from '../../i18n/tmdbLocale';
+import type { AppLocale } from '../../i18n/types';
 
 import type {
   TmdbDiscoverMovieResponse,
@@ -11,6 +14,10 @@ import type {
 const client = new ApiClient({
   type: 'movie',
 });
+
+function tmdbLanguage() {
+  return getTmdbLanguage(i18n.language as AppLocale);
+}
 
 /** 한국 OTT — GET /watch/providers/movie?watch_region=KR 기준 주요 provider */
 const KR_WATCH_PROVIDER_IDS = [
@@ -26,7 +33,7 @@ const DISCOVER_PAGE_COUNT = 10;
 export const getGenres = async (): Promise<TmdbGenreListResponse> => {
   const response = await client.instance.get<TmdbGenreListResponse>(
     '/genre/movie/list',
-    { params: { language: 'ko-KR' } },
+    { params: { language: tmdbLanguage() } },
   );
   return response.data;
 };
@@ -47,7 +54,7 @@ export const discoverMoviesByGenres = async (
     '/discover/movie',
     {
       params: {
-        language: 'ko-KR',
+        language: tmdbLanguage(),
         region: 'KR',
         with_genres: genreIds.join('|'),
         sort_by: sortBy,
@@ -83,7 +90,7 @@ export const searchMovies = async (
     '/search/movie',
     {
       params: {
-        language: 'ko-KR',
+        language: tmdbLanguage(),
         region: 'KR',
         query: trimmed,
         page,
@@ -103,7 +110,7 @@ export const getMovieDetail = async (
     `/movie/${movieId}`,
     {
       params: {
-        language: 'ko-KR',
+        language: tmdbLanguage(),
         append_to_response: 'credits',
       },
     },
@@ -119,7 +126,7 @@ export const getPersonMovieCredits = async (
   const response = await client.instance.get<TmdbPersonMovieCreditsResponse>(
     `/person/${personId}/movie_credits`,
     {
-      params: { language: 'ko-KR' },
+      params: { language: tmdbLanguage() },
     },
   );
 
