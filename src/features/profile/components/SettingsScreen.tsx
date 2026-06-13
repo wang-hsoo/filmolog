@@ -8,13 +8,17 @@ import styled from 'styled-components/native';
 import { RootStackParamList } from '../../../app/navigation/types';
 import { Header } from '../../../components';
 import { resetToAppScreen } from '../../../app/navigation/navigationRef';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
+import {
+  openFeedbackForm,
+  type FeedbackFormType,
+} from '../../../lib/feedback/googleFeedbackForm';
 import {
   DeleteAccountError,
   deleteUserAccount,
   signOutFromApp,
   useAuth,
 } from '../../../lib/supabase';
-import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
 const APP_VERSION = '0.0.1';
@@ -80,6 +84,23 @@ function SettingsScreen() {
     );
   }, [isDeleting, navigation, user?.id]);
 
+  const handleOpenFeedback = useCallback(
+    (type: FeedbackFormType) => {
+      void openFeedbackForm({
+        type,
+        appVersion: APP_VERSION,
+        userId: user?.id,
+      }).catch(error => {
+        console.error('[SettingsScreen] openFeedbackForm failed', error);
+        archiveAlert(
+          '열기 실패',
+          'Google Form을 열 수 없습니다. 잠시 후 다시 시도해주세요.',
+        );
+      });
+    },
+    [user?.id],
+  );
+
   return (
     <AppScreen
       style={{
@@ -109,6 +130,57 @@ function SettingsScreen() {
               <Icon
                 name="chevron-right"
                 size={20}
+                color={theme.colors.primaryMuted}
+              />
+            </MenuRow>
+          </MenuPanel>
+
+          <SectionLabel>지원</SectionLabel>
+          <SupportNotice>
+            Filmolog는 1인으로 운영 중이에요. 남겨주신 의견은 순차 검토하며,
+            반영 시점은 작업 규모에 따라 달라질 수 있어요.
+          </SupportNotice>
+          <MenuPanel>
+            <MenuRow
+              onPress={() => handleOpenFeedback('feature')}
+              accessibilityRole="button">
+              <MenuIconWrap>
+                <Icon
+                  name="lightbulb-outline"
+                  size={20}
+                  color={theme.colors.primary}
+                />
+              </MenuIconWrap>
+              <MenuTextBlock>
+                <MenuLabel>기능 제안하기</MenuLabel>
+                <MenuSubtitle>아이디어를 남겨주시면 검토 후 반영해요</MenuSubtitle>
+              </MenuTextBlock>
+              <Icon
+                name="open-in-new"
+                size={18}
+                color={theme.colors.primaryMuted}
+              />
+            </MenuRow>
+
+            <MenuDivider />
+
+            <MenuRow
+              onPress={() => handleOpenFeedback('bug')}
+              accessibilityRole="button">
+              <MenuIconWrap>
+                <Icon
+                  name="bug-outline"
+                  size={20}
+                  color={theme.colors.primary}
+                />
+              </MenuIconWrap>
+              <MenuTextBlock>
+                <MenuLabel>오류 제보하기</MenuLabel>
+                <MenuSubtitle>접수 후 순차 수정 · 버전·계정은 자동 입력</MenuSubtitle>
+              </MenuTextBlock>
+              <Icon
+                name="open-in-new"
+                size={18}
                 color={theme.colors.primaryMuted}
               />
             </MenuRow>
@@ -184,6 +256,14 @@ const SectionLabel = styled.Text`
   font-size: 10px;
   letter-spacing: 2px;
   color: ${({ theme }) => theme.colors.primaryMuted};
+`;
+
+const SupportNotice = styled.Text`
+  margin: -2px 2px 0;
+  font-family: ${({ theme }) => theme.fonts.bodyLight};
+  font-size: 12px;
+  line-height: 18px;
+  color: ${({ theme }) => theme.colors.dashboardText};
 `;
 
 const MenuPanel = styled.View`

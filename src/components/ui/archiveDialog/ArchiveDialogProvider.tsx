@@ -11,6 +11,10 @@ import type {
   ArchiveDialogConfig,
 } from './types';
 
+const DESTRUCTIVE_COLOR = '#D46B6B';
+const DESTRUCTIVE_BORDER = '#8B4545';
+const DESTRUCTIVE_SURFACE = '#2A1818';
+
 function getOverline(buttons: ArchiveAlertButton[]) {
   const hasDestructive = buttons.some(button => button.style === 'destructive');
   const hasCancel = buttons.some(button => button.style === 'cancel');
@@ -83,6 +87,7 @@ function ArchiveDialogProvider({ children }: PropsWithChildren) {
                   {buttons.map((button, index) => {
                     const isCancel = button.style === 'cancel';
                     const isDestructive = button.style === 'destructive';
+                    const isDefault = !isCancel && !isDestructive;
 
                     return (
                       <DialogButton
@@ -91,10 +96,12 @@ function ArchiveDialogProvider({ children }: PropsWithChildren) {
                         $single={buttons.length === 1}
                         $cancel={isCancel}
                         $destructive={isDestructive}
+                        $default={isDefault}
                         accessibilityRole="button">
                         <DialogButtonLabel
                           $cancel={isCancel}
-                          $destructive={isDestructive}>
+                          $destructive={isDestructive}
+                          $default={isDefault}>
                           {button.text}
                         </DialogButtonLabel>
                       </DialogButton>
@@ -185,6 +192,7 @@ const DialogButton = styled(Pressable)<{
   $single: boolean;
   $cancel: boolean;
   $destructive: boolean;
+  $default: boolean;
 }>`
   flex: ${({ $single }) => ($single ? '0 1 auto' : '1')};
   min-width: ${({ $single }) => ($single ? '120px' : '0')};
@@ -194,24 +202,46 @@ const DialogButton = styled(Pressable)<{
   padding: 0 14px;
   border-radius: ${({ theme }) => theme.radii.panel}px;
   border-width: 1px;
-  border-color: ${({ theme, $cancel, $destructive }) =>
-    $cancel || $destructive
-      ? theme.colors.dashborderBorderAccent
-      : theme.colors.goldSoft};
-  background-color: ${({ theme, $cancel, $destructive }) =>
-    $cancel || $destructive ? theme.colors.surface : theme.colors.primary};
+  border-color: ${({ theme, $cancel, $destructive }) => {
+    if ($cancel) {
+      return theme.colors.dashborderBorder;
+    }
+
+    if ($destructive) {
+      return DESTRUCTIVE_BORDER;
+    }
+
+    return theme.colors.goldSoft;
+  }};
+  background-color: ${({ theme, $cancel, $destructive }) => {
+    if ($cancel) {
+      return 'transparent';
+    }
+
+    if ($destructive) {
+      return DESTRUCTIVE_SURFACE;
+    }
+
+    return theme.colors.primary;
+  }};
 `;
 
 const DialogButtonLabel = styled.Text<{
   $cancel: boolean;
   $destructive: boolean;
+  $default: boolean;
 }>`
-  font-family: ${({ theme }) => theme.fonts.bodySemiBold};
+  font-family: ${({ theme, $default }) =>
+    $default ? theme.fonts.bodySemiBold : theme.fonts.bodyMedium};
   font-size: 14px;
   letter-spacing: 0.2px;
   color: ${({ theme, $cancel, $destructive }) => {
-    if ($cancel || $destructive) {
-      return theme.colors.goldDim;
+    if ($cancel) {
+      return theme.colors.dashboardText;
+    }
+
+    if ($destructive) {
+      return DESTRUCTIVE_COLOR;
     }
 
     return theme.colors.appBackground;

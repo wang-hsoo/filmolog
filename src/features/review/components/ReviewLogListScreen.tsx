@@ -16,80 +16,60 @@ import { useAuth, useGetUserReviewedMovies } from '../../../lib/supabase';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 import { AppScreen, theme } from '../../../theme';
 
+import ReviewLogCalendarView from './ReviewLogCalendarView';
 import ReviewLogRow from './ReviewLogRow';
+import ReviewLogTimelineView from './ReviewLogTimelineView';
+import {
+  REVIEW_PERIOD_OPTIONS,
+  REVIEW_SORT_OPTIONS,
+  REVIEW_VIEW_OPTIONS,
+  filterReviewsByPeriod,
+  groupReviewsByDate,
+  sortReviews,
+  type ReviewLogPeriodKey,
+  type ReviewLogViewMode,
+  type ReviewSortKey,
+} from '../utils/reviewLogUtils';
 
 const H_PAD = 20;
 const MIN_REVIEWS_FOR_BANNER = 15;
-
-type ReviewSortKey =
-  | 'latest'
-  | 'oldest'
-  | 'ratingDesc'
-  | 'ratingAsc'
-  | 'watchedDesc';
-
-const SORT_OPTIONS: { key: ReviewSortKey; label: string }[] = [
-  { key: 'latest', label: '최신 기록순' },
-  { key: 'oldest', label: '오래된 기록순' },
-  { key: 'ratingDesc', label: '평점 높은순' },
-  { key: 'ratingAsc', label: '평점 낮은순' },
-  { key: 'watchedDesc', label: '관람일 최신순' },
-];
-
-function sortReviews(
-  items: UserReviewedMovie[],
-  sortKey: ReviewSortKey,
-): UserReviewedMovie[] {
-  const sorted = [...items];
-
-  switch (sortKey) {
-    case 'latest':
-      return sorted.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-    case 'oldest':
-      return sorted.sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      );
-    case 'ratingDesc':
-      return sorted.sort(
-        (a, b) => b.rating - a.rating || b.createdAt.localeCompare(a.createdAt),
-      );
-    case 'ratingAsc':
-      return sorted.sort(
-        (a, b) => a.rating - b.rating || b.createdAt.localeCompare(a.createdAt),
-      );
-    case 'watchedDesc':
-      return sorted.sort((a, b) => {
-        const aDate = a.watchedDate ?? a.createdAt.slice(0, 10);
-        const bDate = b.watchedDate ?? b.createdAt.slice(0, 10);
-        return bDate.localeCompare(aDate);
-      });
-    default:
-      return sorted;
-  }
-}
 
 function ReviewLogListScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
+  const [viewMode, setViewMode] = useState<ReviewLogViewMode>('list');
+  const [periodKey, setPeriodKey] = useState<ReviewLogPeriodKey>('all');
   const [sortKey, setSortKey] = useState<ReviewSortKey>('latest');
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isPeriodOpen, setIsPeriodOpen] = useState(false);
 
   const { data: reviews = [], isLoading } = useGetUserReviewedMovies(
     user?.id ?? '',
   );
 
+  const periodFilteredReviews = useMemo(
+    () => filterReviewsByPeriod(reviews, periodKey),
+    [periodKey, reviews],
+  );
+
   const sortedReviews = useMemo(
-    () => sortReviews(reviews, sortKey),
-    [reviews, sortKey],
+    () => sortReviews(periodFilteredReviews, sortKey),
+    [periodFilteredReviews, sortKey],
+  );
+
+  const timelineGroups = useMemo(
+    () => groupReviewsByDate(periodFilteredReviews, sortKey),
+    [periodFilteredReviews, sortKey],
   );
 
   const activeSortLabel =
-    SORT_OPTIONS.find(option => option.key === sortKey)?.label ?? '최신 기록순';
+    REVIEW_SORT_OPTIONS.find(option => option.key === sortKey)?.label ??
+    '최신 기록순';
+
+  const activePeriodLabel =
+    REVIEW_PERIOD_OPTIONS.find(option => option.key === periodKey)?.label ??
+    '전체 기간';
 
   const handlePressReview = useCallback(
     (review: UserReviewedMovie) => {
@@ -103,6 +83,13 @@ function ReviewLogListScreen() {
     setIsSortOpen(false);
   }, []);
 
+  const handleSelectPeriod = useCallback((key: ReviewLogPeriodKey) => {
+    setPeriodKey(key);
+    setIsPeriodOpen(false);
+  }, []);
+
+  const showSortControl = viewMode !== 'calendar';
+
   return (
     <AppScreen style={{ paddingTop: insets.top }}>
       <Header subtitle="MY LOGS" navigation={navigation} hideRight />
@@ -115,44 +102,93 @@ function ReviewLogListScreen() {
         }}>
         <ToolbarRow>
           <ToolbarTitle>나의 기록</ToolbarTitle>
-          <SortTrigger onPress={() => setIsSortOpen(true)}>
-            <SortLabel>정렬: {activeSortLabel}</SortLabel>
+          <ToolbarMeta>{periodFilteredReviews.length}편</ToolbarMeta>
+        </ToolbarRow>
+
+        <ViewTabRow>
+          {REVIEW_VIEW_OPTIONS.map(option => {
+            const isActive = viewMode === option.key;
+
+            return (
+              <ViewTab
+                key={option.key}
+                $active={isActive}
+                onPress={() => setViewMode(option.key)}>
+                <ViewTabLabel $active={isActive}>{option.label}</ViewTabLabel>
+              </ViewTab>
+            );
+          })}
+        </ViewTabRow>
+
+        <FilterRow>
+          <FilterChip onPress={() => setIsPeriodOpen(true)}>
+            <FilterChipLabel>기간 · {activePeriodLabel}</FilterChipLabel>
             <Icon
               name="chevron-down"
-              size={16}
+              size={14}
               color={theme.colors.dashboardText}
             />
-          </SortTrigger>
-        </ToolbarRow>
+          </FilterChip>
+
+          {showSortControl ? (
+            <FilterChip onPress={() => setIsSortOpen(true)}>
+              <FilterChipLabel>정렬 · {activeSortLabel}</FilterChipLabel>
+              <Icon
+                name="chevron-down"
+                size={14}
+                color={theme.colors.dashboardText}
+              />
+            </FilterChip>
+          ) : null}
+        </FilterRow>
 
         {isLoading ? (
           <LoadingState>
             <ActivityIndicator color={theme.colors.primary} size="large" />
           </LoadingState>
-        ) : sortedReviews.length === 0 ? (
+        ) : periodFilteredReviews.length === 0 ? (
           <EmptyState>
             <ArchiveEmptyText>
-              아직 남긴 기록이 없습니다. 첫 영화를 기록해보세요.
+              {reviews.length === 0
+                ? '아직 남긴 기록이 없습니다. 첫 영화를 기록해보세요.'
+                : '선택한 기간에 해당하는 기록이 없습니다.'}
             </ArchiveEmptyText>
           </EmptyState>
         ) : (
-          <>
-            <ListFrame>
-              {sortedReviews.map((review, index) => (
-                <ReviewLogRow
-                  key={review.reviewId}
-                  review={review}
-                  isLast={index === sortedReviews.length - 1}
-                  onPress={() => handlePressReview(review)}
-                />
-              ))}
-            </ListFrame>
-            {sortedReviews.length >= MIN_REVIEWS_FOR_BANNER ? (
+          <ContentFrame>
+            {viewMode === 'list' ? (
+              <ListFrame>
+                {sortedReviews.map((review, index) => (
+                  <ReviewLogRow
+                    key={review.reviewId}
+                    review={review}
+                    isLast={index === sortedReviews.length - 1}
+                    onPress={() => handlePressReview(review)}
+                  />
+                ))}
+              </ListFrame>
+            ) : null}
+
+            {viewMode === 'timeline' ? (
+              <ReviewLogTimelineView
+                groups={timelineGroups}
+                onPressReview={handlePressReview}
+              />
+            ) : null}
+
+            {viewMode === 'calendar' ? (
+              <ReviewLogCalendarView
+                reviews={periodFilteredReviews}
+                onPressReview={handlePressReview}
+              />
+            ) : null}
+
+            {periodFilteredReviews.length >= MIN_REVIEWS_FOR_BANNER ? (
               <BannerSlot>
                 <ArchiveBannerAd />
               </BannerSlot>
             ) : null}
-          </>
+          </ContentFrame>
         )}
       </ScrollView>
 
@@ -164,16 +200,42 @@ function ReviewLogListScreen() {
         <SortModalRoot>
           <SortBackdrop onPress={() => setIsSortOpen(false)} />
           <SortSheet>
-            {SORT_OPTIONS.map((option, index) => (
+            {REVIEW_SORT_OPTIONS.map((option, index) => (
               <SortOption
                 key={option.key}
-                $isLast={index === SORT_OPTIONS.length - 1}
+                $isLast={index === REVIEW_SORT_OPTIONS.length - 1}
                 $active={sortKey === option.key}
                 onPress={() => handleSelectSort(option.key)}>
                 <SortOptionLabel $active={sortKey === option.key}>
                   {option.label}
                 </SortOptionLabel>
                 {sortKey === option.key ? (
+                  <Icon name="check" size={16} color={theme.colors.primary} />
+                ) : null}
+              </SortOption>
+            ))}
+          </SortSheet>
+        </SortModalRoot>
+      </Modal>
+
+      <Modal
+        transparent
+        visible={isPeriodOpen}
+        animationType="fade"
+        onRequestClose={() => setIsPeriodOpen(false)}>
+        <SortModalRoot>
+          <SortBackdrop onPress={() => setIsPeriodOpen(false)} />
+          <SortSheet>
+            {REVIEW_PERIOD_OPTIONS.map((option, index) => (
+              <SortOption
+                key={option.key}
+                $isLast={index === REVIEW_PERIOD_OPTIONS.length - 1}
+                $active={periodKey === option.key}
+                onPress={() => handleSelectPeriod(option.key)}>
+                <SortOptionLabel $active={periodKey === option.key}>
+                  {option.label}
+                </SortOptionLabel>
+                {periodKey === option.key ? (
                   <Icon name="check" size={16} color={theme.colors.primary} />
                 ) : null}
               </SortOption>
@@ -189,9 +251,10 @@ export default ReviewLogListScreen;
 
 const ToolbarRow = styled.View`
   flex-direction: row;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  padding: 8px ${H_PAD}px 14px;
+  padding: 8px ${H_PAD}px 10px;
+  gap: 12px;
 `;
 
 const ToolbarTitle = styled.Text`
@@ -201,14 +264,59 @@ const ToolbarTitle = styled.Text`
   color: ${({ theme }) => theme.colors.goldBright};
 `;
 
-const SortTrigger = styled(Pressable)`
+const ToolbarMeta = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.bodyLight};
+  font-size: 12px;
+  color: ${({ theme }) => theme.colors.dashboardText};
+`;
+
+const ViewTabRow = styled.View`
+  flex-direction: row;
+  gap: 8px;
+  padding: 0 ${H_PAD}px 12px;
+`;
+
+const ViewTab = styled(Pressable)<{ $active: boolean }>`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border-radius: 999px;
+  border-width: 1px;
+  border-color: ${({ theme, $active }) =>
+    $active ? theme.colors.primaryMuted : theme.colors.dashborderBorder};
+  background-color: ${({ theme, $active }) =>
+    $active ? theme.colors.surfaceRaised : theme.colors.dashboardBackground};
+`;
+
+const ViewTabLabel = styled.Text<{ $active: boolean }>`
+  font-family: ${({ theme, $active }) =>
+    $active ? theme.fonts.bodySemiBold : theme.fonts.bodyLight};
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  color: ${({ theme, $active }) =>
+    $active ? theme.colors.goldBright : theme.colors.dashboardText};
+`;
+
+const FilterRow = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 ${H_PAD}px 14px;
+`;
+
+const FilterChip = styled(Pressable)`
   flex-direction: row;
   align-items: center;
   gap: 4px;
-  padding: 6px 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.dashborderBorderAccent};
+  background-color: ${({ theme }) => theme.colors.surface};
 `;
 
-const SortLabel = styled.Text`
+const FilterChipLabel = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
   color: ${({ theme }) => theme.colors.dashboardText};
@@ -226,8 +334,12 @@ const EmptyState = styled.View`
   align-items: center;
 `;
 
+const ContentFrame = styled.View`
+  padding: 0 ${H_PAD}px;
+  gap: 20px;
+`;
+
 const ListFrame = styled.View`
-  margin: 0 ${H_PAD}px;
   border-radius: ${({ theme }) => theme.radii.panel}px;
   border-width: 1px;
   border-color: ${({ theme }) => theme.colors.dashborderBorderAccent};
@@ -236,8 +348,7 @@ const ListFrame = styled.View`
 `;
 
 const BannerSlot = styled.View`
-  margin-top: 20px;
-  padding: 0 ${H_PAD}px;
+  margin-top: 4px;
 `;
 
 const SortModalRoot = styled.View`
