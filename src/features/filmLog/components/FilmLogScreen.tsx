@@ -1,10 +1,10 @@
 import { LegendList } from '@legendapp/list/react-native';
 import {
-  NavigationProp,
   RouteProp,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
+import type { StackNavigationProp } from '@react-navigation/stack';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -23,11 +23,13 @@ import styled from 'styled-components/native';
 import { RootStackParamList } from '../../../app/navigation/types';
 import {
   ArchiveEmptyText,
+  ArchiveNativeAd,
   ArchivePanel,
   ArchiveSearchInput,
   ArchiveSearchPanel,
   ArchiveSectionHeader,
   Header,
+  MoviePosterNativeAd,
   MovieRowItem,
 } from '../../../components';
 import { useMovieGridLayout } from '../../explore/hooks/useMovieGridLayout';
@@ -42,6 +44,7 @@ import {
 } from '../../../lib/tmdb/creditsSnapshot';
 import type { TmdbMovie, TmdbMovieDetail } from '../../../lib/tmdb/types';
 import { archiveAlert } from '../../../lib/dialog/archiveDialog';
+import { isMovieEntry, withMovieAdSlots } from '../../../lib/ads';
 import { AppScreen, theme } from '../../../theme';
 
 import MovieInfoCard from './MovieInfoCard';
@@ -53,6 +56,8 @@ const SEARCH_DEBOUNCE_MS = 300;
 const HORIZONTAL_PADDING = 20;
 const REVIEW_HEADER_OFFSET = 64;
 const KEYBOARD_SCROLL_BUFFER = 24;
+const SEARCH_AD_INTERVAL = 9;
+const SEARCH_MAX_ADS = 5;
 
 type FilmLogRoute = RouteProp<RootStackParamList, 'FilmLog'>;
 
@@ -75,7 +80,7 @@ function toTmdbMovieFromDetail(detail: TmdbMovieDetail): TmdbMovie {
 
 function FilmLogScreen() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const route = useRoute<FilmLogRoute>();
   const initialTmdbId = route.params?.tmdbId;
   const { user } = useAuth();
@@ -205,6 +210,16 @@ function FilmLogScreen() {
     [searchPages],
   );
 
+  const searchListData = useMemo(
+    () =>
+      withMovieAdSlots(searchResults, {
+        interval: SEARCH_AD_INTERVAL,
+        maxAds: SEARCH_MAX_ADS,
+        idPrefix: `filmlog-search-${debouncedQuery.trim()}`,
+      }),
+    [debouncedQuery, searchResults],
+  );
+
   const reviewedTmdbIds = useMemo(
     () => new Set(reviewedMovies.map(review => review.tmdbId)),
     [reviewedMovies],
@@ -288,7 +303,7 @@ function FilmLogScreen() {
       : [];
 
     try {
-      await createReview({
+      const created = await createReview({
         userId: user.id,
         tmdbId: selectedMovie.id,
         title: selectedMovie.title,
@@ -304,7 +319,13 @@ function FilmLogScreen() {
         collectionIds: selectedCollectionIds,
       });
 
-      navigation.goBack();
+      navigation.replace('FilmLogComplete', {
+        reviewId: created.id,
+        title: selectedMovie.title,
+        posterPath: selectedMovie.poster_path,
+        rating,
+        reviewNumber: reviewedMovies.length + 1,
+      });
     } catch (error: unknown) {
       const code =
         error && typeof error === 'object' && 'code' in error
@@ -327,6 +348,7 @@ function FilmLogScreen() {
     movieDetail,
     navigation,
     rating,
+    reviewedMovies.length,
     selectedCollectionIds,
     selectedMovie,
     user?.id,
@@ -371,10 +393,16 @@ function FilmLogScreen() {
             />
           ) : null}
 
+          
+          <ArchivePanel>
+            <ArchiveNativeAd />
+          </ArchivePanel>
+
+
           {isSearching ? (
             <ArchiveListFrame>
               <LegendList
-                data={searchResults}
+                data={searchListData}
                 numColumns={gridLayout.numColumns}
                 key={gridLayout.numColumns}
                 showsVerticalScrollIndicator={false}
@@ -412,16 +440,23 @@ function FilmLogScreen() {
                     </FooterLoader>
                   ) : null
                 }
-                renderItem={({ item }) => (
-                  <Pressable onPress={() => handleSelectMovie(item)}>
-                    <MovieRowItem
-                      movie={item}
+                renderItem={({ item }) =>
+                  isMovieEntry(item) ? (
+                    <Pressable onPress={() => handleSelectMovie(item.movie)}>
+                      <MovieRowItem
+                        movie={item.movie}
+                        width={gridLayout.itemWidth}
+                        variant="grid"
+                      />
+                    </Pressable>
+                  ) : (
+                    <MoviePosterNativeAd
                       width={gridLayout.itemWidth}
                       variant="grid"
                     />
-                  </Pressable>
-                )}
-                keyExtractor={item => String(item.id)}
+                  )
+                }
+                keyExtractor={item => item.id}
                 estimatedItemSize={gridLayout.itemHeight}
                 onEndReached={handleSearchEndReached}
                 onEndReachedThreshold={0.4}

@@ -1,16 +1,21 @@
 import { LegendList } from '@legendapp/list/react-native';
 import { ActivityIndicator } from 'react-native';
+import { useMemo } from 'react';
 import styled from 'styled-components/native';
 
 import {
   ArchiveEmptyText,
   ArchivePanel,
   ArchiveSectionHeader,
+  MoviePosterNativeAd,
   MovieRowItem,
   getMovieRowItemHeight,
 } from '../../../components';
+import { isMovieEntry, withMovieAdSlots } from '../../../lib/ads';
 import type { TmdbMovie } from '../../../lib/tmdb/types';
 import { theme } from '../../../theme';
+
+const SHELF_AD_INTERVAL = 6;
 
 type ExploreMovieShelfProps = {
   overline: string;
@@ -22,6 +27,7 @@ type ExploreMovieShelfProps = {
   showRating?: boolean;
   emptyMessage?: string;
   hideWhenEmpty?: boolean;
+  showNativeAd?: boolean;
   onPressMovie?: (movie: TmdbMovie) => void;
 };
 
@@ -35,9 +41,26 @@ function ExploreMovieShelf({
   showRating = false,
   emptyMessage = '아직 표시할 작품이 없습니다.',
   hideWhenEmpty = false,
+  showNativeAd = true,
   onPressMovie,
 }: ExploreMovieShelfProps) {
   const isInitialLoading = isLoading && movies.length === 0;
+
+  const shelfData = useMemo(() => {
+    if (!showNativeAd) {
+      return movies.map(movie => ({
+        kind: 'movie' as const,
+        id: String(movie.id),
+        movie,
+      }));
+    }
+
+    return withMovieAdSlots(movies, {
+      interval: SHELF_AD_INTERVAL,
+      maxAds: 1,
+      idPrefix: `${overline}-${title}`,
+    });
+  }, [movies, overline, showNativeAd, title]);
 
   if (hideWhenEmpty) {
     if (isInitialLoading || isError || movies.length === 0) {
@@ -65,18 +88,24 @@ function ExploreMovieShelf({
         <ArchiveEmptyText>{emptyMessage}</ArchiveEmptyText>
       ) : (
         <LegendList
-          data={movies}
+          data={shelfData}
           horizontal
           nestedScrollEnabled
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <MovieRowItem
-              movie={item}
-              showRating={showRating}
-              onPress={onPressMovie ? () => onPressMovie(item) : undefined}
-            />
-          )}
-          keyExtractor={item => String(item.id)}
+          renderItem={({ item }) =>
+            isMovieEntry(item) ? (
+              <MovieRowItem
+                movie={item.movie}
+                showRating={showRating}
+                onPress={
+                  onPressMovie ? () => onPressMovie(item.movie) : undefined
+                }
+              />
+            ) : (
+              <MoviePosterNativeAd variant="row" showRating={showRating} />
+            )
+          }
+          keyExtractor={item => item.id}
           estimatedItemSize={122}
           style={{ height: shelfHeight }}
         />

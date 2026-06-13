@@ -22,7 +22,7 @@ import {
   CollectionListScreen,
   CollectionScreen,
 } from '../../features/collection';
-import { FilmLogScreen } from '../../features/filmLog';
+import { FilmLogCompleteScreen, FilmLogScreen } from '../../features/filmLog';
 import { MovieDetailScreen } from '../../features/movie';
 import ReviewDetailScreen from '../../features/review/components/ReviewDetailScreen';
 import ReviewLogListScreen from '../../features/review/components/ReviewLogListScreen';
@@ -110,6 +110,10 @@ function RootNavigator() {
         component={CollectionAddMoviesScreen}
       />
       <RootStack.Screen name="FilmLog" component={FilmLogScreen} />
+      <RootStack.Screen
+        name="FilmLogComplete"
+        component={FilmLogCompleteScreen}
+      />
       <RootStack.Screen name="ReviewDetail" component={ReviewDetailScreen} />
       <RootStack.Screen name="ReviewLogList" component={ReviewLogListScreen} />
       <RootStack.Screen name="MovieDetail" component={MovieDetailScreen} />

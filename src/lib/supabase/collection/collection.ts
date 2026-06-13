@@ -182,6 +182,28 @@ export async function removeCollectionMovie(
   }
 }
 
+export async function deleteCollection(collectionId: string) {
+  const supabase = getSupabaseClient();
+
+  const { error: moviesError } = await supabase
+    .from('collection_movies')
+    .delete()
+    .eq('collection_id', collectionId);
+
+  if (moviesError) {
+    throw moviesError;
+  }
+
+  const { error } = await supabase
+    .from('collections')
+    .delete()
+    .eq('id', collectionId);
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function getCollections(userId: string): Promise<Collection[]> {
   const { data, error } = await getSupabaseClient()
     .from('collections')

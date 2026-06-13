@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
 import { RootStackParamList } from '../../../app/navigation/types';
-import { ArchiveEmptyText, Header } from '../../../components';
+import { ArchiveBannerAd, ArchiveEmptyText, Header } from '../../../components';
 import { useAuth, useGetUserReviewedMovies } from '../../../lib/supabase';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 import { AppScreen, theme } from '../../../theme';
@@ -19,6 +19,7 @@ import { AppScreen, theme } from '../../../theme';
 import ReviewLogRow from './ReviewLogRow';
 
 const H_PAD = 20;
+const MIN_REVIEWS_FOR_BANNER = 15;
 
 type ReviewSortKey =
   | 'latest'
@@ -135,16 +136,23 @@ function ReviewLogListScreen() {
             </ArchiveEmptyText>
           </EmptyState>
         ) : (
-          <ListFrame>
-            {sortedReviews.map((review, index) => (
-              <ReviewLogRow
-                key={review.reviewId}
-                review={review}
-                isLast={index === sortedReviews.length - 1}
-                onPress={() => handlePressReview(review)}
-              />
-            ))}
-          </ListFrame>
+          <>
+            <ListFrame>
+              {sortedReviews.map((review, index) => (
+                <ReviewLogRow
+                  key={review.reviewId}
+                  review={review}
+                  isLast={index === sortedReviews.length - 1}
+                  onPress={() => handlePressReview(review)}
+                />
+              ))}
+            </ListFrame>
+            {sortedReviews.length >= MIN_REVIEWS_FOR_BANNER ? (
+              <BannerSlot>
+                <ArchiveBannerAd />
+              </BannerSlot>
+            ) : null}
+          </>
         )}
       </ScrollView>
 
@@ -225,6 +233,11 @@ const ListFrame = styled.View`
   border-color: ${({ theme }) => theme.colors.dashborderBorderAccent};
   background-color: ${({ theme }) => theme.colors.dashboardBackground};
   padding: 4px 14px;
+`;
+
+const BannerSlot = styled.View`
+  margin-top: 20px;
+  padding: 0 ${H_PAD}px;
 `;
 
 const SortModalRoot = styled.View`

@@ -10,6 +10,22 @@ export function getStarIconName(star: number, rating: number) {
   return 'star-outline';
 }
 
+/** 1~5점. 일부 레거시 기록은 10~50(×10)으로 저장됨 */
+export function normalizeReviewRating(rating: number) {
+  if (!Number.isFinite(rating)) {
+    return 0;
+  }
+
+  if (rating > 5) {
+    return rating / 10;
+  }
+
+  return rating;
+}
+
 export function formatRating(rating: number) {
-  return Number.isInteger(rating) ? `${rating}.0` : String(rating);
+  const normalized = normalizeReviewRating(rating);
+  const rounded = Math.round(normalized * 10) / 10;
+
+  return Number.isInteger(rounded) ? `${rounded}.0` : String(rounded);
 }

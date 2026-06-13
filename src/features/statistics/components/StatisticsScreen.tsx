@@ -8,7 +8,9 @@ import styled from 'styled-components/native';
 import { RootStackParamList } from '../../../app/navigation/types';
 import {
   ALL_BADGE_IDS,
+  ArchiveBannerAd,
   ArchiveEmptyText,
+  ArchiveNativeAd,
   ArchivePageHeader,
   ArchivePanel,
   ArchiveSectionHeader,
@@ -294,6 +296,12 @@ function StatisticsScreen() {
                 />
               </ArchivePanel>
 
+
+              <ArchivePanel>
+                <ArchiveNativeAd />
+              </ArchivePanel>
+
+
               <ArchivePanel accent>
                 <ArchiveSectionHeader
                   overline="GENRE"
@@ -475,6 +483,8 @@ function StatisticsScreen() {
                   />
                 </BadgeLink>
               </ArchivePanel>
+
+              <ArchiveBannerAd />
             </>
           )}
         </Content>

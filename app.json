@@ -1,4 +1,8 @@
 {
   "name": "filmolog",
-  "displayName": "FILMOLOG"
+  "displayName": "FILMOLOG",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-4376785638228449~3622145843",
+    "ios_app_id": ""
+  }
 }

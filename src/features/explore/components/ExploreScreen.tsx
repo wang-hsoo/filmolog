@@ -20,9 +20,11 @@ import {
   ArchiveSearchPanel,
   ArchiveSectionHeader,
   Container,
+  MoviePosterNativeAd,
   MovieRowItem,
   MOVIE_ROW_ITEM_HEIGHT,
 } from '../../../components';
+import { isMovieEntry, withMovieAdSlots } from '../../../lib/ads';
 import { queryClient } from '../../../lib/queryClient';
 import {
   communityExploreKeys,
@@ -43,6 +45,9 @@ import ExploreMovieShelf from './ExploreMovieShelf';
 
 const SEARCH_DEBOUNCE_MS = 300;
 const HORIZONTAL_PADDING = 20;
+const CURATION_AD_INTERVAL = 6;
+const SEARCH_AD_INTERVAL = 9;
+const SEARCH_MAX_ADS = 5;
 
 function ExploreScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -135,6 +140,26 @@ function ExploreScreen() {
     [searchPages],
   );
 
+  const curationListData = useMemo(
+    () =>
+      withMovieAdSlots(recommendMovies, {
+        interval: CURATION_AD_INTERVAL,
+        maxAds: 1,
+        idPrefix: 'curation',
+      }),
+    [recommendMovies],
+  );
+
+  const searchListData = useMemo(
+    () =>
+      withMovieAdSlots(searchMovies, {
+        interval: SEARCH_AD_INTERVAL,
+        maxAds: SEARCH_MAX_ADS,
+        idPrefix: `search-${debouncedQuery.trim()}`,
+      }),
+    [debouncedQuery, searchMovies],
+  );
+
   const isRecommendLoading = isGenresLoading || isMoviesLoading;
 
   const handleSearchEndReached = useCallback(() => {
@@ -185,14 +210,21 @@ function ExploreScreen() {
           <ArchiveEmptyText>조건에 맞는 작품이 없습니다.</ArchiveEmptyText>
         ) : (
           <LegendList
-            data={recommendMovies}
+            data={curationListData}
             horizontal
             nestedScrollEnabled
             showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => (
-              <MovieRowItem movie={item} onPress={() => handlePressMovie(item)} />
-            )}
-            keyExtractor={item => String(item.id)}
+            renderItem={({ item }) =>
+              isMovieEntry(item) ? (
+                <MovieRowItem
+                  movie={item.movie}
+                  onPress={() => handlePressMovie(item.movie)}
+                />
+              ) : (
+                <MoviePosterNativeAd variant="row" />
+              )
+            }
+            keyExtractor={item => item.id}
             estimatedItemSize={122}
             style={{ height: MOVIE_ROW_ITEM_HEIGHT }}
           />
@@ -273,6 +305,7 @@ function ExploreScreen() {
         hideWhenEmpty
         onPressMovie={handlePressMovie}
       />
+
     </ArchiveContent>
   );
 
@@ -289,7 +322,7 @@ function ExploreScreen() {
         <SearchContent>
           <ArchiveListFrame>
             <LegendList
-              data={searchMovies}
+              data={searchListData}
               numColumns={gridLayout.numColumns}
               key={gridLayout.numColumns}
               showsVerticalScrollIndicator={false}
@@ -329,15 +362,22 @@ function ExploreScreen() {
                   </FooterLoader>
                 ) : null
               }
-              renderItem={({ item }) => (
-                <MovieRowItem
-                  movie={item}
-                  width={gridLayout.itemWidth}
-                  variant="grid"
-                  onPress={() => handlePressMovie(item)}
-                />
-              )}
-              keyExtractor={item => String(item.id)}
+              renderItem={({ item }) =>
+                isMovieEntry(item) ? (
+                  <MovieRowItem
+                    movie={item.movie}
+                    width={gridLayout.itemWidth}
+                    variant="grid"
+                    onPress={() => handlePressMovie(item.movie)}
+                  />
+                ) : (
+                  <MoviePosterNativeAd
+                    width={gridLayout.itemWidth}
+                    variant="grid"
+                  />
+                )
+              }
+              keyExtractor={item => item.id}
               estimatedItemSize={gridLayout.itemHeight}
               onEndReached={handleSearchEndReached}
               onEndReachedThreshold={0.4}

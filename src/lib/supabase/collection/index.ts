@@ -2,6 +2,7 @@ export {
     useCreateCollection,
     useAddCollectionMovie,
     useRemoveCollectionMovie,
+    useDeleteCollection,
     useGetCollections,
     useGetCollectionListItems,
     useGetCollectionDetail,

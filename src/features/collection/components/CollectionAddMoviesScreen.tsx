@@ -20,7 +20,9 @@ import {
   ArchiveSearchPanel,
   ArchiveSectionHeader,
   Header,
+  MoviePosterNativeAd,
 } from '../../../components';
+import { isListItemEntry, withAdSlots } from '../../../lib/ads';
 import { useAuth } from '../../../lib/supabase/auth';
 import {
   useAddCollectionMovie,
@@ -41,6 +43,8 @@ const H_PAD = 20;
 const LIST_POSTER_WIDTH = 56;
 const LIST_POSTER_HEIGHT = 84;
 const LIST_ROW_HEIGHT = 112;
+const LIST_AD_INTERVAL = 9;
+const LIST_MAX_ADS = 2;
 
 function isDuplicateError(error: unknown) {
   return (
@@ -172,6 +176,20 @@ function CollectionAddMoviesScreen() {
     );
   }, [availableMovies, debouncedQuery]);
 
+  const listData = useMemo(
+    () =>
+      withAdSlots(
+        filteredMovies,
+        movie => String(movie.tmdbId),
+        {
+          interval: LIST_AD_INTERVAL,
+          maxAds: LIST_MAX_ADS,
+          idPrefix: `collection-add-${collectionId}`,
+        },
+      ),
+    [collectionId, filteredMovies],
+  );
+
   const toggleMovie = useCallback((movieId: string) => {
     setSelectedMovieIds(prev =>
       prev.includes(movieId)
@@ -273,7 +291,7 @@ function CollectionAddMoviesScreen() {
         ) : (
           <ArchiveListFrame>
             <LegendList
-              data={filteredMovies}
+              data={listData}
               extraData={selectedMovieIds}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{
@@ -304,19 +322,28 @@ function CollectionAddMoviesScreen() {
                 </EmptyState>
               }
               renderItem={({ item, index }) => {
-                const movieId = String(item.tmdbId);
+                if (!isListItemEntry(item)) {
+                  return (
+                    <AdRowSlot>
+                      <MoviePosterNativeAd variant="row" />
+                    </AdRowSlot>
+                  );
+                }
+
+                const movieId = String(item.item.tmdbId);
                 const isSelected = selectedMovieIds.includes(movieId);
+                const isLast = index === listData.length - 1;
 
                 return (
                   <SelectableMovieRow
-                    movie={item}
+                    movie={item.item}
                     isSelected={isSelected}
-                    isLast={index === filteredMovies.length - 1}
+                    isLast={isLast}
                     onPress={() => toggleMovie(movieId)}
                   />
                 );
               }}
-              keyExtractor={item => String(item.tmdbId)}
+              keyExtractor={item => item.id}
               estimatedItemSize={LIST_ROW_HEIGHT}
               style={{ flex: 1 }}
             />
@@ -474,6 +501,11 @@ const RowDivider = styled.View`
   height: 1px;
   margin: 0 16px;
   background-color: ${({ theme }) => theme.colors.dashbordItemBorder};
+`;
+
+const AdRowSlot = styled.View`
+  align-items: center;
+  padding: 18px 16px;
 `;
 
 const SelectedCount = styled.Text`

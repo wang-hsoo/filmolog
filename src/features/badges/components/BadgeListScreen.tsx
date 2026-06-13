@@ -16,7 +16,7 @@ import {
   type BadgeCategory,
   type BadgeId,
 } from '../../../components/constants/badge.constants';
-import { ArchiveEmptyText, Header } from '../../../components';
+import { ArchiveBannerAd, ArchiveEmptyText, ArchiveNativeAd, Header } from '../../../components';
 import { useAuth, useGetUserBadges } from '../../../lib/supabase';
 import { AppScreen, theme } from '../../../theme';
 

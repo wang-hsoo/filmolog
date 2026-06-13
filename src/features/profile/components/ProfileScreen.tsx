@@ -5,6 +5,7 @@ import styled, { useTheme } from 'styled-components/native';
 
 import { RootStackParamList } from '../../../app/navigation/types';
 import {
+  ArchiveNativeAd,
   ArchivePanel,
   ArchiveSectionHeader,
   Container,
@@ -214,6 +215,10 @@ function ProfileScreen() {
               </MenuRow>
             ))}
           </MenuPanel>
+          
+          <ArchivePanel>
+            <ArchiveNativeAd />
+          </ArchivePanel>
         </Content>
       </ScrollView>
     </Container>

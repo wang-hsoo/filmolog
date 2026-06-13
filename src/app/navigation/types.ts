@@ -11,6 +11,13 @@ export type RootStackParamList = {
   CollectionDetail: { collectionId: string };
   CollectionAddMovies: { collectionId: string };
   FilmLog: { tmdbId?: number } | undefined;
+  FilmLogComplete: {
+    reviewId: string;
+    title: string;
+    posterPath: string | null;
+    rating: number;
+    reviewNumber: number;
+  };
   ReviewDetail: { reviewId: string };
   ReviewLogList: undefined;
   MovieDetail: { tmdbId: number };

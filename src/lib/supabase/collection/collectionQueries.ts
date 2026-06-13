@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
     addCollectionMovie,
     createCollection,
+    deleteCollection,
     getCollectionDetail,
     getCollectionListItems,
     getCollections,
@@ -54,6 +55,20 @@ export const useRemoveCollectionMovie = () => {
             queryClient.invalidateQueries({ queryKey: ['collectionList'] });
             queryClient.invalidateQueries({
                 queryKey: ['collectionDetail', variables.collectionId],
+            });
+            queryClient.invalidateQueries({ queryKey: ['userStats'] });
+        },
+    });
+}
+
+export const useDeleteCollection = () => {
+    return useMutation({
+        mutationFn: (collectionId: string) => deleteCollection(collectionId),
+        onSuccess: (_, collectionId) => {
+            queryClient.invalidateQueries({ queryKey: ['collections'] });
+            queryClient.invalidateQueries({ queryKey: ['collectionList'] });
+            queryClient.removeQueries({
+                queryKey: ['collectionDetail', collectionId],
             });
             queryClient.invalidateQueries({ queryKey: ['userStats'] });
         },

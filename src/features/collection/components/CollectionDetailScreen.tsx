@@ -26,6 +26,7 @@ import {
   Header,
 } from '../../../components';
 import {
+  useDeleteCollection,
   useGetCollectionDetail,
   useRemoveCollectionMovie,
   type CollectionMovieItem,
@@ -197,6 +198,7 @@ function CollectionDetailScreen() {
   const [actionMovie, setActionMovie] = useState<CollectionMovieItem | null>(
     null,
   );
+  const [isCollectionMenuOpen, setIsCollectionMenuOpen] = useState(false);
 
   const width = useWindowDimensions().width;
 
@@ -205,8 +207,12 @@ function CollectionDetailScreen() {
     isLoading,
     isError,
   } = useGetCollectionDetail(collectionId);
-  const { mutateAsync: removeCollectionMovie, isPending: isRemoving } =
+  const { mutateAsync: removeCollectionMovie, isPending: isRemovingMovie } =
     useRemoveCollectionMovie();
+  const { mutateAsync: deleteCollection, isPending: isDeletingCollection } =
+    useDeleteCollection();
+
+  const isBusy = isRemovingMovie || isDeletingCollection;
 
   const collectionTheme = useMemo(
     () => getTheme(collection?.theme_id ?? COLLECTION_THEMES[0].themeId),
@@ -233,10 +239,10 @@ function CollectionDetailScreen() {
   }, []);
 
   const handleCloseActionModal = useCallback(() => {
-    if (!isRemoving) {
+    if (!isRemovingMovie) {
       setActionMovie(null);
     }
-  }, [isRemoving]);
+  }, [isRemovingMovie]);
 
   const handleViewReview = useCallback(
     (reviewId: string) => {
@@ -277,9 +283,45 @@ function CollectionDetailScreen() {
     }
   }, [actionMovie, collectionId, removeCollectionMovie]);
 
+  const handleDeleteCollection = useCallback(() => {
+    if (!collection) {
+      return;
+    }
+
+    setIsCollectionMenuOpen(false);
+
+    archiveAlert(
+      '컬렉션 삭제',
+      `"${collection.name}" 컬렉션을 삭제할까요?\n담긴 영화 목록도 함께 삭제됩니다. (영화 기록은 유지됩니다)`,
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteCollection(collectionId);
+              navigation.goBack();
+            } catch {
+              archiveAlert(
+                '삭제 실패',
+                '컬렉션을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.',
+              );
+            }
+          },
+        },
+      ],
+    );
+  }, [collection, collectionId, deleteCollection, navigation]);
+
   return (
     <ScreenRoot style={{ paddingTop: insets.top }}>
-      <Header subtitle="COLLECTION" navigation={navigation} hideRight />
+      <Header
+        subtitle="COLLECTION"
+        navigation={navigation}
+        onPressRight={() => setIsCollectionMenuOpen(true)}
+        rightDisabled={isBusy}
+      />
 
       {isLoading ? (
         <LoadingState>
@@ -445,7 +487,7 @@ function CollectionDetailScreen() {
 
             {actionMovie?.reviewId ? (
               <ActionSheetButton
-                disabled={isRemoving}
+                disabled={isRemovingMovie}
                 onPress={() => handleViewReview(actionMovie.reviewId!)}>
                 <MciIcon
                   name="notebook-outline"
@@ -458,9 +500,9 @@ function CollectionDetailScreen() {
 
             <ActionSheetButton
               $destructive
-              disabled={isRemoving}
+              disabled={isRemovingMovie}
               onPress={handleDeleteMovie}>
-              {isRemoving ? (
+              {isRemovingMovie ? (
                 <ActivityIndicator color={DESTRUCTIVE_COLOR} size="small" />
               ) : (
                 <>
@@ -478,12 +520,46 @@ function CollectionDetailScreen() {
 
             <ActionSheetButton
               $isLast
-              disabled={isRemoving}
+              disabled={isRemovingMovie}
               onPress={handleCloseActionModal}>
               <ActionSheetButtonLabel>취소</ActionSheetButtonLabel>
             </ActionSheetButton>
           </ActionSheet>
         </ActionModalRoot>
+      </Modal>
+
+      <Modal
+        transparent
+        visible={isCollectionMenuOpen}
+        animationType="fade"
+        onRequestClose={() => setIsCollectionMenuOpen(false)}>
+        <CollectionMenuRoot>
+          <CollectionMenuBackdrop
+            onPress={() => setIsCollectionMenuOpen(false)}
+          />
+          <CollectionMenuSheet style={{ top: insets.top + 56, right: H_PAD }}>
+            <CollectionMenuButton
+              $isLast
+              $destructive
+              disabled={isBusy}
+              onPress={handleDeleteCollection}>
+              {isDeletingCollection ? (
+                <ActivityIndicator color={DESTRUCTIVE_COLOR} size="small" />
+              ) : (
+                <>
+                  <MciIcon
+                    name="trash-can-outline"
+                    size={18}
+                    color={DESTRUCTIVE_COLOR}
+                  />
+                  <CollectionMenuLabel $destructive>
+                    컬렉션 삭제
+                  </CollectionMenuLabel>
+                </>
+              )}
+            </CollectionMenuButton>
+          </CollectionMenuSheet>
+        </CollectionMenuRoot>
       </Modal>
     </ScreenRoot>
   );
@@ -890,6 +966,51 @@ const AddMovieFabLabel = styled.Text`
   font-size: 13px;
   letter-spacing: 0.2px;
   color: ${({ theme }) => theme.colors.primary};
+`;
+
+const CollectionMenuRoot = styled.View`
+  flex: 1;
+`;
+
+const CollectionMenuBackdrop = styled(Pressable)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+`;
+
+const CollectionMenuSheet = styled.View`
+  position: absolute;
+  min-width: 168px;
+  border-radius: 10px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.dashborderBorderAccent};
+  background-color: ${({ theme }) => theme.colors.dashboardBackground};
+  overflow: hidden;
+`;
+
+const CollectionMenuButton = styled(Pressable)<{
+  $destructive?: boolean;
+  $isLast?: boolean;
+  disabled?: boolean;
+}>`
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 16px;
+  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
+  border-bottom-width: ${({ $isLast }) => ($isLast ? 0 : 1)}px;
+  border-bottom-color: ${({ theme }) => theme.colors.dashborderBorderAccent};
+`;
+
+const CollectionMenuLabel = styled.Text<{ $destructive?: boolean }>`
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-size: 14px;
+  color: ${({ theme, $destructive }) =>
+    $destructive ? DESTRUCTIVE_COLOR : theme.colors.dashboardText};
 `;
 
 const ScreenView = styled.View<{ $height: number }>`

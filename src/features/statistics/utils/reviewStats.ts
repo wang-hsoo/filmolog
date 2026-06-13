@@ -1,3 +1,4 @@
+import { normalizeReviewRating } from '../../filmLog/utils/rating';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 
 export type MonthlyCount = {
@@ -86,7 +87,10 @@ export function buildRatingBuckets(reviews: UserReviewedMovie[]): RatingBucket[]
   const counts = new Map<number, number>(stars.map(star => [star, 0]));
 
   for (const review of reviews) {
-    const star = Math.min(5, Math.max(1, Math.round(review.rating)));
+    const star = Math.min(
+      5,
+      Math.max(1, Math.round(normalizeReviewRating(review.rating))),
+    );
     counts.set(star, (counts.get(star) ?? 0) + 1);
   }
 
@@ -213,7 +217,7 @@ export function getTopRatedReviews(
   return [...reviews]
     .sort(
       (a, b) =>
-        b.rating - a.rating ||
+        normalizeReviewRating(b.rating) - normalizeReviewRating(a.rating) ||
         getReviewDate(b).getTime() - getReviewDate(a).getTime(),
     )
     .slice(0, limit);
@@ -312,10 +316,13 @@ export function buildGenreRatingStats(
 
       const existing = totals.get(genreId);
       if (existing) {
-        existing.sum += review.rating;
+        existing.sum += normalizeReviewRating(review.rating);
         existing.count += 1;
       } else {
-        totals.set(genreId, { sum: review.rating, count: 1 });
+        totals.set(genreId, {
+          sum: normalizeReviewRating(review.rating),
+          count: 1,
+        });
       }
     }
   }
@@ -404,7 +411,14 @@ export function buildYearSummary(reviews: UserReviewedMovie[]): YearSummary {
   const previous = getReviewsInYear(reviews, year - 1);
   const avgRating =
     current.length > 0
-      ? current.reduce((sum, review) => sum + review.rating, 0) / current.length
+      ? Math.round(
+          (current.reduce(
+            (sum, review) => sum + normalizeReviewRating(review.rating),
+            0,
+          ) /
+            current.length) *
+            10,
+        ) / 10
       : 0;
 
   return {
