@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
 import { RootStackParamList } from '../../../app/navigation/types';
-import { ArchiveBannerAd, ArchiveEmptyText, Header } from '../../../components';
+import { ArchiveBannerAd, ArchiveEmptyText, ArchiveNativeAd, ArchivePanel, Header } from '../../../components';
 import { useAuth, useGetUserReviewedMovies } from '../../../lib/supabase';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 import { AppScreen, theme } from '../../../theme';
@@ -197,11 +197,14 @@ function ReviewLogListScreen() {
               />
             ) : null}
 
-            {periodFilteredReviews.length >= MIN_REVIEWS_FOR_BANNER ? (
+            {/* {periodFilteredReviews.length >= MIN_REVIEWS_FOR_BANNER ? (
               <BannerSlot>
                 <ArchiveBannerAd />
               </BannerSlot>
-            ) : null}
+            ) : null} */}
+            <ArchivePanel>
+              <ArchiveNativeAd />
+            </ArchivePanel>
           </ContentFrame>
         )}
       </ScrollView>
@@ -290,7 +293,7 @@ const ViewTabRow = styled.View`
   padding: 0 ${H_PAD}px 12px;
 `;
 
-const ViewTab = styled(Pressable)<{ $active: boolean }>`
+const ViewTab = styled(Pressable) <{ $active: boolean }>`
   flex: 1;
   align-items: center;
   justify-content: center;

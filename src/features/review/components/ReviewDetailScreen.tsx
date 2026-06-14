@@ -22,6 +22,7 @@ import styled from 'styled-components/native';
 import { RootStackParamList } from '../../../app/navigation/types';
 import {
   ArchiveEmptyText,
+  ArchiveNativeAd,
   ArchivePanel,
   ArchiveSectionHeader,
   Header,
@@ -469,6 +470,10 @@ function ReviewDetailScreen() {
                   </ArchivePanel>
                 </>
               )}
+
+              {/* <ArchivePanel>
+                <ArchiveNativeAd />
+              </ArchivePanel> */}
             </Content>
           </ScrollView>
 
@@ -879,7 +884,7 @@ const ActionRow = styled.View`
   background-color: ${({ theme }) => theme.colors.dashboardBackground}ee;
 `;
 
-const ActionButton = styled(Pressable)<{
+const ActionButton = styled(Pressable) <{
   $flex?: boolean;
   $primary?: boolean;
   $destructive?: boolean;
@@ -944,7 +949,7 @@ const MenuSheet = styled.View`
   overflow: hidden;
 `;
 
-const MenuButton = styled(Pressable)<{
+const MenuButton = styled(Pressable) <{
   $destructive?: boolean;
   $isLast?: boolean;
 }>`

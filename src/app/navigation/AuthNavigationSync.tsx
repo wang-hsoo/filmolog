@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 import { useAuth } from '../../lib/supabase/auth';
 
@@ -7,7 +7,7 @@ import { resetToAppScreen } from './navigationRef';
 export function AuthNavigationSync() {
   const { user, isLoading } = useAuth();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isLoading || user) {
       return;
     }

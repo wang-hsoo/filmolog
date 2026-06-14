@@ -495,7 +495,9 @@ function StatisticsScreen() {
                 </BadgeLink>
               </ArchivePanel>
 
-              <ArchiveBannerAd />
+              <ArchivePanel>
+                <ArchiveNativeAd />
+              </ArchivePanel>
             </>
           )}
         </Content>

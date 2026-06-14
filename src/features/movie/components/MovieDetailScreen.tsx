@@ -15,6 +15,7 @@ import styled from 'styled-components/native';
 import { RootStackParamList } from '../../../app/navigation/types';
 import {
   ArchiveEmptyText,
+  ArchiveNativeAd,
   ArchivePanel,
   ArchiveSectionHeader,
   Header,
@@ -332,6 +333,9 @@ function MovieDetailScreen() {
                 <ArchiveEmptyText>{t('movie.detail.synopsis.empty')}</ArchiveEmptyText>
               )}
             </ArchivePanel>
+            <ArchivePanel>
+                <ArchiveNativeAd />
+              </ArchivePanel>
           </Content>
         </ScrollView>
 

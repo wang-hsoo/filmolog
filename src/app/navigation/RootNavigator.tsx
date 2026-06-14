@@ -92,7 +92,6 @@ function RootNavigator() {
 
   const stack = (
     <RootStack.Navigator
-      key={user?.id ?? 'guest'}
       screenOptions={{
         headerShown: false,
         animation: 'none',
@@ -129,11 +128,7 @@ function RootNavigator() {
     return <BootstrapLoader />;
   }
 
-  if (!user) {
-    return stack;
-  }
-
-  return <ProfileProvider userId={user.id}>{stack}</ProfileProvider>;
+  return <ProfileProvider userId={user?.id}>{stack}</ProfileProvider>;
 }
 
 const styles = StyleSheet.create({

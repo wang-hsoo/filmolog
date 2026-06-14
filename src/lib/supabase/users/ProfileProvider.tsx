@@ -13,7 +13,7 @@ type ProfileContextValue = {
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
 type ProfileProviderProps = {
-  userId: string;
+  userId?: string;
   children: ReactNode;
 };
 

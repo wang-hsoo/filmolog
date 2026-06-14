@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -7,7 +8,7 @@ import { useTheme } from 'styled-components/native';
 
 import { AdBootstrap, ArchiveDialogProvider } from '../components';
 import { BadgeUnlockProvider } from '../features/badges';
-import { useAuth } from '../lib/supabase/auth';
+import { bindSupabaseAuthAppState, useAuth } from '../lib/supabase/auth';
 import { navigationTheme } from '../theme';
 import { AuthNavigationSync } from './navigation/AuthNavigationSync';
 import { rootNavigationRef } from './navigation/navigationRef';
@@ -17,6 +18,10 @@ import { queryClient } from '../lib/queryClient';
 function MainAppContent() {
   const theme = useTheme();
   const { user } = useAuth();
+
+  useEffect(() => {
+    bindSupabaseAuthAppState();
+  }, []);
 
   return (
     <BadgeUnlockProvider userId={user?.id ?? null}>

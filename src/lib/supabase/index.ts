@@ -6,6 +6,7 @@ export {
   getUserProfile,
   useAuth,
   signOutFromApp,
+  bindSupabaseAuthAppState,
 } from './auth';
 export {
   fetchUserProfile,
