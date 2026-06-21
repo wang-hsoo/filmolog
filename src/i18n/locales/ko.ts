@@ -275,9 +275,13 @@ const translation = {
       rating: {
         title: "평점",
       },
+      reaction: {
+        title: "한 줄 반응",
+        subtitle: "최대 2개까지 선택 (선택)",
+      },
       review: {
-        title: "한줄평 · 감상",
-        subtitle: "짧은 메모도 좋아요.",
+        title: "감상",
+        subtitle: "자유롭게 적어보세요 (선택)",
         placeholder: "이 영화에 대한 생각을 적어보세요.",
       },
       collection: {
@@ -322,6 +326,10 @@ const translation = {
       rating: {
         title: "내 평점",
         subtitle: "이 작품에 남긴 점수.",
+      },
+      reaction: {
+        title: "한 줄 반응",
+        subtitle: "기록할 때 선택한 반응 (최대 2개).",
       },
       journal: {
         title: "감상 기록",
@@ -624,6 +632,16 @@ const translation = {
       },
     },
   },
+  reactions: {
+    items: {
+      masterpiece: "인생작을 만났어요",
+      keeper: "소장하고 싶은 명작",
+      immersive: "시간 가는 줄 몰랐어요",
+      catharsis: "짜릿한 카타르시스",
+      afterglow: "깊은 여운이 남아요",
+      disappointed: "기대보다 아쉬워요",
+    },
+  },
   movie: {
     detail: {
       catalog: {
@@ -635,6 +653,8 @@ const translation = {
         subtitle: "Filmolog 유저들의 평균 평점과 기록 수.",
         loadFailed: "커뮤니티 평가를 불러오지 못했습니다.",
         empty: "아직 Filmolog에 기록된 평가가 없습니다.",
+        reactionsTitle: "커뮤니티 반응",
+        reactionsSubtitle: "기록할 때 남긴 한 줄 반응",
       },
       synopsis: {
         title: "줄거리",

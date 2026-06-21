@@ -1,5 +1,5 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { Image } from 'react-native';
+import { Image, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,9 +21,19 @@ import { HOME_BANNER_ASPECT_RATIO, HOME_IMAGE } from '../constatns';
 import HomeCollectionShelf from './HomeCollectionShelf';
 import HomeRecentLogs from './HomeRecentLogs';
 
+type StatKey = keyof typeof STATS_ICONS;
+
+const STAT_ORDER: StatKey[] = [
+  'reviewCount',
+  'collectionCount',
+  'wishlistCount',
+  'avgRating',
+];
+
 function HomeScreen() {
   const { t } = useTranslation();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const tabNavigation = navigation.getParent();
   const { user } = useAuth();
 
   const { data: userStats } = useGetUserStats(user?.id ?? '');
@@ -33,6 +43,25 @@ function HomeScreen() {
     
   const { data: reviewedMovies = [], isLoading: isReviewsLoading } =
     useGetUserReviewedMovies(user?.id ?? '');
+
+  const handleStatPress = (key: StatKey) => {
+    switch (key) {
+      case 'reviewCount':
+        navigation.navigate('ReviewLogList');
+        break;
+      case 'collectionCount':
+        navigation.navigate('CollectionList');
+        break;
+      case 'wishlistCount':
+        navigation.navigate('WishlistList');
+        break;
+      case 'avgRating':
+        tabNavigation?.navigate('Statistics' as never);
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <Container isGetter={false}>
@@ -53,22 +82,23 @@ function HomeScreen() {
           />
 
           <StatsRow>
-            {Object.entries(userStats ?? {}).map(([key, value], index) => (
-              <StatItem
+            {STAT_ORDER.map((key, index) => (
+              <StatPressable
                 key={key}
-                $isLast={
-                  index === Object.entries(userStats ?? {}).length - 1
-                }>
-                <Icon
-                  name={STATS_ICONS[key as keyof typeof STATS_ICONS]}
-                  size={22}
-                  color={theme.colors.dashboardIcon}
-                />
-                <StatItemLabel numberOfLines={2}>
-                  {getStatsLabel(t, key as keyof typeof STATS_ICONS)}
-                </StatItemLabel>
-                <StatItemValue>{value}</StatItemValue>
-              </StatItem>
+                onPress={() => handleStatPress(key)}
+                accessibilityRole="button">
+                <StatItem $isLast={index === STAT_ORDER.length - 1}>
+                  <Icon
+                    name={STATS_ICONS[key]}
+                    size={22}
+                    color={theme.colors.dashboardIcon}
+                  />
+                  <StatItemLabel numberOfLines={2}>
+                    {getStatsLabel(t, key)}
+                  </StatItemLabel>
+                  <StatItemValue>{userStats?.[key] ?? '—'}</StatItemValue>
+                </StatItem>
+              </StatPressable>
             ))}
           </StatsRow>
         </ArchivePanel>
@@ -113,6 +143,10 @@ const HomeContainer = styled.View`
 const StatsRow = styled.View`
   flex-direction: row;
   align-items: center;
+`;
+
+const StatPressable = styled(Pressable)`
+  flex: 1;
 `;
 
 const StatItem = styled.View<{ $isLast: boolean }>`

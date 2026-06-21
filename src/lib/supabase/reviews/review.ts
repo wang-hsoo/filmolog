@@ -3,6 +3,11 @@ import { getSupabaseClient } from '../client';
 import { i18n } from '../../../i18n';
 import { refreshMovieStats } from '../explore/communityExplore';
 import type { MoviePersonSnapshot } from '../../tmdb/creditsSnapshot';
+import type { ReactionKey } from '../../../components/constants/reaction.constants';
+import {
+  normalizeReactionKeys,
+  parseReactionKeysFromRow,
+} from '../../../components/constants/reaction.constants';
 import type { UserReviewedMovie } from '../users/movie';
 
 export type UpsertMovieInput = {
@@ -28,6 +33,7 @@ export type CreateReviewInput = {
   originalTitle?: string | null;
   rating: number;
   content: string;
+  reactionKeys?: ReactionKey[];
   watchedDate: string;
   collectionIds?: string[];
 };
@@ -36,6 +42,7 @@ export type UpdateReviewInput = {
   reviewId: string;
   rating: number;
   content: string;
+  reactionKeys?: ReactionKey[];
   watchedDate: string;
 };
 
@@ -45,6 +52,8 @@ type ReviewWithMovieRow = {
   tmdb_id: number;
   rating: number;
   content: string | null;
+  reaction_keys: string[] | null;
+  reaction_key?: string | null;
   watched_date: string | null;
   created_at: string;
   movies:
@@ -107,6 +116,10 @@ function mapReviewRow(review: ReviewWithMovieRow): UserReviewedMovie {
     tmdbId: review.tmdb_id,
     rating: review.rating,
     content: review.content,
+    reactionKeys: parseReactionKeysFromRow(
+      review.reaction_keys,
+      review.reaction_key,
+    ),
     watchedDate: review.watched_date,
     createdAt: review.created_at,
     title: movie?.title ?? i18n.t('common.movieMeta.fallbackMovieTitle', { id: review.tmdb_id }),
@@ -116,6 +129,11 @@ function mapReviewRow(review: ReviewWithMovieRow): UserReviewedMovie {
     directors: movie?.directors ?? [],
     topCast: movie?.topCast ?? [],
   };
+}
+
+function toReactionKeysColumn(keys: ReactionKey[] | undefined) {
+  const normalized = normalizeReactionKeys(keys);
+  return normalized.length > 0 ? normalized : null;
 }
 
 export async function upsertMovie({
@@ -197,6 +215,7 @@ export async function createReview({
   originalTitle,
   rating,
   content,
+  reactionKeys = [],
   watchedDate,
   collectionIds = [],
 }: CreateReviewInput) {
@@ -218,6 +237,7 @@ export async function createReview({
       tmdb_id: tmdbId,
       rating,
       content: content.trim(),
+      reaction_keys: toReactionKeysColumn(reactionKeys),
       watched_date: watchedDate,
     })
     .select()
@@ -248,6 +268,8 @@ export async function getReviewById(
       tmdb_id,
       rating,
       content,
+      reaction_keys,
+      reaction_key,
       watched_date,
       created_at,
       movies (
@@ -275,6 +297,7 @@ export async function updateReview({
   reviewId,
   rating,
   content,
+  reactionKeys = [],
   watchedDate,
 }: UpdateReviewInput) {
   const { data, error } = await getSupabaseClient()
@@ -282,6 +305,7 @@ export async function updateReview({
     .update({
       rating,
       content: content.trim(),
+      reaction_keys: toReactionKeysColumn(reactionKeys),
       watched_date: watchedDate,
     })
     .eq('id', reviewId)

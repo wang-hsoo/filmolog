@@ -1,5 +1,7 @@
 import { getSupabaseClient } from '../client';
 import { i18n } from '../../../i18n';
+import type { ReactionKey } from '../../../components/constants/reaction.constants';
+import { parseReactionKeysFromRow } from '../../../components/constants/reaction.constants';
 import type { MoviePersonSnapshot } from '../../tmdb/creditsSnapshot';
 
 type MovieRow = {
@@ -18,6 +20,8 @@ type ReviewWithMovieRow = {
   tmdb_id: number;
   rating: number;
   content: string | null;
+  reaction_keys: string[] | null;
+  reaction_key?: string | null;
   watched_date: string | null;
   created_at: string;
   movies: MovieRow | MovieRow[] | null;
@@ -28,6 +32,7 @@ export type UserReviewedMovie = {
   tmdbId: number;
   rating: number;
   content: string | null;
+  reactionKeys: ReactionKey[];
   watchedDate: string | null;
   createdAt: string;
   title: string;
@@ -60,6 +65,8 @@ export async function getUserReviewedMovies(
       tmdb_id,
       rating,
       content,
+      reaction_keys,
+      reaction_key,
       watched_date,
       created_at,
       movies (
@@ -88,6 +95,10 @@ export async function getUserReviewedMovies(
       tmdbId: review.tmdb_id,
       rating: review.rating,
       content: review.content,
+      reactionKeys: parseReactionKeysFromRow(
+        review.reaction_keys,
+        review.reaction_key,
+      ),
       watchedDate: review.watched_date,
       createdAt: review.created_at,
       title: movie?.title ?? i18n.t('common.movieMeta.fallbackMovieTitle', { id: review.tmdb_id }),

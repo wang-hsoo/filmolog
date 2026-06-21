@@ -44,6 +44,8 @@ import {
 import { archiveAlert } from '../../../lib/dialog/archiveDialog';
 import { AppScreen, theme } from '../../../theme';
 
+import MovieReactionCards from './MovieReactionCards';
+
 type MovieDetailRoute = RouteProp<RootStackParamList, 'MovieDetail'>;
 
 const H_PAD = 20;
@@ -113,6 +115,8 @@ function MovieDetailScreen() {
 
   const communityRating = communityStats?.avgRating ?? null;
   const reviewCount = communityStats?.reviewCount ?? 0;
+  const reactionCounts = communityStats?.reactionCounts;
+  const reactionTotal = communityStats?.reactionTotal ?? 0;
 
   const wishlistMovieInput = useMemo(() => {
     if (!movieDetail) {
@@ -319,6 +323,20 @@ function MovieDetailScreen() {
                 </CommunityStatsCard>
               )}
             </ArchivePanel>
+
+            {!isStatsLoading &&
+            !isStatsError &&
+            reactionTotal > 0 &&
+            reactionCounts ? (
+              <ArchivePanel accent>
+                <ArchiveSectionHeader
+                  overline="REACTION"
+                  title={t('movie.detail.community.reactionsTitle')}
+                  subtitle={t('movie.detail.community.reactionsSubtitle')}
+                />
+                <MovieReactionCards reactionCounts={reactionCounts} />
+              </ArchivePanel>
+            ) : null}
 
             <ArchivePanel accent>
               <ArchiveSectionHeader

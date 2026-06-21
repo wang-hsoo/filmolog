@@ -26,7 +26,9 @@ import {
   ArchivePanel,
   ArchiveSectionHeader,
   Header,
+  REACTION_ICONS,
 } from '../../../components';
+import type { ReactionKey } from '../../../components/constants/reaction.constants';
 import ReviewForm from '../../filmLog/components/ReviewForm';
 import {
   parseDateOnly,
@@ -111,6 +113,7 @@ function ReviewDetailScreen() {
   const shareCardRef = useRef<View>(null);
   const posterReadyRef = useRef(false);
   const [rating, setRating] = useState(0);
+  const [reactionKeys, setReactionKeys] = useState<ReactionKey[]>([]);
   const [content, setContent] = useState('');
   const [watchedDate, setWatchedDate] = useState(() => startOfDay(new Date()));
 
@@ -166,6 +169,7 @@ function ReviewDetailScreen() {
     }
 
     setRating(review.rating);
+    setReactionKeys(review.reactionKeys);
     setContent(review.content ?? '');
     setWatchedDate(parseDateOnly(review.watchedDate));
   }, [review]);
@@ -203,6 +207,7 @@ function ReviewDetailScreen() {
       await updateReview({
         reviewId: review.reviewId,
         rating,
+        reactionKeys,
         content,
         watchedDate: toDateOnlyString(watchedDate),
       });
@@ -213,7 +218,7 @@ function ReviewDetailScreen() {
         t('errors.saveFailed.reviewUpdate'),
       );
     }
-  }, [content, rating, review, t, updateReview, watchedDate]);
+  }, [content, rating, reactionKeys, review, t, updateReview, watchedDate]);
 
   const handleDelete = useCallback(() => {
     if (!review) {
@@ -400,6 +405,8 @@ function ReviewDetailScreen() {
                 <ReviewForm
                   rating={rating}
                   onRatingChange={setRating}
+                  reactionKeys={reactionKeys}
+                  onReactionKeysChange={setReactionKeys}
                   content={content}
                   onContentChange={setContent}
                   watchedDate={watchedDate}
@@ -438,6 +445,30 @@ function ReviewDetailScreen() {
                       <RatingScale>/ 5.0</RatingScale>
                     </RatingCard>
                   </ArchivePanel>
+
+                  {review.reactionKeys.length > 0 ? (
+                    <ArchivePanel accent>
+                      <ArchiveSectionHeader
+                        overline="REACTION"
+                        title={t('review.detail.reaction.title')}
+                        subtitle={t('review.detail.reaction.subtitle')}
+                      />
+                      <ReactionBadgeRow>
+                        {review.reactionKeys.map(key => (
+                          <ReactionBadge key={key}>
+                            <MciIcon
+                              name={REACTION_ICONS[key]}
+                              size={18}
+                              color={theme.colors.primary}
+                            />
+                            <ReactionBadgeLabel>
+                              {t(`reactions.items.${key}`)}
+                            </ReactionBadgeLabel>
+                          </ReactionBadge>
+                        ))}
+                      </ReactionBadgeRow>
+                    </ArchivePanel>
+                  ) : null}
 
                   <ArchivePanel accent>
                     <JournalHeader>
@@ -800,6 +831,30 @@ const RatingCard = styled.View`
   border-width: 1px;
   border-color: ${({ theme }) => theme.colors.goldLine};
   background-color: ${({ theme }) => theme.colors.surface};
+`;
+
+const ReactionBadgeRow = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
+const ReactionBadge = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 10px 14px;
+  border-radius: ${({ theme }) => theme.radii.search}px;
+  border-width: 1px;
+  border-color: ${({ theme }) => theme.colors.dashborderBorderAccent};
+  background-color: ${({ theme }) => theme.colors.surface};
+`;
+
+const ReactionBadgeLabel = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.bodyMedium};
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.goldBright};
 `;
 
 const RatingStars = styled.View`

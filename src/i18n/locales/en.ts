@@ -275,9 +275,13 @@ const translation = {
       rating: {
         title: "Rating",
       },
+      reaction: {
+        title: "Quick reaction",
+        subtitle: "Pick up to 2 (optional)",
+      },
       review: {
-        title: "Quick note · Review",
-        subtitle: "Even a short note is fine.",
+        title: "Review",
+        subtitle: "Write freely (optional)",
         placeholder: "Write your thoughts about this film.",
       },
       collection: {
@@ -322,6 +326,10 @@ const translation = {
       rating: {
         title: "My rating",
         subtitle: "The score you gave this title.",
+      },
+      reaction: {
+        title: "Quick reaction",
+        subtitle: "Reactions you picked when logging (up to 2).",
       },
       journal: {
         title: "Journal",
@@ -624,6 +632,16 @@ const translation = {
       },
     },
   },
+  reactions: {
+    items: {
+      masterpiece: "A life-changing film",
+      keeper: "Worth owning",
+      immersive: "Time flew by",
+      catharsis: "Thrilling catharsis",
+      afterglow: "Deep afterglow",
+      disappointed: "Below expectations",
+    },
+  },
   movie: {
     detail: {
       catalog: {
@@ -635,6 +653,8 @@ const translation = {
         subtitle: "Average rating and log count from Filmolog users.",
         loadFailed: "Couldn't load community rating.",
         empty: "No Filmolog ratings yet.",
+        reactionsTitle: "Community reactions",
+        reactionsSubtitle: "Quick reactions picked when logging",
       },
       synopsis: {
         title: "Synopsis",

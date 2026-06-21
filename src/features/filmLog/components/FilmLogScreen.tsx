@@ -33,6 +33,7 @@ import {
   MoviePosterNativeAd,
   MovieRowItem,
 } from '../../../components';
+import type { ReactionKey } from '../../../components/constants/reaction.constants';
 import { useMovieGridLayout } from '../../explore/hooks/useMovieGridLayout';
 import { useAuth } from '../../../lib/supabase/auth';
 import { useGetCollections } from '../../../lib/supabase/collection';
@@ -98,6 +99,7 @@ function FilmLogScreen() {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedMovie, setSelectedMovie] = useState<TmdbMovie | null>(null);
   const [rating, setRating] = useState(0);
+  const [reactionKeys, setReactionKeys] = useState<ReactionKey[]>([]);
   const [content, setContent] = useState('');
   const [watchedDate, setWatchedDate] = useState(() => startOfDay(new Date()));
   const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[]>(
@@ -235,6 +237,7 @@ function FilmLogScreen() {
   const handleSelectMovie = useCallback((movie: TmdbMovie) => {
     setSelectedMovie(movie);
     setRating(0);
+    setReactionKeys([]);
     setContent('');
     setWatchedDate(startOfDay(new Date()));
     setSelectedCollectionIds([]);
@@ -258,6 +261,7 @@ function FilmLogScreen() {
     setPhase('search');
     setSelectedMovie(null);
     setRating(0);
+    setReactionKeys([]);
     setContent('');
     setWatchedDate(startOfDay(new Date()));
     setSelectedCollectionIds([]);
@@ -320,6 +324,7 @@ function FilmLogScreen() {
         originalTitle,
         rating,
         content,
+        reactionKeys,
         watchedDate: toDateOnlyString(watchedDate),
         collectionIds: selectedCollectionIds,
       });
@@ -356,6 +361,7 @@ function FilmLogScreen() {
     movieDetail,
     navigation,
     rating,
+    reactionKeys,
     reviewedMovies.length,
     selectedCollectionIds,
     selectedMovie,
@@ -531,6 +537,8 @@ function FilmLogScreen() {
               <ReviewForm
                 rating={rating}
                 onRatingChange={setRating}
+                reactionKeys={reactionKeys}
+                onReactionKeysChange={setReactionKeys}
                 content={content}
                 onContentChange={setContent}
                 watchedDate={watchedDate}

@@ -8,6 +8,11 @@ import {
   ArchiveEmptyText,
   ArchivePanel,
   ArchiveSectionHeader,
+  MAX_REACTION_SELECTIONS,
+  REACTION_ICONS,
+  REACTION_KEYS,
+  toggleReactionKey,
+  type ReactionKey,
 } from '../../../components';
 import type { Collection } from '../../../lib/supabase/collection';
 import { theme } from '../../../theme';
@@ -26,6 +31,8 @@ const STAR_SIZE = 36;
 export type ReviewFormProps = {
   rating: number;
   onRatingChange: (rating: number) => void;
+  reactionKeys: ReactionKey[];
+  onReactionKeysChange: (reactionKeys: ReactionKey[]) => void;
   content: string;
   onContentChange: (content: string) => void;
   watchedDate: Date;
@@ -42,6 +49,8 @@ export type ReviewFormProps = {
 function ReviewForm({
   rating,
   onRatingChange,
+  reactionKeys,
+  onReactionKeysChange,
   content,
   onContentChange,
   watchedDate,
@@ -69,6 +78,15 @@ function ReviewForm({
     },
     [onWatchedDateChange, today, watchedDate],
   );
+
+  const handleReactionPress = useCallback(
+    (key: ReactionKey) => {
+      onReactionKeysChange(toggleReactionKey(reactionKeys, key));
+    },
+    [onReactionKeysChange, reactionKeys],
+  );
+
+  const isSelectionFull = reactionKeys.length >= MAX_REACTION_SELECTIONS;
 
   return (
     <>
@@ -176,7 +194,48 @@ function ReviewForm({
 
       <ArchivePanel accent>
         <ArchiveSectionHeader
-          overline="REVIEW"
+          overline="REACTION"
+          title={t('filmLog.form.reaction.title')}
+          subtitle={t('filmLog.form.reaction.subtitle')}
+        />
+
+        <ReactionGrid>
+          {REACTION_KEYS.map(key => {
+            const isActive = reactionKeys.includes(key);
+            const isDisabled = !isActive && isSelectionFull;
+
+            return (
+              <ReactionChip
+                key={key}
+                $active={isActive}
+                $disabled={isDisabled}
+                onPress={() => handleReactionPress(key)}
+                disabled={isDisabled}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isActive, disabled: isDisabled }}>
+                <Icon
+                  name={REACTION_ICONS[key]}
+                  size={18}
+                  color={
+                    isActive
+                      ? theme.colors.primary
+                      : isDisabled
+                        ? theme.colors.goldDim
+                        : theme.colors.dashboardIcon
+                  }
+                />
+                <ReactionChipLabel $active={isActive} $disabled={isDisabled}>
+                  {t(`reactions.items.${key}`)}
+                </ReactionChipLabel>
+              </ReactionChip>
+            );
+          })}
+        </ReactionGrid>
+      </ArchivePanel>
+
+      <ArchivePanel accent>
+        <ArchiveSectionHeader
+          overline="JOURNAL"
           title={t('filmLog.form.review.title')}
           subtitle={t('filmLog.form.review.subtitle')}
         />
@@ -278,6 +337,50 @@ const QuickDateLabel = styled.Text<{ $active: boolean }>`
   font-size: 13px;
   color: ${({ theme, $active }) =>
     $active ? theme.colors.goldBright : theme.colors.dashboardText};
+`;
+
+const ReactionGrid = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
+const ReactionChip = styled(Pressable)<{ $active: boolean; $disabled?: boolean }>`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-grow: 1;
+  flex-basis: 100%;
+  padding: 12px 14px;
+  border-radius: ${({ theme }) => theme.radii.search}px;
+  border-width: 1px;
+  border-color: ${({ theme, $active, $disabled }) =>
+    $active
+      ? theme.colors.primary
+      : $disabled
+        ? theme.colors.dashborderBorderAccent
+        : theme.colors.dashborderBorderAccent};
+  background-color: ${({ theme, $active, $disabled }) =>
+    $active
+      ? theme.colors.surfaceRaised
+      : $disabled
+        ? theme.colors.surface
+        : theme.colors.surface};
+  opacity: ${({ $disabled, $active }) => ($disabled && !$active ? 0.45 : 1)};
+`;
+
+const ReactionChipLabel = styled.Text<{ $active: boolean; $disabled?: boolean }>`
+  flex: 1;
+  flex-shrink: 1;
+  font-family: ${({ theme }) => theme.fonts.bodyMedium};
+  font-size: 13px;
+  line-height: 18px;
+  color: ${({ theme, $active, $disabled }) =>
+    $active
+      ? theme.colors.goldBright
+      : $disabled
+        ? theme.colors.goldDim
+        : theme.colors.dashboardText};
 `;
 
 const DatePickerRow = styled.View`

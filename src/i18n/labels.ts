@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 
 import type { BadgeCategory, BadgeId } from '../components/constants/badge.constants';
+import type { ReactionKey } from '../components/constants/reaction.constants';
 import type {
   ReviewLogPeriodKey,
   ReviewLogViewMode,
@@ -26,6 +27,10 @@ export function getBadgeDescription(t: TFunction, id: BadgeId) {
 
 export function getBadgeCategoryLabel(t: TFunction, category: BadgeCategory) {
   return t(`badges.categories.${category}`);
+}
+
+export function getReactionLabel(t: TFunction, key: ReactionKey) {
+  return t(`reactions.items.${key}`);
 }
 
 const REVIEW_SORT_I18N: Record<ReviewSortKey, string> = {
