@@ -1,5 +1,5 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { useCallback, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
@@ -9,7 +9,6 @@ import styled from 'styled-components/native';
 import { RootStackParamList } from '../../../app/navigation/types';
 import {
   ALL_BADGE_IDS,
-  ArchiveBannerAd,
   ArchiveEmptyText,
   ArchiveNativeAd,
   ArchivePageHeader,
@@ -18,7 +17,6 @@ import {
   Container,
 } from '../../../components';
 import { formatRating } from '../../filmLog/utils/rating';
-import ExploreMovieShelf from '../../explore/components/ExploreMovieShelf';
 import {
   useAuth,
   useGetUserBadges,
@@ -28,31 +26,41 @@ import {
 } from '../../../lib/supabase';
 import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
 import { useGetGenres } from '../../../lib/tmdb';
-import type { TmdbMovie } from '../../../lib/tmdb/types';
 import { theme } from '../../../theme';
-
-import { useStatsPersonRecommendations } from '../hooks/useStatsPersonRecommendations';
 
 import StatisticsBarChart from './StatisticsBarChart';
 import StatisticsGenreRating from './StatisticsGenreRating';
+import StatisticsLineChart from './StatisticsLineChart';
 import StatisticsPersonRank from './StatisticsPersonRank';
 import StatisticsPieChart from './StatisticsPieChart';
+import StatisticsReactionProfile from './StatisticsReactionProfile';
+import StatisticsTabBar, {
+  type StatisticsTabKey,
+} from './StatisticsTabBar';
+import StatisticsYearFilter from './StatisticsYearFilter';
 import {
   buildCastRankings,
+  buildCumulativeCounts,
   buildDecadeCounts,
   buildDirectorRankings,
   buildGenreRatingStats,
   buildGenreSlices,
   buildJournalStats,
-  buildMonthlyCounts,
+  buildMonthlyTimeline,
+  buildPeriodSummary,
   buildPreferredGenreStats,
   buildRatingBuckets,
-  buildYearSummary,
+  buildReactionProfile,
+  buildYearlyCounts,
   countReviewsLastDays,
   countReviewsThisMonth,
+  filterReviewsByYear,
+  getAvailableYears,
   getPreferredGenreInsight,
   getRaterInsight,
+  getTimelineInsight,
   getTopRatedReviews,
+  type StatsYearFilter,
 } from '../utils/reviewStats';
 
 const H_PAD = 20;
@@ -63,6 +71,9 @@ function StatisticsScreen() {
   const { user } = useAuth();
   const { profile } = useProfileContext();
   const userId = user?.id ?? '';
+
+  const [activeTab, setActiveTab] = useState<StatisticsTabKey>('overview');
+  const [yearFilter, setYearFilter] = useState<StatsYearFilter>('all');
 
   const { data: userStats } = useGetUserStats(userId);
   const { data: reviews = [], isLoading: isReviewsLoading } =
@@ -78,48 +89,59 @@ function StatisticsScreen() {
     return map;
   }, [genreData?.genres]);
 
+  const availableYears = useMemo(() => getAvailableYears(reviews), [reviews]);
+
+  const filteredReviews = useMemo(
+    () => filterReviewsByYear(reviews, yearFilter),
+    [reviews, yearFilter],
+  );
+
+  const periodSummary = useMemo(
+    () => buildPeriodSummary(reviews, yearFilter),
+    [reviews, yearFilter],
+  );
+
+  const monthlyTimeline = useMemo(
+    () => buildMonthlyTimeline(filteredReviews, yearFilter, 12),
+    [filteredReviews, yearFilter],
+  );
+
+  const yearlyCounts = useMemo(() => buildYearlyCounts(reviews), [reviews]);
+
+  const cumulativeCounts = useMemo(
+    () => buildCumulativeCounts(filteredReviews),
+    [filteredReviews],
+  );
+
+  const timelineInsight = useMemo(
+    () => getTimelineInsight(monthlyTimeline, yearlyCounts, yearFilter),
+    [monthlyTimeline, yearlyCounts, yearFilter],
+  );
+
   const { slices: genreSlices, missingGenreReviewCount } = useMemo(
-    () => buildGenreSlices(reviews, genreNameById),
-    [genreNameById, reviews],
+    () => buildGenreSlices(filteredReviews, genreNameById),
+    [filteredReviews, genreNameById],
   );
 
   const { rankings: directorRankings, missingReviewCount: missingDirectorCount } =
-    useMemo(() => buildDirectorRankings(reviews), [reviews]);
+    useMemo(() => buildDirectorRankings(filteredReviews), [filteredReviews]);
 
   const { rankings: castRankings, missingReviewCount: missingCastCount } =
-    useMemo(() => buildCastRankings(reviews), [reviews]);
-
-  // const {
-  //   topDirector,
-  //   topCast,
-  //   directorRecommendMovies,
-  //   castRecommendMovies,
-  //   isDirectorCreditsLoading,
-  //   isDirectorCreditsError,
-  //   isCastCreditsLoading,
-  //   isCastCreditsError,
-  // } = useStatsPersonRecommendations(userId);
-
-  // const handlePressRecommendMovie = useCallback(
-  //   (movie: TmdbMovie) => {
-  //     navigation.navigate('MovieDetail', { tmdbId: movie.id });
-  //   },
-  //   [navigation],
-  // );
+    useMemo(() => buildCastRankings(filteredReviews), [filteredReviews]);
 
   const genreRatingStats = useMemo(
-    () => buildGenreRatingStats(reviews, genreNameById),
-    [genreNameById, reviews],
+    () => buildGenreRatingStats(filteredReviews, genreNameById),
+    [filteredReviews, genreNameById],
   );
 
   const preferredGenreStats = useMemo(
     () =>
       buildPreferredGenreStats(
         profile?.preferred_genres ?? [],
-        reviews,
+        filteredReviews,
         genreNameById,
       ),
-    [genreNameById, profile?.preferred_genres, reviews],
+    [filteredReviews, genreNameById, profile?.preferred_genres],
   );
 
   const preferredGenreInsight = useMemo(
@@ -138,31 +160,62 @@ function StatisticsScreen() {
   );
 
   const { items: decadeCounts, missingReleaseYearCount } = useMemo(
-    () => buildDecadeCounts(reviews),
+    () => buildDecadeCounts(filteredReviews),
+    [filteredReviews],
+  );
+
+  const ratingBuckets = useMemo(
+    () => buildRatingBuckets(filteredReviews),
+    [filteredReviews],
+  );
+
+  const reactionProfile = useMemo(
+    () => buildReactionProfile(filteredReviews),
+    [filteredReviews],
+  );
+
+  const topRated = useMemo(
+    () => getTopRatedReviews(filteredReviews),
+    [filteredReviews],
+  );
+
+  const journalStats = useMemo(
+    () => buildJournalStats(filteredReviews),
+    [filteredReviews],
+  );
+
+  const thisMonthCount = useMemo(
+    () => countReviewsThisMonth(reviews),
     [reviews],
   );
 
-  const monthlyCounts = buildMonthlyCounts(reviews);
-  const ratingBuckets = buildRatingBuckets(reviews);
-  const topRated = getTopRatedReviews(reviews);
-  const journalStats = buildJournalStats(reviews);
-  const yearSummary = buildYearSummary(reviews);
-  const thisMonthCount = countReviewsThisMonth(reviews);
-  const last30DaysCount = countReviewsLastDays(reviews, 30);
-  const avgRating = userStats?.avgRating ?? 0;
-  const reviewCount = userStats?.reviewCount ?? reviews.length;
+  const last30DaysCount = useMemo(
+    () => countReviewsLastDays(reviews, 30),
+    [reviews],
+  );
+
   const wishlistCount = userStats?.wishlistCount ?? 0;
   const collectionCount = userStats?.collectionCount ?? 0;
-  const raterInsight = getRaterInsight(avgRating, reviewCount);
-  const yearDelta = yearSummary.count - yearSummary.previousYearCount;
+  const raterInsight = getRaterInsight(
+    periodSummary.avgRating,
+    periodSummary.count,
+  );
+
   const yearDeltaLabel =
-    yearDelta > 0
-      ? t('statistics.insights.yearDeltaUp', { delta: yearDelta })
-      : yearDelta < 0
-        ? t('statistics.insights.yearDeltaDown', { delta: yearDelta })
-        : yearSummary.previousYearCount > 0
-          ? t('statistics.insights.yearDeltaSame')
-          : null;
+    periodSummary.previousCount > 0 || periodSummary.delta !== 0
+      ? periodSummary.delta > 0
+        ? t('statistics.insights.yearDeltaUp', { delta: periodSummary.delta })
+        : periodSummary.delta < 0
+          ? t('statistics.insights.yearDeltaDown', {
+              delta: periodSummary.delta,
+            })
+          : t('statistics.insights.yearDeltaSame')
+      : null;
+
+  const periodCountLabel =
+    yearFilter === 'all'
+      ? t('common.stats.totalLogs')
+      : t('statistics.yearFilter.yearLogs', { year: yearFilter });
 
   return (
     <Container isGetter={false}>
@@ -179,325 +232,427 @@ function StatisticsScreen() {
             </LoaderWrap>
           ) : (
             <>
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="SUMMARY"
-                  title={t('statistics.sections.filmography.title')}
-                  subtitle={t('statistics.sections.filmography.subtitle')}
-                />
-                <SummaryGrid>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.totalLogs')}</SummaryLabel>
-                    <SummaryValue>{reviewCount}</SummaryValue>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.avgRatingShort')}</SummaryLabel>
-                    <SummaryValue>
-                      {reviewCount > 0 ? formatRating(avgRating) : '—'}
-                    </SummaryValue>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.thisMonth')}</SummaryLabel>
-                    <SummaryValue>{thisMonthCount}</SummaryValue>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.last30Days')}</SummaryLabel>
-                    <SummaryValue>{last30DaysCount}</SummaryValue>
-                  </SummaryItem>
-                </SummaryGrid>
-                <InsightText>{raterInsight}</InsightText>
-              </ArchivePanel>
+              <StatisticsYearFilter
+                years={availableYears}
+                value={yearFilter}
+                onChange={setYearFilter}
+              />
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline={`${yearSummary.year}`}
-                  title={t('statistics.sections.thisYear.title')}
-                  subtitle={t('statistics.sections.thisYear.subtitle')}
-                />
-                <SummaryGrid>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.thisYearLogs')}</SummaryLabel>
-                    <SummaryValue>{yearSummary.count}</SummaryValue>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.thisYearAvg')}</SummaryLabel>
-                    <SummaryValue>
-                      {yearSummary.count > 0
-                        ? formatRating(yearSummary.avgRating)
-                        : '—'}
-                    </SummaryValue>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.wishlistCount')}</SummaryLabel>
-                    <SummaryValue>{wishlistCount}</SummaryValue>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.collections')}</SummaryLabel>
-                    <SummaryValue>{collectionCount}</SummaryValue>
-                  </SummaryItem>
-                </SummaryGrid>
-                {yearDeltaLabel ? (
-                  <InsightText>{yearDeltaLabel}</InsightText>
-                ) : null}
-              </ArchivePanel>
+              <StatisticsTabBar value={activeTab} onChange={setActiveTab} />
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="JOURNAL"
-                  title={t('statistics.sections.journalHabit.title')}
-                  subtitle={t('statistics.sections.journalHabit.subtitle')}
-                />
-                <SummaryGrid>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.withJournal')}</SummaryLabel>
-                    <SummaryValue>{journalStats.contentRate}%</SummaryValue>
-                  </SummaryItem>
-                  <SummaryItem>
-                    <SummaryLabel>{t('common.stats.avgChars')}</SummaryLabel>
-                    <SummaryValue>
-                      {journalStats.withContentCount > 0
-                        ? journalStats.avgContentLength
-                        : '—'}
-                    </SummaryValue>
-                  </SummaryItem>
-                </SummaryGrid>
-                <InsightText>
-                  {journalStats.totalReviews === 0
-                    ? t('statistics.insights.journalEmpty')
-                    : t('statistics.insights.journalCount', {
-                        count: journalStats.withContentCount,
-                      })}
-                </InsightText>
-              </ArchivePanel>
+              {activeTab === 'overview' ? (
+                <>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="SUMMARY"
+                      title={t('statistics.sections.filmography.title')}
+                      subtitle={t('statistics.sections.filmography.subtitle')}
+                    />
+                    <SummaryGrid>
+                      <SummaryItem>
+                        <SummaryLabel>{periodCountLabel}</SummaryLabel>
+                        <SummaryValue>{periodSummary.count}</SummaryValue>
+                      </SummaryItem>
+                      <SummaryItem>
+                        <SummaryLabel>
+                          {t('common.stats.avgRatingShort')}
+                        </SummaryLabel>
+                        <SummaryValue>
+                          {periodSummary.count > 0
+                            ? formatRating(periodSummary.avgRating)
+                            : '—'}
+                        </SummaryValue>
+                      </SummaryItem>
+                      {yearFilter === 'all' ? (
+                        <>
+                          <SummaryItem>
+                            <SummaryLabel>
+                              {t('common.stats.thisMonth')}
+                            </SummaryLabel>
+                            <SummaryValue>{thisMonthCount}</SummaryValue>
+                          </SummaryItem>
+                          <SummaryItem>
+                            <SummaryLabel>
+                              {t('common.stats.last30Days')}
+                            </SummaryLabel>
+                            <SummaryValue>{last30DaysCount}</SummaryValue>
+                          </SummaryItem>
+                        </>
+                      ) : (
+                        <>
+                          <SummaryItem>
+                            <SummaryLabel>
+                              {t('common.stats.wishlistCount')}
+                            </SummaryLabel>
+                            <SummaryValue>{wishlistCount}</SummaryValue>
+                          </SummaryItem>
+                          <SummaryItem>
+                            <SummaryLabel>
+                              {t('common.stats.collections')}
+                            </SummaryLabel>
+                            <SummaryValue>{collectionCount}</SummaryValue>
+                          </SummaryItem>
+                        </>
+                      )}
+                    </SummaryGrid>
+                    {yearDeltaLabel ? (
+                      <InsightText>{yearDeltaLabel}</InsightText>
+                    ) : null}
+                    <InsightText>{raterInsight}</InsightText>
+                  </ArchivePanel>
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="TIMELINE"
-                  title={t('statistics.sections.monthly.title')}
-                  subtitle={t('statistics.sections.monthly.subtitle')}
-                />
-                <StatisticsBarChart
-                  items={monthlyCounts.map(item => ({
-                    label: item.label,
-                    value: item.count,
-                  }))}
-                  emptyMessage={t('statistics.sections.monthly.empty')}
-                />
-              </ArchivePanel>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="TIMELINE"
+                      title={t('statistics.sections.monthly.title')}
+                      subtitle={t('statistics.sections.monthly.subtitle')}
+                    />
+                    <StatisticsLineChart
+                      items={monthlyTimeline.map(item => ({
+                        label: item.label,
+                        value: item.count,
+                      }))}
+                      emptyMessage={t('statistics.sections.monthly.empty')}
+                    />
+                    {timelineInsight ? (
+                      <InsightText>{timelineInsight}</InsightText>
+                    ) : null}
+                  </ArchivePanel>
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="RATING"
-                  title={t('statistics.sections.ratingDistribution.title')}
-                  subtitle={t('statistics.sections.ratingDistribution.subtitle')}
-                />
-                <StatisticsBarChart
-                  items={ratingBuckets.map(item => ({
-                    label: item.label,
-                    value: item.count,
-                  }))}
-                  emptyMessage={t('statistics.sections.ratingDistribution.empty')}
-                />
-              </ArchivePanel>
-
-
-              <ArchivePanel>
-                <ArchiveNativeAd />
-              </ArchivePanel>
-
-
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="GENRE"
-                  title={t('statistics.sections.genreDistribution.title')}
-                  subtitle={t('statistics.sections.genreDistribution.subtitle')}
-                />
-                <StatisticsPieChart
-                  slices={genreSlices}
-                  emptyMessage={t('statistics.sections.genreDistribution.empty')}
-                />
-                {missingGenreReviewCount > 0 ? (
-                  <GenreNote>
-                    {t('statistics.sections.genreDistribution.excludedNote', {
-                      count: missingGenreReviewCount,
-                    })}
-                  </GenreNote>
-                ) : null}
-              </ArchivePanel>
-
-              {preferredGenreStats.length > 0 ? (
-                <ArchivePanel accent>
-                  <ArchiveSectionHeader
-                    overline="TASTE"
-                    title={t('statistics.sections.preferredVsActual.title')}
-                    subtitle={t('statistics.sections.preferredVsActual.subtitle')}
-                  />
-                  <StatisticsPersonRank
-                    items={preferredGenreRankings}
-                    valueSuffix={t('common.units.times')}
-                    emptyMessage={t('statistics.sections.preferredVsActual.empty')}
-                  />
-                  {preferredGenreInsight ? (
-                    <InsightText>{preferredGenreInsight}</InsightText>
-                  ) : null}
-                </ArchivePanel>
+                  <ArchivePanel>
+                    <ArchiveNativeAd />
+                  </ArchivePanel>
+                </>
               ) : null}
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="GENRE RATING"
-                  title={t('statistics.sections.genreRating.title')}
-                  subtitle={t('statistics.sections.genreRating.subtitle')}
-                />
-                <StatisticsGenreRating
-                  items={genreRatingStats}
-                  emptyMessage={t('statistics.sections.genreRating.empty')}
-                />
-              </ArchivePanel>
+              {activeTab === 'time' ? (
+                <>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="MONTHLY"
+                      title={t('statistics.sections.monthly.title')}
+                      subtitle={t('statistics.sections.monthly.subtitle')}
+                    />
+                    <StatisticsLineChart
+                      items={monthlyTimeline.map(item => ({
+                        label: item.label,
+                        value: item.count,
+                      }))}
+                      emptyMessage={t('statistics.sections.monthly.empty')}
+                    />
+                  </ArchivePanel>
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="ERA"
-                  title={t('statistics.sections.decade.title')}
-                  subtitle={t('statistics.sections.decade.subtitle')}
-                />
-                <StatisticsBarChart
-                  items={decadeCounts.map(item => ({
-                    label: String(Number.parseInt(item.key, 10)),
-                    value: item.count,
-                  }))}
-                  emptyMessage={t('statistics.sections.decade.empty')}
-                />
-                {missingReleaseYearCount > 0 ? (
-                  <GenreNote>
-                    {t('statistics.sections.decade.excludedNote', {
-                      count: missingReleaseYearCount,
-                    })}
-                  </GenreNote>
-                ) : null}
-              </ArchivePanel>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="YEARLY"
+                      title={t('statistics.sections.yearly.title')}
+                      subtitle={t('statistics.sections.yearly.subtitle')}
+                    />
+                    <StatisticsBarChart
+                      items={yearlyCounts.map(item => ({
+                        label: String(item.year),
+                        value: item.count,
+                      }))}
+                      emptyMessage={t('statistics.sections.yearly.empty')}
+                    />
+                  </ArchivePanel>
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="DIRECTOR"
-                  title={t('statistics.sections.directors.title')}
-                  subtitle={t('statistics.sections.directors.subtitle')}
-                />
-                <StatisticsPersonRank
-                  items={directorRankings}
-                  emptyMessage={t('statistics.sections.directors.empty')}
-                />
-                {missingDirectorCount > 0 ? (
-                  <GenreNote>
-                    {t('statistics.sections.directors.excludedNote', {
-                      count: missingDirectorCount,
-                    })}
-                  </GenreNote>
-                ) : null}
-              </ArchivePanel>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="CUMULATIVE"
+                      title={t('statistics.sections.cumulative.title')}
+                      subtitle={t('statistics.sections.cumulative.subtitle')}
+                    />
+                    <StatisticsLineChart
+                      items={cumulativeCounts.map(item => ({
+                        label: item.label,
+                        value: item.count,
+                      }))}
+                      emptyMessage={t('statistics.sections.cumulative.empty')}
+                    />
+                  </ArchivePanel>
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="CAST"
-                  title={t('statistics.sections.cast.title')}
-                  subtitle={t('statistics.sections.cast.subtitle')}
-                />
-                <StatisticsPersonRank
-                  items={castRankings}
-                  emptyMessage={t('statistics.sections.cast.empty')}
-                />
-                {missingCastCount > 0 ? (
-                  <GenreNote>
-                    {t('statistics.sections.cast.excludedNote', {
-                      count: missingCastCount,
-                    })}
-                  </GenreNote>
-                ) : null}
-              </ArchivePanel>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="RATING"
+                      title={t('statistics.sections.ratingDistribution.title')}
+                      subtitle={t(
+                        'statistics.sections.ratingDistribution.subtitle',
+                      )}
+                    />
+                    <StatisticsBarChart
+                      items={ratingBuckets.map(item => ({
+                        label: item.label,
+                        value: item.count,
+                      }))}
+                      emptyMessage={t(
+                        'statistics.sections.ratingDistribution.empty',
+                      )}
+                    />
+                  </ArchivePanel>
+                  <ArchivePanel>
+                    <ArchiveNativeAd />
+                  </ArchivePanel>
+                </>
+              ) : null}
 
-              <ArchivePanel accent>
-                <ArchiveSectionHeader
-                  overline="HIGHLIGHTS"
-                  title={t('statistics.sections.highlights.title')}
-                  subtitle={t('statistics.sections.highlights.subtitle')}
-                />
-                {topRated.length === 0 ? (
-                  <ArchiveEmptyText>
-                    {t('statistics.sections.highlights.empty')}
-                  </ArchiveEmptyText>
-                ) : (
-                  <HighlightList>
-                    {topRated.map((review, index) => (
-                      <HighlightRow
-                        key={review.reviewId}
-                        onPress={() =>
-                          navigation.navigate('ReviewDetail', {
-                            reviewId: review.reviewId,
-                          })
-                        }
-                        accessibilityRole="button">
-                        <RankText>{index + 1}</RankText>
-                        <PosterWrap>
-                          {review.posterPath ? (
-                            <Poster
-                              source={{
-                                uri: getTmdbPosterUrl(review.posterPath),
-                              }}
-                              resizeMode={FastImage.resizeMode.cover}
+              {activeTab === 'taste' ? (
+                <>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="GENRE"
+                      title={t('statistics.sections.genreDistribution.title')}
+                      subtitle={t(
+                        'statistics.sections.genreDistribution.subtitle',
+                      )}
+                    />
+                    <StatisticsPieChart
+                      slices={genreSlices}
+                      emptyMessage={t(
+                        'statistics.sections.genreDistribution.empty',
+                      )}
+                    />
+                    {missingGenreReviewCount > 0 ? (
+                      <GenreNote>
+                        {t('statistics.sections.genreDistribution.excludedNote', {
+                          count: missingGenreReviewCount,
+                        })}
+                      </GenreNote>
+                    ) : null}
+                  </ArchivePanel>
+
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="REACTION"
+                      title={t('statistics.sections.reactions.title')}
+                      subtitle={t('statistics.sections.reactions.subtitle')}
+                    />
+                    <StatisticsReactionProfile items={reactionProfile} />
+                  </ArchivePanel>
+
+                  <ArchivePanel>
+                    <ArchiveNativeAd />
+                  </ArchivePanel>
+
+                  {preferredGenreStats.length > 0 ? (
+                    <ArchivePanel accent>
+                      <ArchiveSectionHeader
+                        overline="TASTE"
+                        title={t('statistics.sections.preferredVsActual.title')}
+                        subtitle={t(
+                          'statistics.sections.preferredVsActual.subtitle',
+                        )}
+                      />
+                      <StatisticsPersonRank
+                        items={preferredGenreRankings}
+                        valueSuffix={t('common.units.times')}
+                        emptyMessage={t(
+                          'statistics.sections.preferredVsActual.empty',
+                        )}
+                      />
+                      {preferredGenreInsight ? (
+                        <InsightText>{preferredGenreInsight}</InsightText>
+                      ) : null}
+                    </ArchivePanel>
+                  ) : null}
+
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="GENRE RATING"
+                      title={t('statistics.sections.genreRating.title')}
+                      subtitle={t('statistics.sections.genreRating.subtitle')}
+                    />
+                    <StatisticsGenreRating
+                      items={genreRatingStats}
+                      emptyMessage={t('statistics.sections.genreRating.empty')}
+                    />
+                  </ArchivePanel>
+
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="ERA"
+                      title={t('statistics.sections.decade.title')}
+                      subtitle={t('statistics.sections.decade.subtitle')}
+                    />
+                    <StatisticsBarChart
+                      items={decadeCounts.map(item => ({
+                        label: String(Number.parseInt(item.key, 10)),
+                        value: item.count,
+                      }))}
+                      emptyMessage={t('statistics.sections.decade.empty')}
+                    />
+                    {missingReleaseYearCount > 0 ? (
+                      <GenreNote>
+                        {t('statistics.sections.decade.excludedNote', {
+                          count: missingReleaseYearCount,
+                        })}
+                      </GenreNote>
+                    ) : null}
+                  </ArchivePanel>
+
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="DIRECTOR"
+                      title={t('statistics.sections.directors.title')}
+                      subtitle={t('statistics.sections.directors.subtitle')}
+                    />
+                    <StatisticsPersonRank
+                      items={directorRankings}
+                      emptyMessage={t('statistics.sections.directors.empty')}
+                    />
+                    {missingDirectorCount > 0 ? (
+                      <GenreNote>
+                        {t('statistics.sections.directors.excludedNote', {
+                          count: missingDirectorCount,
+                        })}
+                      </GenreNote>
+                    ) : null}
+                  </ArchivePanel>
+
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="CAST"
+                      title={t('statistics.sections.cast.title')}
+                      subtitle={t('statistics.sections.cast.subtitle')}
+                    />
+                    <StatisticsPersonRank
+                      items={castRankings}
+                      emptyMessage={t('statistics.sections.cast.empty')}
+                    />
+                    {missingCastCount > 0 ? (
+                      <GenreNote>
+                        {t('statistics.sections.cast.excludedNote', {
+                          count: missingCastCount,
+                        })}
+                      </GenreNote>
+                    ) : null}
+                  </ArchivePanel>
+                  <ArchivePanel>
+                    <ArchiveNativeAd />
+                  </ArchivePanel>
+                </>
+              ) : null}
+
+              {activeTab === 'highlights' ? (
+                <>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="HIGHLIGHTS"
+                      title={t('statistics.sections.highlights.title')}
+                      subtitle={t('statistics.sections.highlights.subtitle')}
+                    />
+                    {topRated.length === 0 ? (
+                      <ArchiveEmptyText>
+                        {t('statistics.sections.highlights.empty')}
+                      </ArchiveEmptyText>
+                    ) : (
+                      <HighlightList>
+                        {topRated.map((review, index) => (
+                          <HighlightRow
+                            key={review.reviewId}
+                            onPress={() =>
+                              navigation.navigate('ReviewDetail', {
+                                reviewId: review.reviewId,
+                              })
+                            }
+                            accessibilityRole="button">
+                            <RankText>{index + 1}</RankText>
+                            <PosterWrap>
+                              {review.posterPath ? (
+                                <Poster
+                                  source={{
+                                    uri: getTmdbPosterUrl(review.posterPath),
+                                  }}
+                                  resizeMode={FastImage.resizeMode.cover}
+                                />
+                              ) : (
+                                <PosterPlaceholder />
+                              )}
+                            </PosterWrap>
+                            <HighlightInfo>
+                              <HighlightTitle numberOfLines={2}>
+                                {review.title}
+                              </HighlightTitle>
+                              <HighlightRating>
+                                {formatRating(review.rating)}{' '}
+                                {t('common.rating.scaleSuffix')}
+                              </HighlightRating>
+                            </HighlightInfo>
+                            <Icon
+                              name="chevron-right"
+                              size={20}
+                              color={theme.colors.primaryMuted}
                             />
-                          ) : (
-                            <PosterPlaceholder />
-                          )}
-                        </PosterWrap>
-                        <HighlightInfo>
-                          <HighlightTitle numberOfLines={2}>
-                            {review.title}
-                          </HighlightTitle>
-                          <HighlightRating>
-                            {formatRating(review.rating)}{' '}
-                            {t('common.rating.scaleSuffix')}
-                          </HighlightRating>
-                        </HighlightInfo>
-                        <Icon
-                          name="chevron-right"
-                          size={20}
-                          color={theme.colors.primaryMuted}
-                        />
-                      </HighlightRow>
-                    ))}
-                  </HighlightList>
-                )}
-              </ArchivePanel>
+                          </HighlightRow>
+                        ))}
+                      </HighlightList>
+                    )}
+                  </ArchivePanel>
 
-              <ArchivePanel>
-                <ArchiveSectionHeader
-                  overline="BADGES"
-                  title={t('statistics.sections.badges.title')}
-                  subtitle={t('statistics.sections.badges.subtitle')}
-                />
-                <BadgeSummaryRow>
-                  <BadgeSummaryLabel>{t('common.stats.earned')}</BadgeSummaryLabel>
-                  <BadgeSummaryValue>
-                    {earnedBadges.length} / {ALL_BADGE_IDS.length}
-                  </BadgeSummaryValue>
-                </BadgeSummaryRow>
-                <BadgeLink
-                  onPress={() => navigation.navigate('BadgeList')}
-                  accessibilityRole="button">
-                  <BadgeLinkText>
-                    {t('statistics.sections.badges.viewAll')}
-                  </BadgeLinkText>
-                  <Icon
-                    name="chevron-right"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                </BadgeLink>
-              </ArchivePanel>
+                  <ArchivePanel accent>
+                    <ArchiveSectionHeader
+                      overline="JOURNAL"
+                      title={t('statistics.sections.journalHabit.title')}
+                      subtitle={t('statistics.sections.journalHabit.subtitle')}
+                    />
+                    <SummaryGrid>
+                      <SummaryItem>
+                        <SummaryLabel>
+                          {t('common.stats.withJournal')}
+                        </SummaryLabel>
+                        <SummaryValue>{journalStats.contentRate}%</SummaryValue>
+                      </SummaryItem>
+                      <SummaryItem>
+                        <SummaryLabel>{t('common.stats.avgChars')}</SummaryLabel>
+                        <SummaryValue>
+                          {journalStats.withContentCount > 0
+                            ? journalStats.avgContentLength
+                            : '—'}
+                        </SummaryValue>
+                      </SummaryItem>
+                    </SummaryGrid>
+                    <InsightText>
+                      {journalStats.totalReviews === 0
+                        ? t('statistics.insights.journalEmpty')
+                        : t('statistics.insights.journalCount', {
+                            count: journalStats.withContentCount,
+                          })}
+                    </InsightText>
+                  </ArchivePanel>
 
-              <ArchivePanel>
-                <ArchiveNativeAd />
-              </ArchivePanel>
+                  <ArchivePanel>
+                    <ArchiveSectionHeader
+                      overline="BADGES"
+                      title={t('statistics.sections.badges.title')}
+                      subtitle={t('statistics.sections.badges.subtitle')}
+                    />
+                    <BadgeSummaryRow>
+                      <BadgeSummaryLabel>
+                        {t('common.stats.earned')}
+                      </BadgeSummaryLabel>
+                      <BadgeSummaryValue>
+                        {earnedBadges.length} / {ALL_BADGE_IDS.length}
+                      </BadgeSummaryValue>
+                    </BadgeSummaryRow>
+                    <BadgeLink
+                      onPress={() => navigation.navigate('BadgeList')}
+                      accessibilityRole="button">
+                      <BadgeLinkText>
+                        {t('statistics.sections.badges.viewAll')}
+                      </BadgeLinkText>
+                      <Icon
+                        name="chevron-right"
+                        size={18}
+                        color={theme.colors.primary}
+                      />
+                    </BadgeLink>
+                  </ArchivePanel>
+
+                  <ArchivePanel>
+                    <ArchiveNativeAd />
+                  </ArchivePanel>
+                </>
+              ) : null}
             </>
           )}
         </Content>

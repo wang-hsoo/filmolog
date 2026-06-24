@@ -1,6 +1,12 @@
 import { normalizeReviewRating } from '../../filmLog/utils/rating';
 import { i18n } from '../../../i18n';
+import {
+  REACTION_KEYS,
+  type ReactionKey,
+} from '../../../components/constants/reaction.constants';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
+
+export type StatsYearFilter = 'all' | number;
 
 export type MonthlyCount = {
   key: string;
@@ -57,9 +63,254 @@ function formatMonthLabel(key: string) {
   });
 }
 
+export function filterReviewsByYear(
+  reviews: UserReviewedMovie[],
+  yearFilter: StatsYearFilter,
+): UserReviewedMovie[] {
+  if (yearFilter === 'all') {
+    return reviews;
+  }
+
+  return reviews.filter(
+    review => getReviewDate(review).getFullYear() === yearFilter,
+  );
+}
+
+export function getAvailableYears(reviews: UserReviewedMovie[]): number[] {
+  const years = new Set<number>();
+
+  for (const review of reviews) {
+    years.add(getReviewDate(review).getFullYear());
+  }
+
+  return [...years].sort((a, b) => b - a);
+}
+
+export type YearlyCount = {
+  year: number;
+  count: number;
+  avgRating: number;
+};
+
+export function buildYearlyCounts(reviews: UserReviewedMovie[]): YearlyCount[] {
+  const totals = new Map<number, { sum: number; count: number }>();
+
+  for (const review of reviews) {
+    const year = getReviewDate(review).getFullYear();
+    const rating = normalizeReviewRating(review.rating);
+    const existing = totals.get(year);
+
+    if (existing) {
+      existing.sum += rating;
+      existing.count += 1;
+    } else {
+      totals.set(year, { sum: rating, count: 1 });
+    }
+  }
+
+  return [...totals.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([year, { sum, count }]) => ({
+      year,
+      count,
+      avgRating: Math.round((sum / count) * 10) / 10,
+    }));
+}
+
+export function buildMonthlyTimeline(
+  reviews: UserReviewedMovie[],
+  yearFilter: StatsYearFilter,
+  rollingMonthCount = 12,
+): MonthlyCount[] {
+  if (yearFilter === 'all') {
+    return buildMonthlyCounts(reviews, rollingMonthCount);
+  }
+
+  const keys: string[] = [];
+
+  for (let month = 1; month <= 12; month += 1) {
+    keys.push(`${yearFilter}-${String(month).padStart(2, '0')}`);
+  }
+
+  const counts = new Map(keys.map(key => [key, 0]));
+
+  for (const review of reviews) {
+    const key = formatMonthKey(getReviewDate(review));
+
+    if (counts.has(key)) {
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+  }
+
+  return keys.map(key => ({
+    key,
+    label: formatMonthLabel(key),
+    count: counts.get(key) ?? 0,
+  }));
+}
+
+export type CumulativePoint = {
+  key: string;
+  label: string;
+  count: number;
+};
+
+export function buildCumulativeCounts(
+  reviews: UserReviewedMovie[],
+): CumulativePoint[] {
+  if (reviews.length === 0) {
+    return [];
+  }
+
+  const sorted = [...reviews].sort(
+    (a, b) => getReviewDate(a).getTime() - getReviewDate(b).getTime(),
+  );
+  const monthly = new Map<string, number>();
+
+  for (const review of sorted) {
+    const key = formatMonthKey(getReviewDate(review));
+    monthly.set(key, (monthly.get(key) ?? 0) + 1);
+  }
+
+  const keys = [...monthly.keys()].sort();
+  let running = 0;
+
+  return keys.map(key => {
+    running += monthly.get(key) ?? 0;
+
+    return {
+      key,
+      label: formatMonthLabel(key),
+      count: running,
+    };
+  });
+}
+
+export type PeriodSummary = {
+  count: number;
+  avgRating: number;
+  previousCount: number;
+  delta: number;
+};
+
+export function buildPeriodSummary(
+  allReviews: UserReviewedMovie[],
+  yearFilter: StatsYearFilter,
+): PeriodSummary {
+  const filtered = filterReviewsByYear(allReviews, yearFilter);
+  const count = filtered.length;
+  const avgRating =
+    count > 0
+      ? Math.round(
+          (filtered.reduce(
+            (sum, review) => sum + normalizeReviewRating(review.rating),
+            0,
+          ) /
+            count) *
+            10,
+        ) / 10
+      : 0;
+
+  if (yearFilter === 'all') {
+    const currentYear = new Date().getFullYear();
+    const thisYearCount = getReviewsInYear(allReviews, currentYear).length;
+    const previousCount = getReviewsInYear(allReviews, currentYear - 1).length;
+
+    return {
+      count,
+      avgRating,
+      previousCount,
+      delta: thisYearCount - previousCount,
+    };
+  }
+
+  const previousCount = getReviewsInYear(allReviews, yearFilter - 1).length;
+
+  return {
+    count,
+    avgRating,
+    previousCount,
+    delta: count - previousCount,
+  };
+}
+
+export type ReactionProfileItem = {
+  key: ReactionKey;
+  count: number;
+  percent: number;
+};
+
+export function buildReactionProfile(
+  reviews: UserReviewedMovie[],
+): ReactionProfileItem[] {
+  const counts = new Map<ReactionKey, number>(
+    REACTION_KEYS.map(key => [key, 0]),
+  );
+  let total = 0;
+
+  for (const review of reviews) {
+    for (const key of review.reactionKeys) {
+      if (!counts.has(key)) {
+        continue;
+      }
+
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+      total += 1;
+    }
+  }
+
+  return REACTION_KEYS.map(key => ({
+    key,
+    count: counts.get(key) ?? 0,
+    percent:
+      total > 0
+        ? Math.round(((counts.get(key) ?? 0) / total) * 100)
+        : 0,
+  })).filter(item => item.count > 0);
+}
+
+export function getTimelineInsight(
+  monthlyCounts: MonthlyCount[],
+  yearlyCounts: YearlyCount[],
+  yearFilter: StatsYearFilter,
+): string | null {
+  if (monthlyCounts.length === 0 && yearlyCounts.length === 0) {
+    return null;
+  }
+
+  if (yearFilter === 'all') {
+    if (yearlyCounts.length === 0) {
+      return null;
+    }
+
+    const topYear = [...yearlyCounts].sort((a, b) => b.count - a.count)[0];
+
+    if (!topYear || topYear.count === 0) {
+      return null;
+    }
+
+    return i18n.t('statistics.insights.mostActiveYear', {
+      year: topYear.year,
+      count: topYear.count,
+    });
+  }
+
+  const topMonth = [...monthlyCounts].sort((a, b) => b.count - a.count)[0];
+
+  if (!topMonth || topMonth.count === 0) {
+    return i18n.t('statistics.insights.yearEmpty', { year: yearFilter });
+  }
+
+  return i18n.t('statistics.insights.mostActiveMonth', {
+    year: yearFilter,
+    month: topMonth.label,
+    count: topMonth.count,
+  });
+}
+
 export function buildMonthlyCounts(
   reviews: UserReviewedMovie[],
-  monthCount = 6,
+  monthCount = 12,
 ): MonthlyCount[] {
   const now = new Date();
   const keys: string[] = [];

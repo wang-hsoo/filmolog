@@ -488,6 +488,16 @@ const translation = {
   statistics: {
     pageTitle: "통계",
     tagline: "모든 기록은 한 편의 영화가 되어 당신이라는 필모그래피로 남습니다.",
+    yearFilter: {
+      all: "전체",
+      yearLogs: "{{year}}년 기록",
+    },
+    tabs: {
+      overview: "개요",
+      time: "시간",
+      taste: "취향",
+      highlights: "하이라이트",
+    },
     sections: {
       filmography: {
         title: "나의 필모그래피",
@@ -503,8 +513,23 @@ const translation = {
       },
       monthly: {
         title: "월별 기록",
-        subtitle: "최근 6개월간 쌓인 장면 수.",
+        subtitle: "선택한 기간의 시청 흐름.",
         empty: "기록이 쌓이면 월별 그래프가 표시됩니다.",
+      },
+      yearly: {
+        title: "연도별 기록",
+        subtitle: "해마다 쌓인 필모그래피.",
+        empty: "기록이 쌓이면 연도별 그래프가 표시됩니다.",
+      },
+      cumulative: {
+        title: "누적 필모그래피",
+        subtitle: "시간에 따라 쌓인 기록 수.",
+        empty: "기록이 쌓이면 누적 그래프가 표시됩니다.",
+      },
+      reactions: {
+        title: "내 반응 프로필",
+        subtitle: "기록할 때 남긴 한 줄 반응.",
+        empty: "반응을 남긴 기록이 있으면 표시됩니다.",
       },
       ratingDistribution: {
         title: "평점 분포",
@@ -570,6 +595,9 @@ const translation = {
       raterGenerous: "관대한 평론가 — 좋은 장면을 넉넉히 기억하는 타입.",
       raterStrict: "깐깐한 평론가 — 엄선한 장면만 필모그래피에 담습니다.",
       raterBalanced: "균형 잡힌 시선 — 기록마다 장면의 온도가 고르게 남아 있습니다.",
+      mostActiveYear: "{{year}}년에 가장 많이 봤어요 ({{count}}편).",
+      mostActiveMonth: "{{year}}년 {{month}}에 가장 많이 봤어요 ({{count}}편).",
+      yearEmpty: "{{year}}년에는 아직 기록이 없습니다.",
     },
   },
   badges: {

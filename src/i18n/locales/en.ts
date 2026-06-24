@@ -488,6 +488,16 @@ const translation = {
   statistics: {
     pageTitle: "Statistics",
     tagline: "Every log becomes a film in the filmography that is you.",
+    yearFilter: {
+      all: "All",
+      yearLogs: "{{year}} logs",
+    },
+    tabs: {
+      overview: "Overview",
+      time: "Time",
+      taste: "Taste",
+      highlights: "Highlights",
+    },
     sections: {
       filmography: {
         title: "My filmography",
@@ -503,8 +513,23 @@ const translation = {
       },
       monthly: {
         title: "Monthly logs",
-        subtitle: "Scenes logged over the last 6 months.",
+        subtitle: "Viewing flow for the selected period.",
         empty: "Monthly chart appears as you log more.",
+      },
+      yearly: {
+        title: "Yearly logs",
+        subtitle: "Your filmography by year.",
+        empty: "Yearly chart appears as you log more.",
+      },
+      cumulative: {
+        title: "Cumulative filmography",
+        subtitle: "Total logs over time.",
+        empty: "Cumulative chart appears as you log more.",
+      },
+      reactions: {
+        title: "My reaction profile",
+        subtitle: "Quick reactions from your logs.",
+        empty: "Shown when you log reactions.",
       },
       ratingDistribution: {
         title: "Rating distribution",
@@ -570,6 +595,9 @@ const translation = {
       raterGenerous: "Generous critic — you remember the good scenes generously.",
       raterStrict: "Strict critic — only chosen scenes make your filmography.",
       raterBalanced: "Balanced eye — each log keeps a steady emotional temperature.",
+      mostActiveYear: "You logged the most in {{year}} ({{count}} films).",
+      mostActiveMonth: "Most active in {{month}} {{year}} ({{count}} films).",
+      yearEmpty: "No logs in {{year}} yet.",
     },
   },
   badges: {
