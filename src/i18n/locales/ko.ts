@@ -308,6 +308,12 @@ const translation = {
       title: "나의 기록",
       emptyAll: "아직 남긴 기록이 없습니다. 첫 영화를 기록해보세요.",
       emptyPeriod: "선택한 기간에 해당하는 기록이 없습니다.",
+      yearFilter: {
+        all: "전체",
+      },
+      monthFilter: {
+        all: "전체",
+      },
     },
     calendar: {
       monthComplete: "이번 달 칸을 모두 채웠어요",
@@ -316,6 +322,19 @@ const translation = {
       hint: "빈 칸을 눌러 그날 기록을, 포스터를 눌러 상세로 이동하세요.",
       emptyDay: "이 날은 아직 비어 있어요. 기록을 남기면 포스터가 채워집니다.",
       emptyMonth: "이번 달에 남긴 기록이 없습니다.",
+      saveImage: "갤러리에 저장",
+      shareImage: "공유하기",
+      shareTitle: "Filmolog 영화 달력",
+      shareMessage: "{{year}}년 {{month}}월 · {{count}}편\n— Filmolog",
+      saveSuccess: "사진 앱에 저장했어요.",
+      saveFailed: "저장하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+      saveEmpty: "이번 달에 저장할 기록이 없습니다.",
+      permissionDenied: "사진 접근 권한이 필요합니다. 설정에서 허용해 주세요.",
+      saving: "이미지 만드는 중…",
+      footerTagline: "나만의 영화 달력 — Filmolog",
+      previewTitle: "달력 미리보기",
+      previewHeadline: "이번 달 영화 달력",
+      previewHint: "인스타 스토리·카톡으로 공유하기 좋은 9:16 이미지예요.",
     },
     detail: {
       loadFailed: "기록을 불러오지 못했습니다.",

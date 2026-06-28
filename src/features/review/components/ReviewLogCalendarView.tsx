@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
@@ -31,9 +31,11 @@ import {
   indexReviewsByDate,
 } from '../utils/reviewLogUtils';
 
-type ReviewLogCalendarViewProps = {
+export type ReviewLogCalendarViewProps = {
   reviews: UserReviewedMovie[];
   onPressReview: (review: UserReviewedMovie) => void;
+  focusMonth?: Date | null;
+  onVisibleMonthChange?: (month: Date) => void;
 };
 
 function formatRating(rating: number) {
@@ -156,6 +158,8 @@ function PosterMosaicTile({ review, onPress }: PosterMosaicTileProps) {
 function ReviewLogCalendarView({
   reviews,
   onPressReview,
+  focusMonth = null,
+  onVisibleMonthChange,
 }: ReviewLogCalendarViewProps) {
   const { t } = useTranslation();
   const weekdayLabels = useMemo(() => getWeekdayLabels(t), [t]);
@@ -164,6 +168,19 @@ function ReviewLogCalendarView({
     startOfDay(new Date(today.getFullYear(), today.getMonth(), 1)),
   );
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!focusMonth) {
+      return;
+    }
+
+    setVisibleMonth(focusMonth);
+    setSelectedDateKey(null);
+  }, [focusMonth]);
+
+  useEffect(() => {
+    onVisibleMonthChange?.(visibleMonth);
+  }, [onVisibleMonthChange, visibleMonth]);
 
   const reviewsByDate = useMemo(() => indexReviewsByDate(reviews), [reviews]);
 

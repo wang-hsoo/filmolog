@@ -21,6 +21,10 @@ export type ReviewLogPeriodKey =
   | 'last90'
   | 'thisYear';
 
+export type ReviewLogYearFilter = 'all' | number;
+
+export type ReviewLogMonthFilter = 'all' | number;
+
 export type ReviewLogDateGroup = {
   dateKey: string;
   reviews: UserReviewedMovie[];
@@ -64,6 +68,62 @@ export function sortReviews(
     default:
       return sorted;
   }
+}
+
+export function getAvailableLogYears(reviews: UserReviewedMovie[]): number[] {
+  const years = new Set<number>();
+
+  for (const review of reviews) {
+    const dateKey = getReviewDateKey(review);
+    const year = Number.parseInt(dateKey.slice(0, 4), 10);
+
+    if (Number.isFinite(year)) {
+      years.add(year);
+    }
+  }
+
+  return [...years].sort((a, b) => b - a);
+}
+
+export function filterReviewsByYearMonth(
+  reviews: UserReviewedMovie[],
+  yearFilter: ReviewLogYearFilter,
+  monthFilter: ReviewLogMonthFilter,
+): UserReviewedMovie[] {
+  if (yearFilter === 'all') {
+    return reviews;
+  }
+
+  const yearPrefix = `${yearFilter}-`;
+
+  if (monthFilter === 'all') {
+    return reviews.filter(review => getReviewDateKey(review).startsWith(yearPrefix));
+  }
+
+  const monthPrefix = `${yearFilter}-${String(monthFilter).padStart(2, '0')}`;
+
+  return reviews.filter(review => getReviewDateKey(review).startsWith(monthPrefix));
+}
+
+export function resolveCalendarFocusMonth(
+  yearFilter: ReviewLogYearFilter,
+  monthFilter: ReviewLogMonthFilter,
+): Date | null {
+  if (yearFilter === 'all') {
+    return null;
+  }
+
+  if (monthFilter !== 'all') {
+    return startOfDay(new Date(yearFilter, monthFilter - 1, 1));
+  }
+
+  const today = startOfDay(new Date());
+
+  if (today.getFullYear() === yearFilter) {
+    return startOfDay(new Date(yearFilter, today.getMonth(), 1));
+  }
+
+  return startOfDay(new Date(yearFilter, 0, 1));
 }
 
 export function filterReviewsByPeriod(

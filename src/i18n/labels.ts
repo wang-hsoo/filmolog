@@ -49,7 +49,7 @@ export function getReviewSortOptions(t: TFunction) {
 }
 
 export function getReviewViewOptions(t: TFunction) {
-  return (['list', 'timeline', 'calendar'] as ReviewLogViewMode[]).map(key => ({
+  return (['calendar', 'list', 'timeline'] as ReviewLogViewMode[]).map(key => ({
     key,
     label: t(`common.viewMode.${key}`),
   }));

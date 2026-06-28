@@ -1,83 +1,116 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { useCallback, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  ScrollView,
-} from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActivityIndicator, Modal, Pressable, ScrollView, type View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
 
 import { RootStackParamList } from '../../../app/navigation/types';
-import { ArchiveBannerAd, ArchiveEmptyText, ArchiveNativeAd, ArchivePanel, Header } from '../../../components';
+import {
+  ArchiveEmptyText,
+  ArchiveNativeAd,
+  ArchivePanel,
+  Header,
+} from '../../../components';
 import { useAuth, useGetUserReviewedMovies } from '../../../lib/supabase';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 import { AppScreen, theme } from '../../../theme';
-import {
-  getReviewPeriodOptions,
-  getReviewSortOptions,
-  getReviewViewOptions,
-} from '../../../i18n/labels';
+import { getReviewSortOptions, getReviewViewOptions } from '../../../i18n/labels';
+import { archiveAlert } from '../../../lib/dialog/archiveDialog';
+import { startOfDay } from '../../filmLog/utils/date';
 
+import ReviewCalendarExportBar from './ReviewCalendarExportBar';
+import ReviewCalendarPreviewModal from './ReviewCalendarPreviewModal';
+import ReviewCalendarShareCard from './ReviewCalendarShareCard';
 import ReviewLogCalendarView from './ReviewLogCalendarView';
+import ReviewLogDateFilter from './ReviewLogDateFilter';
 import ReviewLogRow from './ReviewLogRow';
 import ReviewLogTimelineView from './ReviewLogTimelineView';
 import {
-  filterReviewsByPeriod,
+  filterReviewsByYearMonth,
+  getAvailableLogYears,
   groupReviewsByDate,
+  resolveCalendarFocusMonth,
   sortReviews,
-  type ReviewLogPeriodKey,
+  type ReviewLogMonthFilter,
   type ReviewLogViewMode,
+  type ReviewLogYearFilter,
   type ReviewSortKey,
 } from '../utils/reviewLogUtils';
+import { buildCalendarShareModel } from '../utils/calendarShareExport';
+import { shareCalendarGalleryImage } from '../utils/shareCalendarGallery';
 
 const H_PAD = 20;
-const MIN_REVIEWS_FOR_BANNER = 15;
 
 function ReviewLogListScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
-  const [viewMode, setViewMode] = useState<ReviewLogViewMode>('list');
-  const [periodKey, setPeriodKey] = useState<ReviewLogPeriodKey>('all');
+  const shareCardRef = useRef<View>(null);
+  const [viewMode, setViewMode] = useState<ReviewLogViewMode>('calendar');
+  const [yearFilter, setYearFilter] = useState<ReviewLogYearFilter>('all');
+  const [monthFilter, setMonthFilter] = useState<ReviewLogMonthFilter>('all');
   const [sortKey, setSortKey] = useState<ReviewSortKey>('latest');
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [isPeriodOpen, setIsPeriodOpen] = useState(false);
+  const [isCalendarExporting, setIsCalendarExporting] = useState(false);
+  const [isCalendarPreviewOpen, setIsCalendarPreviewOpen] = useState(false);
+  const [calendarVisibleMonth, setCalendarVisibleMonth] = useState(() => {
+    const today = startOfDay(new Date());
+    return startOfDay(new Date(today.getFullYear(), today.getMonth(), 1));
+  });
 
   const { data: reviews = [], isLoading } = useGetUserReviewedMovies(
     user?.id ?? '',
   );
 
-  const periodFilteredReviews = useMemo(
-    () => filterReviewsByPeriod(reviews, periodKey),
-    [periodKey, reviews],
+  const availableYears = useMemo(() => getAvailableLogYears(reviews), [reviews]);
+
+  const filteredReviews = useMemo(
+    () => filterReviewsByYearMonth(reviews, yearFilter, monthFilter),
+    [monthFilter, reviews, yearFilter],
   );
 
   const sortedReviews = useMemo(
-    () => sortReviews(periodFilteredReviews, sortKey),
-    [periodFilteredReviews, sortKey],
+    () => sortReviews(filteredReviews, sortKey),
+    [filteredReviews, sortKey],
   );
 
   const timelineGroups = useMemo(
-    () => groupReviewsByDate(periodFilteredReviews, sortKey),
-    [periodFilteredReviews, sortKey],
+    () => groupReviewsByDate(filteredReviews, sortKey),
+    [filteredReviews, sortKey],
+  );
+
+  const calendarFocusMonth = useMemo(
+    () => resolveCalendarFocusMonth(yearFilter, monthFilter),
+    [monthFilter, yearFilter],
+  );
+
+  useEffect(() => {
+    if (calendarFocusMonth) {
+      setCalendarVisibleMonth(calendarFocusMonth);
+    }
+  }, [calendarFocusMonth]);
+
+  const calendarShareModel = useMemo(
+    () =>
+      buildCalendarShareModel({
+        reviews: filteredReviews,
+        visibleMonth: calendarVisibleMonth,
+        t,
+        i18nLanguage: i18n.language,
+        footerTagline: t('review.calendar.footerTagline'),
+      }),
+    [calendarVisibleMonth, filteredReviews, i18n.language, t],
   );
 
   const sortOptions = useMemo(() => getReviewSortOptions(t), [t]);
   const viewOptions = useMemo(() => getReviewViewOptions(t), [t]);
-  const periodOptions = useMemo(() => getReviewPeriodOptions(t), [t]);
 
   const activeSortLabel =
     sortOptions.find(option => option.key === sortKey)?.label ??
     t('common.sort.latestLog');
-
-  const activePeriodLabel =
-    periodOptions.find(option => option.key === periodKey)?.label ??
-    t('common.period.all');
 
   const handlePressReview = useCallback(
     (review: UserReviewedMovie) => {
@@ -91,12 +124,52 @@ function ReviewLogListScreen() {
     setIsSortOpen(false);
   }, []);
 
-  const handleSelectPeriod = useCallback((key: ReviewLogPeriodKey) => {
-    setPeriodKey(key);
-    setIsPeriodOpen(false);
+  const handleYearChange = useCallback((value: ReviewLogYearFilter) => {
+    setYearFilter(value);
+    setMonthFilter('all');
   }, []);
 
+  const handleVisibleMonthChange = useCallback((month: Date) => {
+    setCalendarVisibleMonth(month);
+  }, []);
+
+  const handleOpenCalendarPreview = useCallback(() => {
+    if (!calendarShareModel.canExport) {
+      archiveAlert(
+        t('review.calendar.saveImage'),
+        t('review.calendar.saveEmpty'),
+      );
+      return;
+    }
+
+    setIsCalendarPreviewOpen(true);
+  }, [calendarShareModel.canExport, t]);
+
+  const handleShareCalendar = useCallback(async () => {
+    if (!calendarShareModel.canExport) {
+      archiveAlert(
+        t('review.calendar.shareImage'),
+        t('review.calendar.saveEmpty'),
+      );
+      return;
+    }
+
+    setIsCalendarExporting(true);
+
+    try {
+      await shareCalendarGalleryImage(
+        shareCardRef,
+        calendarShareModel.shareMessage,
+      );
+    } catch {
+      // 사용자가 공유 시트를 닫은 경우 등은 무시
+    } finally {
+      setIsCalendarExporting(false);
+    }
+  }, [calendarShareModel.canExport, calendarShareModel.shareMessage, t]);
+
   const showSortControl = viewMode !== 'calendar';
+  const showCalendarExport = viewMode === 'calendar';
 
   return (
     <AppScreen style={{ paddingTop: insets.top }}>
@@ -111,7 +184,7 @@ function ReviewLogListScreen() {
         <ToolbarRow>
           <ToolbarTitle>{t('review.list.title')}</ToolbarTitle>
           <ToolbarMeta>
-            {t('common.units.filmCount', { count: periodFilteredReviews.length })}
+            {t('common.units.filmCount', { count: filteredReviews.length })}
           </ToolbarMeta>
         </ToolbarRow>
 
@@ -130,19 +203,25 @@ function ReviewLogListScreen() {
           })}
         </ViewTabRow>
 
-        <FilterRow>
-          <FilterChip onPress={() => setIsPeriodOpen(true)}>
-            <FilterChipLabel>
-              {t('common.sort.periodPrefix', { label: activePeriodLabel })}
-            </FilterChipLabel>
-            <Icon
-              name="chevron-down"
-              size={14}
-              color={theme.colors.dashboardText}
-            />
-          </FilterChip>
+        <ReviewLogDateFilter
+          years={availableYears}
+          yearFilter={yearFilter}
+          monthFilter={monthFilter}
+          onYearChange={handleYearChange}
+          onMonthChange={setMonthFilter}
+        />
 
-          {showSortControl ? (
+        {showCalendarExport ? (
+          <ReviewCalendarExportBar
+            disabled={!calendarShareModel.canExport}
+            isBusy={isCalendarExporting}
+            onPressSave={handleOpenCalendarPreview}
+            onPressShare={handleShareCalendar}
+          />
+        ) : null}
+
+        {showSortControl ? (
+          <SortFilterRow>
             <FilterChip onPress={() => setIsSortOpen(true)}>
               <FilterChipLabel>
                 {t('common.sort.sortChipPrefix', { label: activeSortLabel })}
@@ -153,14 +232,14 @@ function ReviewLogListScreen() {
                 color={theme.colors.dashboardText}
               />
             </FilterChip>
-          ) : null}
-        </FilterRow>
+          </SortFilterRow>
+        ) : null}
 
         {isLoading ? (
           <LoadingState>
             <ActivityIndicator color={theme.colors.primary} size="large" />
           </LoadingState>
-        ) : periodFilteredReviews.length === 0 ? (
+        ) : filteredReviews.length === 0 ? (
           <EmptyState>
             <ArchiveEmptyText>
               {reviews.length === 0
@@ -192,22 +271,36 @@ function ReviewLogListScreen() {
 
             {viewMode === 'calendar' ? (
               <ReviewLogCalendarView
-                reviews={periodFilteredReviews}
+                reviews={filteredReviews}
                 onPressReview={handlePressReview}
+                focusMonth={calendarFocusMonth}
+                onVisibleMonthChange={handleVisibleMonthChange}
               />
             ) : null}
 
-            {/* {periodFilteredReviews.length >= MIN_REVIEWS_FOR_BANNER ? (
-              <BannerSlot>
-                <ArchiveBannerAd />
-              </BannerSlot>
-            ) : null} */}
             <ArchivePanel>
               <ArchiveNativeAd />
             </ArchivePanel>
           </ContentFrame>
         )}
       </ScrollView>
+
+      {showCalendarExport && calendarShareModel.canExport ? (
+        <ShareCardHost pointerEvents="none">
+          <ReviewCalendarShareCard
+            ref={shareCardRef}
+            {...calendarShareModel.shareCardProps}
+          />
+        </ShareCardHost>
+      ) : null}
+
+      <ReviewCalendarPreviewModal
+        visible={isCalendarPreviewOpen}
+        onClose={() => setIsCalendarPreviewOpen(false)}
+        shareCardProps={calendarShareModel.shareCardProps}
+        shareMessage={calendarShareModel.shareMessage}
+        monthTitle={calendarShareModel.shareCardProps.monthTitle}
+      />
 
       <Modal
         transparent
@@ -227,32 +320,6 @@ function ReviewLogListScreen() {
                   {option.label}
                 </SortOptionLabel>
                 {sortKey === option.key ? (
-                  <Icon name="check" size={16} color={theme.colors.primary} />
-                ) : null}
-              </SortOption>
-            ))}
-          </SortSheet>
-        </SortModalRoot>
-      </Modal>
-
-      <Modal
-        transparent
-        visible={isPeriodOpen}
-        animationType="fade"
-        onRequestClose={() => setIsPeriodOpen(false)}>
-        <SortModalRoot>
-          <SortBackdrop onPress={() => setIsPeriodOpen(false)} />
-          <SortSheet>
-            {periodOptions.map((option, index) => (
-              <SortOption
-                key={option.key}
-                $isLast={index === periodOptions.length - 1}
-                $active={periodKey === option.key}
-                onPress={() => handleSelectPeriod(option.key)}>
-                <SortOptionLabel $active={periodKey === option.key}>
-                  {option.label}
-                </SortOptionLabel>
-                {periodKey === option.key ? (
                   <Icon name="check" size={16} color={theme.colors.primary} />
                 ) : null}
               </SortOption>
@@ -293,7 +360,7 @@ const ViewTabRow = styled.View`
   padding: 0 ${H_PAD}px 12px;
 `;
 
-const ViewTab = styled(Pressable) <{ $active: boolean }>`
+const ViewTab = styled(Pressable)<{ $active: boolean }>`
   flex: 1;
   align-items: center;
   justify-content: center;
@@ -315,10 +382,7 @@ const ViewTabLabel = styled.Text<{ $active: boolean }>`
     $active ? theme.colors.goldBright : theme.colors.dashboardText};
 `;
 
-const FilterRow = styled.View`
-  flex-direction: row;
-  flex-wrap: wrap;
-  gap: 8px;
+const SortFilterRow = styled.View`
   padding: 0 ${H_PAD}px 14px;
 `;
 
@@ -326,6 +390,7 @@ const FilterChip = styled(Pressable)`
   flex-direction: row;
   align-items: center;
   gap: 4px;
+  align-self: flex-start;
   padding: 8px 12px;
   border-radius: 999px;
   border-width: 1px;
@@ -364,16 +429,12 @@ const ListFrame = styled.View`
   padding: 4px 14px;
 `;
 
-const BannerSlot = styled.View`
-  margin-top: 4px;
-`;
-
 const SortModalRoot = styled.View`
   flex: 1;
   justify-content: flex-end;
 `;
 
-const SortBackdrop = styled(Pressable)`
+const SortBackdrop = styled.Pressable`
   position: absolute;
   top: 0;
   right: 0;
@@ -408,4 +469,11 @@ const SortOptionLabel = styled.Text<{ $active: boolean }>`
   font-size: 14px;
   color: ${({ theme, $active }) =>
     $active ? theme.colors.goldBright : theme.colors.goldSoft};
+`;
+
+const ShareCardHost = styled.View`
+  position: absolute;
+  top: -10000px;
+  left: 0;
+  opacity: 0;
 `;

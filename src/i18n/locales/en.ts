@@ -308,6 +308,12 @@ const translation = {
       title: "My logs",
       emptyAll: "No logs yet. Record your first film.",
       emptyPeriod: "No logs in the selected period.",
+      yearFilter: {
+        all: "All",
+      },
+      monthFilter: {
+        all: "All months",
+      },
     },
     calendar: {
       monthComplete: "You filled every slot this month",
@@ -316,6 +322,19 @@ const translation = {
       hint: "Tap an empty cell for that day, or a poster for details.",
       emptyDay: "This day is empty. Log a film to fill it with a poster.",
       emptyMonth: "No logs this month.",
+      saveImage: "Save to gallery",
+      shareImage: "Share",
+      shareTitle: "Filmolog film calendar",
+      shareMessage: "{{month}}/{{year}} · {{count}} films\n— Filmolog",
+      saveSuccess: "Saved to your photo library.",
+      saveFailed: "Couldn't save the image. Please try again.",
+      saveEmpty: "Nothing to save this month.",
+      permissionDenied: "Photo access is required. Allow it in Settings.",
+      saving: "Creating image…",
+      footerTagline: "Your film calendar — Filmolog",
+      previewTitle: "Calendar preview",
+      previewHeadline: "This month's film calendar",
+      previewHint: "A 9:16 image ready for Stories or chat.",
     },
     detail: {
       loadFailed: "Couldn't load this log.",
