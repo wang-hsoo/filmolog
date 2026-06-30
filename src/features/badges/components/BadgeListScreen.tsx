@@ -1,6 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, ScrollView } from 'react-native';
+import { Image, Pressable, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -16,7 +16,7 @@ import {
   type BadgeCategory,
   type BadgeId,
 } from '../../../components/constants/badge.constants';
-import { ArchiveBannerAd, ArchiveEmptyText, ArchiveNativeAd, Header } from '../../../components';
+import { ArchiveBannerAd, ArchiveEmptyText, ArchiveNativeAd, Header, ScreenLoadingView } from '../../../components';
 import {
   getBadgeCategoryLabel,
   getBadgeDescription,
@@ -75,7 +75,7 @@ function BadgeListScreen() {
 
           {isLoading ? (
             <LoaderWrap>
-              <ActivityIndicator color={theme.colors.primary} size="large" />
+              <ScreenLoadingView bare size={88} />
             </LoaderWrap>
           ) : isError ? (
             <ArchiveEmptyText>{t('badges.list.loadFailed')}</ArchiveEmptyText>

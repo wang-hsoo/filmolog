@@ -1,12 +1,12 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import styled from 'styled-components/native';
 
 import { RootStackParamList } from '../../../app/navigation/types';
-import { ArchiveEmptyText, Header } from '../../../components';
+import { ArchiveEmptyText, Header, ScreenLoadingView } from '../../../components';
 import { useAuth, useGetUserWishlist } from '../../../lib/supabase';
 import { getTmdbPosterUrl } from '../../../lib/tmdb/images';
 import { AppScreen, theme } from '../../../theme';
@@ -32,7 +32,7 @@ function WishlistListScreen() {
         <Content>
           {isLoading ? (
             <LoaderWrap>
-              <ActivityIndicator color={theme.colors.primary} size="large" />
+              <ScreenLoadingView bare size={88} />
             </LoaderWrap>
           ) : isError ? (
             <ArchiveEmptyText>

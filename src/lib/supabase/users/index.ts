@@ -15,5 +15,9 @@ export {
   getUserReviewedMovies,
   type UserReviewedMovie,
 } from './movie';
-export { useGetUserMovies, useGetUserReviewedMovies } from './movieQueries';
+export {
+  useCachedUserReviewedMovies,
+  useGetUserMovies,
+  useGetUserReviewedMovies,
+} from './movieQueries';
 export { DeleteAccountError, deleteUserAccount } from './account';

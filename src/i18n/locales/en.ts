@@ -22,6 +22,9 @@ const translation = {
       saveAction: "Save",
       saveWithCount: "Save ({{count}})",
     },
+    loading: {
+      spinner: "LOADING...",
+    },
     accessibility: {
       back: "Go back",
       settings: "Settings",
@@ -306,6 +309,8 @@ const translation = {
   review: {
     list: {
       title: "My logs",
+      loadingTitle: "Loading your logs",
+      loadingCaption: "Preparing your poster calendar…",
       emptyAll: "No logs yet. Record your first film.",
       emptyPeriod: "No logs in the selected period.",
       yearFilter: {

@@ -22,6 +22,7 @@ import {
   ArchiveSectionHeader,
   Header,
   MoviePosterNativeAd,
+  ScreenLoadingView,
 } from '../../../components';
 import { isListItemEntry, withAdSlots } from '../../../lib/ads';
 import { useAuth } from '../../../lib/supabase/auth';
@@ -300,7 +301,7 @@ function CollectionAddMoviesScreen() {
       <ListArea>
         {isLoading ? (
           <LoadingState>
-            <ActivityIndicator color={theme.colors.primary} />
+            <ScreenLoadingView bare size={80} />
           </LoadingState>
         ) : (
           <ArchiveListFrame>

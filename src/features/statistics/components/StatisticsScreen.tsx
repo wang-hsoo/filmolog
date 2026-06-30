@@ -1,6 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,6 +15,7 @@ import {
   ArchivePanel,
   ArchiveSectionHeader,
   Container,
+  ScreenLoadingView,
 } from '../../../components';
 import { formatRating } from '../../filmLog/utils/rating';
 import {
@@ -228,7 +229,7 @@ function StatisticsScreen() {
         <Content>
           {isReviewsLoading ? (
             <LoaderWrap>
-              <ActivityIndicator color={theme.colors.primary} size="large" />
+              <ScreenLoadingView bare size={88} />
             </LoaderWrap>
           ) : (
             <>

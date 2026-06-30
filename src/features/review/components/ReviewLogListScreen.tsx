@@ -1,6 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, type View } from 'react-native';
+import { Modal, Pressable, ScrollView, type View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -13,7 +13,7 @@ import {
   ArchivePanel,
   Header,
 } from '../../../components';
-import { useAuth, useGetUserReviewedMovies } from '../../../lib/supabase';
+import { useAuth, useCachedUserReviewedMovies, useGetUserReviewedMovies } from '../../../lib/supabase';
 import type { UserReviewedMovie } from '../../../lib/supabase/users/movie';
 import { AppScreen, theme } from '../../../theme';
 import { getReviewSortOptions, getReviewViewOptions } from '../../../i18n/labels';
@@ -39,15 +39,19 @@ import {
   type ReviewSortKey,
 } from '../utils/reviewLogUtils';
 import { buildCalendarShareModel } from '../utils/calendarShareExport';
+import { prefetchMonthReviewPosters } from '../utils/prefetchReviewPosters';
 import { shareCalendarGalleryImage } from '../utils/shareCalendarGallery';
+
+import ReviewLogLoadingView from './ReviewLogLoadingView';
 
 const H_PAD = 20;
 
 function ReviewLogListScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
+  const cachedReviews = useCachedUserReviewedMovies(user?.id);
   const shareCardRef = useRef<View>(null);
   const [viewMode, setViewMode] = useState<ReviewLogViewMode>('calendar');
   const [yearFilter, setYearFilter] = useState<ReviewLogYearFilter>('all');
@@ -61,15 +65,21 @@ function ReviewLogListScreen() {
     return startOfDay(new Date(today.getFullYear(), today.getMonth(), 1));
   });
 
-  const { data: reviews = [], isLoading } = useGetUserReviewedMovies(
-    user?.id ?? '',
-  );
+  const {
+    data: reviews,
+    isLoading: isReviewsLoading,
+  } = useGetUserReviewedMovies(user?.id ?? '');
 
-  const availableYears = useMemo(() => getAvailableLogYears(reviews), [reviews]);
+  const hasReviewData = reviews !== undefined || cachedReviews !== undefined;
+  const isLogsLoading = !hasReviewData && isReviewsLoading;
+
+  const resolvedReviews = reviews ?? cachedReviews ?? [];
+
+  const availableYears = useMemo(() => getAvailableLogYears(resolvedReviews), [resolvedReviews]);
 
   const filteredReviews = useMemo(
-    () => filterReviewsByYearMonth(reviews, yearFilter, monthFilter),
-    [monthFilter, reviews, yearFilter],
+    () => filterReviewsByYearMonth(resolvedReviews, yearFilter, monthFilter),
+    [monthFilter, resolvedReviews, yearFilter],
   );
 
   const sortedReviews = useMemo(
@@ -93,16 +103,23 @@ function ReviewLogListScreen() {
     }
   }, [calendarFocusMonth]);
 
+  useEffect(() => {
+    if (isLogsLoading || filteredReviews.length === 0) {
+      return;
+    }
+
+    prefetchMonthReviewPosters(filteredReviews, calendarVisibleMonth);
+  }, [calendarVisibleMonth, filteredReviews, isLogsLoading]);
+
   const calendarShareModel = useMemo(
     () =>
       buildCalendarShareModel({
         reviews: filteredReviews,
         visibleMonth: calendarVisibleMonth,
         t,
-        i18nLanguage: i18n.language,
         footerTagline: t('review.calendar.footerTagline'),
       }),
-    [calendarVisibleMonth, filteredReviews, i18n.language, t],
+    [calendarVisibleMonth, filteredReviews, t],
   );
 
   const sortOptions = useMemo(() => getReviewSortOptions(t), [t]);
@@ -184,7 +201,9 @@ function ReviewLogListScreen() {
         <ToolbarRow>
           <ToolbarTitle>{t('review.list.title')}</ToolbarTitle>
           <ToolbarMeta>
-            {t('common.units.filmCount', { count: filteredReviews.length })}
+            {isLogsLoading
+              ? '…'
+              : t('common.units.filmCount', { count: filteredReviews.length })}
           </ToolbarMeta>
         </ToolbarRow>
 
@@ -211,7 +230,7 @@ function ReviewLogListScreen() {
           onMonthChange={setMonthFilter}
         />
 
-        {showCalendarExport ? (
+        {showCalendarExport && !isLogsLoading ? (
           <ReviewCalendarExportBar
             disabled={!calendarShareModel.canExport}
             isBusy={isCalendarExporting}
@@ -235,14 +254,12 @@ function ReviewLogListScreen() {
           </SortFilterRow>
         ) : null}
 
-        {isLoading ? (
-          <LoadingState>
-            <ActivityIndicator color={theme.colors.primary} size="large" />
-          </LoadingState>
+        {isLogsLoading ? (
+          <ReviewLogLoadingView />
         ) : filteredReviews.length === 0 ? (
           <EmptyState>
             <ArchiveEmptyText>
-              {reviews.length === 0
+              {resolvedReviews.length === 0
                 ? t('review.list.emptyAll')
                 : t('review.list.emptyPeriod')}
             </ArchiveEmptyText>
@@ -402,13 +419,6 @@ const FilterChipLabel = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
   color: ${({ theme }) => theme.colors.dashboardText};
-`;
-
-const LoadingState = styled.View`
-  flex: 1;
-  min-height: 200px;
-  align-items: center;
-  justify-content: center;
 `;
 
 const EmptyState = styled.View`

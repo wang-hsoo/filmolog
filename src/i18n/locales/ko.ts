@@ -22,6 +22,9 @@ const translation = {
       saveAction: "저장하기",
       saveWithCount: "저장하기 ({{count}})",
     },
+    loading: {
+      spinner: "LOADING...",
+    },
     accessibility: {
       back: "뒤로",
       settings: "설정",
@@ -306,6 +309,8 @@ const translation = {
   review: {
     list: {
       title: "나의 기록",
+      loadingTitle: "기록을 불러오는 중",
+      loadingCaption: "포스터 달력을 준비하고 있어요.",
       emptyAll: "아직 남긴 기록이 없습니다. 첫 영화를 기록해보세요.",
       emptyPeriod: "선택한 기간에 해당하는 기록이 없습니다.",
       yearFilter: {

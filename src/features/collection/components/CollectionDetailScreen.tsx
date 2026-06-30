@@ -25,6 +25,7 @@ import {
   ArchiveEmptyText,
   COLLECTION_THEMES,
   Header,
+  ScreenLoadingView,
 } from '../../../components';
 import {
   useDeleteCollection,
@@ -335,7 +336,7 @@ function CollectionDetailScreen() {
 
       {isLoading ? (
         <LoadingState>
-          <ActivityIndicator color={theme.colors.primary} size="large" />
+          <ScreenLoadingView bare size={88} />
         </LoadingState>
       ) : isError || !collection ? (
         <ErrorState>

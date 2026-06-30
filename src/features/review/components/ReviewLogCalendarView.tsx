@@ -30,6 +30,7 @@ import {
   getReviewDateKey,
   indexReviewsByDate,
 } from '../utils/reviewLogUtils';
+import { prefetchMonthReviewPosters } from '../utils/prefetchReviewPosters';
 
 export type ReviewLogCalendarViewProps = {
   reviews: UserReviewedMovie[];
@@ -80,13 +81,13 @@ function CalendarPosterDay({
           <PosterStack>
             {secondaryPosterUri ? (
               <BackPoster
-                source={{ uri: secondaryPosterUri }}
+                source={{ uri: secondaryPosterUri, priority: FastImage.priority.high }}
                 resizeMode={FastImage.resizeMode.cover}
               />
             ) : null}
             {posterUri ? (
               <FrontPoster
-                source={{ uri: posterUri }}
+                source={{ uri: posterUri, priority: FastImage.priority.high }}
                 resizeMode={FastImage.resizeMode.cover}
               />
             ) : (
@@ -137,7 +138,7 @@ function PosterMosaicTile({ review, onPress }: PosterMosaicTileProps) {
       <MosaicPosterMat>
         {posterUri ? (
           <MosaicPoster
-            source={{ uri: posterUri }}
+            source={{ uri: posterUri, priority: FastImage.priority.normal }}
             resizeMode={FastImage.resizeMode.cover}
           />
         ) : (
@@ -195,6 +196,10 @@ function ReviewLogCalendarView({
     () => filterReviewsInMonth(reviews, visibleMonth),
     [reviews, visibleMonth],
   );
+
+  useEffect(() => {
+    prefetchMonthReviewPosters(reviews, visibleMonth);
+  }, [reviews, visibleMonth]);
 
   const dayReviews = useMemo(() => {
     if (!selectedDateKey) {

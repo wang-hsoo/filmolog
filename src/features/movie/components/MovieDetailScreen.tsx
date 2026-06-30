@@ -19,6 +19,7 @@ import {
   ArchivePanel,
   ArchiveSectionHeader,
   Header,
+  ScreenLoadingView,
 } from '../../../components';
 import {
   formatRating,
@@ -169,7 +170,7 @@ function MovieDetailScreen() {
 
       {isLoading ? (
         <LoadingState>
-          <ActivityIndicator color={theme.colors.primary} size="large" />
+          <ScreenLoadingView bare size={88} />
         </LoadingState>
       ) : isError || !movieDetail ? (
         <ErrorState>

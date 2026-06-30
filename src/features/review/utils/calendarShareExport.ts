@@ -40,7 +40,6 @@ type BuildCalendarShareModelInput = {
   visibleMonth: Date;
   today?: Date;
   t: TFunction;
-  i18nLanguage: string;
   footerTagline: string;
 };
 
@@ -49,7 +48,6 @@ export function buildCalendarShareModel({
   visibleMonth,
   today = startOfDay(new Date()),
   t,
-  i18nLanguage,
   footerTagline,
 }: BuildCalendarShareModelInput): CalendarShareModel {
   const reviewsByDate = indexReviewsByDate(reviews);
@@ -118,11 +116,6 @@ export function buildCalendarShareModel({
     month: visibleMonth.getMonth() + 1,
   });
 
-  const shareMonthLabel = new Intl.DateTimeFormat(
-    i18nLanguage === 'en' ? 'en-US' : 'ko-KR',
-    { month: 'long' },
-  ).format(visibleMonth);
-
   const shareProgressLabel = t('common.units.monthProgress', {
     filledDays,
     eligibleDays,
@@ -149,8 +142,6 @@ export function buildCalendarShareModel({
     },
     shareCardProps: {
       monthTitle: shareMonthTitle,
-      yearLabel: String(visibleMonth.getFullYear()),
-      monthLabel: shareMonthLabel,
       progressLabel: shareProgressLabel,
       captionLabel: shareCaptionLabel,
       weekdayLabels: getWeekdayLabels(t),

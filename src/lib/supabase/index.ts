@@ -20,6 +20,7 @@ export {
   useGetUserStats,
   getUserFavoriteGenres,
   useGetUserFavoriteGenres,
+  useCachedUserReviewedMovies,
   useGetUserReviewedMovies,
   DeleteAccountError,
   deleteUserAccount,

@@ -1,7 +1,6 @@
 import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { useCallback, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
   Image,
   ImageBackground,
   Modal,
@@ -18,6 +17,7 @@ import {
   ArchiveEmptyText,
   COLLECTION_THEMES,
   Header,
+  ScreenLoadingView,
 } from '../../../components';
 import { useAuth } from '../../../lib/supabase';
 import {
@@ -199,7 +199,7 @@ function CollectionListScreen() {
 
         {isLoading ? (
           <LoadingState>
-            <ActivityIndicator color={theme.colors.primary} size="large" />
+            <ScreenLoadingView bare size={88} />
           </LoadingState>
         ) : sortedCollections.length === 0 ? (
           <EmptyState>

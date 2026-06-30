@@ -1,6 +1,5 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import {
-  ActivityIndicator,
   InteractionManager,
   StyleSheet,
 } from 'react-native';
@@ -12,6 +11,7 @@ import {
   useAuth,
   useProfileContext,
 } from '../../lib/supabase';
+import { ScreenLoadingView } from '../../components';
 import { AppScreen, theme } from '../../theme';
 
 import type { RootStackParamList } from './types';
@@ -39,7 +39,7 @@ const RootStack = createStackNavigator<RootStackParamList>();
 function BootstrapLoader() {
   return (
     <AppScreen style={styles.centered}>
-      <ActivityIndicator color={theme.colors.primary} size="large" />
+      <ScreenLoadingView bare size={96} />
     </AppScreen>
   );
 }

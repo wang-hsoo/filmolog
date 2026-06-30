@@ -27,6 +27,7 @@ import {
   ArchiveSectionHeader,
   Header,
   REACTION_ICONS,
+  ScreenLoadingView,
 } from '../../../components';
 import type { ReactionKey } from '../../../components/constants/reaction.constants';
 import ReviewForm from '../../filmLog/components/ReviewForm';
@@ -310,7 +311,7 @@ function ReviewDetailScreen() {
 
       {isLoading ? (
         <LoadingState>
-          <ActivityIndicator color={theme.colors.primary} size="large" />
+          <ScreenLoadingView bare size={88} />
         </LoadingState>
       ) : isError || !review ? (
         <ErrorState>

@@ -21,8 +21,6 @@ export type CalendarShareDayCell = {
 
 export type ReviewCalendarShareCardProps = {
   monthTitle: string;
-  yearLabel: string;
-  monthLabel: string;
   progressLabel: string;
   captionLabel: string;
   weekdayLabels: string[];
@@ -46,8 +44,6 @@ const ReviewCalendarShareCard = forwardRef<View, ReviewCalendarShareCardProps>(
   (
     {
       monthTitle,
-      yearLabel,
-      monthLabel,
       progressLabel,
       captionLabel,
       weekdayLabels,
@@ -72,7 +68,6 @@ const ReviewCalendarShareCard = forwardRef<View, ReviewCalendarShareCardProps>(
     }, [progressLabel]);
 
     const weekRows = useMemo(() => chunkWeekRows(days), [days]);
-    const moodPosters = highlightPosterUris.slice(0, 4);
     const stripPosters = highlightPosterUris.slice(0, 5);
 
     return (
@@ -82,138 +77,108 @@ const ReviewCalendarShareCard = forwardRef<View, ReviewCalendarShareCardProps>(
         style={{
           width: CALENDAR_SHARE_CARD_WIDTH,
           height: CALENDAR_SHARE_CARD_HEIGHT,
-          backgroundColor: '#050504',
         }}>
-        <CanvasRoot>
-          {moodPosters.map((uri, index) => (
-            <MoodPosterWrap
-              key={`${uri}-${index}`}
-              $index={index}
-              $total={moodPosters.length}>
-              <MoodPoster
-                source={{ uri }}
-                resizeMode={FastImage.resizeMode.cover}
-              />
-            </MoodPosterWrap>
-          ))}
+        <LinearGradient
+          colors={['#17130F', '#0E0C0A', '#060605']}
+          locations={[0, 0.55, 1]}
+          style={{ flex: 1 }}>
+          <CanvasInner>
+            <TopRow>
+              <BrandMark>FILMOLOG</BrandMark>
+              <FilmCountPill>{filmCountLabel}</FilmCountPill>
+            </TopRow>
 
-          <LinearGradient
-            colors={[
-              'rgba(5, 5, 4, 0.55)',
-              'rgba(8, 7, 6, 0.82)',
-              'rgba(5, 5, 4, 0.92)',
-            ]}
-            locations={[0, 0.45, 1]}
-            style={{ flex: 1 }}>
-            <GlowOrb $side="left" />
-            <GlowOrb $side="right" />
+            <TitleBlock>
+              <MonthTitle>{monthTitle}</MonthTitle>
+              <ProgressRow>
+                <ProgressTrack>
+                  <ProgressFill $ratio={progressRatio} />
+                </ProgressTrack>
+                <ProgressLabel>{progressLabel}</ProgressLabel>
+              </ProgressRow>
+              <CaptionLabel>{captionLabel}</CaptionLabel>
+            </TitleBlock>
 
-            <CanvasInner>
-              <TopRow>
-                <BrandMark>FILMOLOG</BrandMark>
-                <FilmCountPill>{filmCountLabel}</FilmCountPill>
-              </TopRow>
+            <CalendarBlock>
+              <WeekdayRow>
+                {weekdayLabels.map(label => (
+                  <WeekdayCell key={label}>
+                    <WeekdayLabel>{label}</WeekdayLabel>
+                  </WeekdayCell>
+                ))}
+              </WeekdayRow>
 
-              <HeroBlock>
-                <YearLabel>{yearLabel}</YearLabel>
-                <MonthTitle>{monthLabel}</MonthTitle>
-                <HeroCaption>{captionLabel}</HeroCaption>
-
-                <StatsRow>
-                  <StatChip>
-                    <StatChipValue>{progressLabel}</StatChipValue>
-                  </StatChip>
-                  <ProgressTrack>
-                    <ProgressFill $ratio={progressRatio} />
-                  </ProgressTrack>
-                </StatsRow>
-              </HeroBlock>
-
-              <CalendarBlock>
-                <WeekdayRow>
-                  {weekdayLabels.map(label => (
-                    <WeekdayCell key={label}>
-                      <WeekdayLabel>{label}</WeekdayLabel>
-                    </WeekdayCell>
-                  ))}
-                </WeekdayRow>
-
-                <Grid>
-                  {weekRows.map((row, rowIndex) => (
-                    <GridRow key={`row-${rowIndex}`}>
-                      {row.map(cell =>
-                        cell.day == null ? (
-                          <GridSpacer key={cell.key} />
-                        ) : (
-                          <DayCell
-                            key={cell.key}
-                            $hasPoster={Boolean(cell.posterUri)}>
-                            {cell.posterUri ? (
-                              <>
-                                <DayPoster
-                                  source={{ uri: cell.posterUri }}
-                                  resizeMode={FastImage.resizeMode.cover}
-                                />
-                                <DayShade />
-                                <DayBadge $today={cell.isToday}>
-                                  <DayBadgeLabel $today={cell.isToday}>
-                                    {cell.day}
-                                  </DayBadgeLabel>
-                                </DayBadge>
-                                {cell.reviewCount > 1 ? (
-                                  <CountBadge>
-                                    <CountBadgeLabel>
-                                      +{cell.reviewCount - 1}
-                                    </CountBadgeLabel>
-                                  </CountBadge>
-                                ) : null}
-                              </>
-                            ) : (
-                              <EmptyDay
+              <Grid>
+                {weekRows.map((row, rowIndex) => (
+                  <GridRow key={`row-${rowIndex}`}>
+                    {row.map(cell =>
+                      cell.day == null ? (
+                        <GridSpacer key={cell.key} />
+                      ) : (
+                        <DayCell
+                          key={cell.key}
+                          $hasPoster={Boolean(cell.posterUri)}>
+                          {cell.posterUri ? (
+                            <>
+                              <DayPoster
+                                source={{ uri: cell.posterUri }}
+                                resizeMode={FastImage.resizeMode.cover}
+                              />
+                              <DayShade />
+                              <DayBadge $today={cell.isToday}>
+                                <DayBadgeLabel $today={cell.isToday}>
+                                  {cell.day}
+                                </DayBadgeLabel>
+                              </DayBadge>
+                              {cell.reviewCount > 1 ? (
+                                <CountBadge>
+                                  <CountBadgeLabel>
+                                    +{cell.reviewCount - 1}
+                                  </CountBadgeLabel>
+                                </CountBadge>
+                              ) : null}
+                            </>
+                          ) : (
+                            <EmptyDay
+                              $today={cell.isToday}
+                              $future={cell.isFuture}>
+                              <EmptyDayLabel
                                 $today={cell.isToday}
                                 $future={cell.isFuture}>
-                                <EmptyDayLabel
-                                  $today={cell.isToday}
-                                  $future={cell.isFuture}>
-                                  {cell.day}
-                                </EmptyDayLabel>
-                              </EmptyDay>
-                            )}
-                          </DayCell>
-                        ),
-                      )}
-                    </GridRow>
+                                {cell.day}
+                              </EmptyDayLabel>
+                            </EmptyDay>
+                          )}
+                        </DayCell>
+                      ),
+                    )}
+                  </GridRow>
+                ))}
+              </Grid>
+            </CalendarBlock>
+
+            <BottomBlock>
+              {stripPosters.length > 0 ? (
+                <FilmStrip>
+                  {stripPosters.map((uri, index) => (
+                    <StripPosterWrap
+                      key={`${uri}-${index}`}
+                      $index={index}
+                      $total={stripPosters.length}>
+                      <StripPoster
+                        source={{ uri }}
+                        resizeMode={FastImage.resizeMode.cover}
+                      />
+                    </StripPosterWrap>
                   ))}
-                </Grid>
-              </CalendarBlock>
+                </FilmStrip>
+              ) : null}
 
-              <BottomBlock>
-                {stripPosters.length > 0 ? (
-                  <FilmStrip>
-                    {stripPosters.map((uri, index) => (
-                      <StripPosterWrap
-                        key={`${uri}-${index}`}
-                        $index={index}
-                        $total={stripPosters.length}>
-                        <StripPoster
-                          source={{ uri }}
-                          resizeMode={FastImage.resizeMode.cover}
-                        />
-                      </StripPosterWrap>
-                    ))}
-                  </FilmStrip>
-                ) : null}
-
-                <FooterRow>
-                  <FooterDot />
-                  <FooterTagline>{footerTagline}</FooterTagline>
-                  <FooterDot />
-                </FooterRow>
-                <FooterMonth>{monthTitle}</FooterMonth>
-              </BottomBlock>
-            </CanvasInner>
-          </LinearGradient>
-        </CanvasRoot>
+              <FooterRule />
+              <FooterTagline>{footerTagline}</FooterTagline>
+            </BottomBlock>
+          </CanvasInner>
+        </LinearGradient>
       </View>
     );
   },
@@ -222,74 +187,6 @@ const ReviewCalendarShareCard = forwardRef<View, ReviewCalendarShareCardProps>(
 ReviewCalendarShareCard.displayName = 'ReviewCalendarShareCard';
 
 export default ReviewCalendarShareCard;
-
-const CanvasRoot = styled.View`
-  flex: 1;
-  overflow: hidden;
-  background-color: #050504;
-`;
-
-const MoodPosterWrap = styled.View<{ $index: number; $total: number }>`
-  position: absolute;
-  width: ${({ $total }) => ($total <= 2 ? 52 : 44)}%;
-  aspect-ratio: 0.68;
-  border-radius: 14px;
-  overflow: hidden;
-  opacity: 0.22;
-  top: ${({ $index }) => {
-    if ($index === 0) {
-      return '-4%';
-    }
-    if ($index === 1) {
-      return '8%';
-    }
-    if ($index === 2) {
-      return '62%';
-    }
-    return '72%';
-  }};
-  left: ${({ $index }) => {
-    if ($index === 0) {
-      return '-8%';
-    }
-    if ($index === 1) {
-      return '58%';
-    }
-    if ($index === 2) {
-      return '-6%';
-    }
-    return '62%';
-  }};
-  transform: rotate(
-    ${({ $index }) => {
-      if ($index === 0) {
-        return '-8deg';
-      }
-      if ($index === 1) {
-        return '6deg';
-      }
-      if ($index === 2) {
-        return '5deg';
-      }
-      return '-5deg';
-    }}
-  );
-`;
-
-const MoodPoster = styled(FastImage)`
-  width: 100%;
-  height: 100%;
-`;
-
-const GlowOrb = styled.View<{ $side: 'left' | 'right' }>`
-  position: absolute;
-  top: ${({ $side }) => ($side === 'left' ? '12%' : '58%')};
-  ${({ $side }) => ($side === 'left' ? 'left: -18%' : 'right: -18%')};
-  width: 46%;
-  aspect-ratio: 1;
-  border-radius: 999px;
-  background-color: rgba(184, 149, 107, 0.08);
-`;
 
 const CanvasInner = styled.View`
   flex: 1;
@@ -300,83 +197,49 @@ const TopRow = styled.View`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 `;
 
 const BrandMark = styled.Text`
   font-family: GowunBatang-Bold;
-  font-size: 11px;
-  letter-spacing: 5px;
-  color: rgba(184, 149, 107, 0.88);
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: #b8956b;
 `;
 
 const FilmCountPill = styled.Text`
-  padding: 5px 11px;
+  padding: 5px 10px;
   border-radius: 999px;
   overflow: hidden;
   font-family: Pretendard-Medium;
-  font-size: 10px;
-  color: #dcc9a8;
-  background-color: rgba(184, 149, 107, 0.1);
-  border-width: 1px;
-  border-color: rgba(184, 149, 107, 0.28);
-`;
-
-const HeroBlock = styled.View`
-  align-items: center;
-  margin-bottom: 14px;
-  gap: 4px;
-`;
-
-const YearLabel = styled.Text`
-  font-family: Pretendard-Regular;
   font-size: 11px;
-  letter-spacing: 3px;
-  color: rgba(184, 149, 107, 0.72);
+  color: #d9c4a0;
+  background-color: rgba(184, 149, 107, 0.12);
+  border-width: 1px;
+  border-color: #3d3226;
+`;
+
+const TitleBlock = styled.View`
+  margin-bottom: 12px;
+  gap: 8px;
 `;
 
 const MonthTitle = styled.Text`
   font-family: GowunBatang-Bold;
-  font-size: 36px;
-  line-height: 42px;
-  color: #f5efe6;
-  text-align: center;
+  font-size: 28px;
+  line-height: 34px;
+  color: #f2ebe0;
 `;
 
-const HeroCaption = styled.Text`
-  margin-top: 2px;
-  font-family: GowunBatang-Regular;
-  font-size: 12px;
-  line-height: 18px;
-  color: rgba(168, 155, 142, 0.88);
-  text-align: center;
-`;
-
-const StatsRow = styled.View`
-  width: 100%;
-  margin-top: 10px;
-  gap: 8px;
+const ProgressRow = styled.View`
+  flex-direction: row;
   align-items: center;
-`;
-
-const StatChip = styled.View`
-  padding: 6px 14px;
-  border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.04);
-  border-width: 1px;
-  border-color: rgba(184, 149, 107, 0.18);
-`;
-
-const StatChipValue = styled.Text`
-  font-family: Pretendard-Regular;
-  font-size: 11px;
-  color: #c4b5a3;
-  letter-spacing: 0.3px;
+  gap: 10px;
 `;
 
 const ProgressTrack = styled.View`
-  width: 72%;
-  height: 3px;
+  flex: 1;
+  height: 5px;
   border-radius: 999px;
   background-color: rgba(255, 255, 255, 0.06);
   overflow: hidden;
@@ -389,6 +252,19 @@ const ProgressFill = styled.View<{ $ratio: number }>`
   background-color: #b8956b;
 `;
 
+const ProgressLabel = styled.Text`
+  font-family: Pretendard-Regular;
+  font-size: 11px;
+  color: #a89b8e;
+`;
+
+const CaptionLabel = styled.Text`
+  font-family: Pretendard-Regular;
+  font-size: 11px;
+  line-height: 16px;
+  color: #7a6f63;
+`;
+
 const CalendarBlock = styled.View`
   flex: 1;
   min-height: 0;
@@ -397,6 +273,7 @@ const CalendarBlock = styled.View`
 
 const WeekdayRow = styled.View`
   flex-direction: row;
+  margin-bottom: 2px;
   padding: 0 1px;
 `;
 
@@ -407,9 +284,8 @@ const WeekdayCell = styled.View`
 
 const WeekdayLabel = styled.Text`
   font-family: Pretendard-Regular;
-  font-size: 9px;
-  letter-spacing: 0.5px;
-  color: rgba(122, 111, 99, 0.92);
+  font-size: 10px;
+  color: #7a6f63;
 `;
 
 const Grid = styled.View`
@@ -430,12 +306,10 @@ const GridSpacer = styled.View`
 
 const DayCell = styled.View<{ $hasPoster: boolean }>`
   flex: 1;
-  border-radius: 7px;
+  border-radius: 8px;
   overflow: hidden;
   border-width: ${({ $hasPoster }) => ($hasPoster ? 1 : 0.5)}px;
-  border-color: ${({ $hasPoster }) =>
-    $hasPoster ? 'rgba(74, 61, 48, 0.9)' : 'rgba(42, 35, 28, 0.85)'};
-  background-color: rgba(255, 255, 255, 0.02);
+  border-color: ${({ $hasPoster }) => ($hasPoster ? '#4a3d30' : '#2a231c')};
 `;
 
 const DayPoster = styled(FastImage)`
@@ -443,24 +317,22 @@ const DayPoster = styled(FastImage)`
   height: 100%;
 `;
 
-const DayShade = styled(LinearGradient).attrs({
-  colors: ['transparent', 'rgba(0, 0, 0, 0.45)'],
-  locations: [0.35, 1],
-})`
+const DayShade = styled.View`
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 50%;
+  height: 40%;
+  background-color: rgba(0, 0, 0, 0.28);
 `;
 
 const DayBadge = styled.View<{ $today: boolean }>`
   position: absolute;
-  top: 3px;
-  left: 3px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 3px;
+  top: 4px;
+  left: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
   border-radius: 999px;
   align-items: center;
   justify-content: center;
@@ -470,49 +342,48 @@ const DayBadge = styled.View<{ $today: boolean }>`
 
 const DayBadgeLabel = styled.Text<{ $today: boolean }>`
   font-family: Pretendard-SemiBold;
-  font-size: 9px;
+  font-size: 10px;
   color: ${({ $today }) => ($today ? '#080807' : '#f2ebe0')};
 `;
 
 const CountBadge = styled.View`
   position: absolute;
-  right: 3px;
-  bottom: 3px;
-  min-width: 16px;
-  height: 14px;
-  padding: 0 3px;
+  right: 4px;
+  bottom: 4px;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 4px;
   border-radius: 999px;
   align-items: center;
   justify-content: center;
-  background-color: rgba(8, 8, 7, 0.84);
+  background-color: rgba(8, 8, 7, 0.82);
   border-width: 1px;
-  border-color: rgba(184, 149, 107, 0.35);
+  border-color: #4a3d30;
 `;
 
 const CountBadgeLabel = styled.Text`
   font-family: Pretendard-SemiBold;
-  font-size: 8px;
-  color: #dcc9a8;
+  font-size: 9px;
+  color: #d9c4a0;
 `;
 
 const EmptyDay = styled.View<{ $today: boolean; $future: boolean }>`
   flex: 1;
   align-items: center;
   justify-content: center;
-  border-radius: 5px;
+  border-radius: 6px;
   border-width: 1px;
   border-style: dashed;
-  border-color: ${({ $today }) =>
-    $today ? 'rgba(138, 112, 82, 0.85)' : 'rgba(42, 35, 28, 0.9)'};
+  border-color: ${({ $today }) => ($today ? '#8a7052' : '#2a231c')};
   background-color: ${({ $today }) =>
-    $today ? 'rgba(184, 149, 107, 0.06)' : 'rgba(255, 255, 255, 0.015)'};
-  opacity: ${({ $future }) => ($future ? 0.42 : 1)};
+    $today ? 'rgba(184, 149, 107, 0.08)' : 'rgba(255, 255, 255, 0.02)'};
+  opacity: ${({ $future }) => ($future ? 0.45 : 1)};
 `;
 
 const EmptyDayLabel = styled.Text<{ $today: boolean; $future: boolean }>`
   font-family: ${({ $today }) =>
     $today ? 'Pretendard-SemiBold' : 'Pretendard-Regular'};
-  font-size: 10px;
+  font-size: 11px;
   color: ${({ $today, $future }) => {
     if ($today) {
       return '#d9c4a0';
@@ -573,30 +444,15 @@ const StripPoster = styled(FastImage)`
   height: 100%;
 `;
 
-const FooterRow = styled.View`
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-`;
-
-const FooterDot = styled.View`
-  width: 3px;
-  height: 3px;
-  border-radius: 999px;
-  background-color: rgba(184, 149, 107, 0.55);
+const FooterRule = styled.View`
+  width: 100%;
+  height: 1px;
+  background-color: #3d3226;
 `;
 
 const FooterTagline = styled.Text`
-  font-family: GowunBatang-Regular;
-  font-size: 11px;
-  color: rgba(184, 149, 107, 0.78);
-  letter-spacing: 0.2px;
-`;
-
-const FooterMonth = styled.Text`
+  text-align: center;
   font-family: Pretendard-Regular;
-  font-size: 9px;
-  letter-spacing: 2px;
-  color: rgba(122, 111, 99, 0.72);
-  text-transform: uppercase;
+  font-size: 11px;
+  color: #8a7052;
 `;

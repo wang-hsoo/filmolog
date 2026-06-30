@@ -6,7 +6,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 import { RootStackParamList } from '../../../app/navigation/types';
-import { ArchiveSectionHeader, Header } from '../../../components';
+import {
+  ArchiveSectionHeader,
+  Header,
+} from '../../../components';
 import { useProfileContext } from '../../../lib/supabase';
 import { useGetGenres } from '../../../lib/tmdb';
 import { archiveAlert } from '../../../lib/dialog/archiveDialog';
