@@ -35,16 +35,10 @@ function waitForPosterWarmup(timeoutMs = 1200) {
   });
 }
 
+/** Android 9 이하에서만 갤러리 쓰기 권한 요청. API 29+는 MediaStore insert로 READ 불필요 */
 async function ensureAndroidSavePermission() {
-  if (Platform.OS !== 'android') {
+  if (Platform.OS !== 'android' || Platform.Version >= 29) {
     return true;
-  }
-
-  if (Platform.Version >= 33) {
-    const result = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
-    );
-    return result === PermissionsAndroid.RESULTS.GRANTED;
   }
 
   if (Platform.Version >= 23) {

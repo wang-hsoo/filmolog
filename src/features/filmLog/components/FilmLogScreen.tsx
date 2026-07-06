@@ -409,9 +409,9 @@ function FilmLogScreen() {
           ) : null}
 
           
-          <ArchivePanel>
+          {!isSearching && <ArchivePanel>
             <ArchiveNativeAd />
-          </ArchivePanel>
+          </ArchivePanel>}
 
 
           {isSearching ? (
