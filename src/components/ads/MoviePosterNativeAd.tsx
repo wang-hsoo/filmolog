@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 import {
   NativeAd,
   NativeAdView,
@@ -109,10 +109,7 @@ function MoviePosterNativeAd({
       <NativeAdView nativeAd={nativeAd}>
         <ShelfPosterMat $width={frameSize} $height={frameHeight}>
           <ShelfPosterFrame $width={width} $height={posterHeight}>
-            <NativeMediaView
-              resizeMode="cover"
-              style={{ width: '100%', height: '100%' }}
-            />
+            <NativeMediaView resizeMode="cover" style={styles.media} />
             <AdBadge>
               <AdBadgeText>Ad</AdBadgeText>
             </AdBadge>
@@ -161,10 +158,7 @@ function ListRowNativeAd({ nativeAd }: { nativeAd: NativeAd | null }) {
     <NativeAdView nativeAd={nativeAd}>
       <ListRowRoot>
         <ListRowPosterMat>
-          <NativeMediaView
-            resizeMode="cover"
-            style={{ width: '100%', height: '100%' }}
-          />
+          <NativeMediaView resizeMode="cover" style={styles.media} />
           <AdBadge>
             <AdBadgeText>Ad</AdBadgeText>
           </AdBadge>
@@ -189,6 +183,12 @@ function ListRowNativeAd({ nativeAd }: { nativeAd: NativeAd | null }) {
 
 export default MoviePosterNativeAd;
 
+const styles = StyleSheet.create({
+  media: {
+    ...StyleSheet.absoluteFill,
+  },
+});
+
 const ShelfContainer = styled.View<{
   $width: number;
   $variant: 'row' | 'grid';
@@ -211,6 +211,7 @@ const ShelfPosterMat = styled.View<{ $width: number; $height: number }>`
 `;
 
 const ShelfPosterFrame = styled.View<{ $width: number; $height: number }>`
+  position: relative;
   width: ${({ $width }) => $width}px;
   height: ${({ $height }) => $height}px;
   border-radius: ${({ theme }) => theme.radii.poster}px;

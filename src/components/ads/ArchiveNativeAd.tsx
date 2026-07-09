@@ -6,6 +6,7 @@ import {
   NativeAssetType,
   NativeMediaView,
 } from 'react-native-google-mobile-ads';
+import { StyleSheet } from 'react-native';
 import styled from 'styled-components/native';
 
 import { AD_UNITS } from '../../lib/ads';
@@ -54,7 +55,7 @@ function ArchiveNativeAd() {
       <NativeAdView nativeAd={nativeAd}>
         <ContentRow>
           <MediaWrap>
-            <NativeMediaView resizeMode="cover" style={{ width: '100%', height: '100%' }} />
+            <NativeMediaView resizeMode="cover" style={styles.media} />
           </MediaWrap>
 
           <CopyCol>
@@ -79,6 +80,12 @@ function ArchiveNativeAd() {
 }
 
 export default ArchiveNativeAd;
+
+const styles = StyleSheet.create({
+  media: {
+    ...StyleSheet.absoluteFill,
+  },
+});
 
 const Card = styled.View`
   border-width: 1px;
