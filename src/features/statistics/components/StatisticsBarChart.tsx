@@ -70,7 +70,7 @@ const BarColumn = styled.View`
 const BarValue = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.primaryMuted};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const BarTrack = styled.View`
@@ -94,5 +94,5 @@ const BarFill = styled.View`
 const BarLabel = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;

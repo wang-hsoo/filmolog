@@ -93,7 +93,7 @@ const PageSubtitle = styled.Text`
   font-size: 13px;
   line-height: 20px;
   letter-spacing: 0.2px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const GoldRule = styled.View`
@@ -126,14 +126,14 @@ const SectionSubtitle = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 13px;
   line-height: 20px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const EmptyText = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 13px;
   line-height: 20px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 export const ArchiveSearchPanel = styled.View`

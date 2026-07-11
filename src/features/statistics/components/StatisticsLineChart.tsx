@@ -156,7 +156,7 @@ const LabelSlot = styled.View`
 const AxisLabel = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 10px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
   text-align: center;
 `;
 
@@ -164,6 +164,6 @@ const AxisValue = styled.Text`
   margin-top: 2px;
   font-family: ${({ theme }) => theme.fonts.bodyMedium};
   font-size: 10px;
-  color: ${({ theme }) => theme.colors.primaryMuted};
+  color: ${({ theme }) => theme.colors.goldSoft};
   text-align: center;
 `;

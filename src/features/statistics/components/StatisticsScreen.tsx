@@ -694,7 +694,7 @@ const SummaryItem = styled.View`
 const SummaryLabel = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const SummaryValue = styled.Text`
@@ -708,7 +708,7 @@ const InsightText = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 13px;
   line-height: 20px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const GenreNote = styled.Text`
@@ -716,7 +716,7 @@ const GenreNote = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 11px;
   line-height: 16px;
-  color: ${({ theme }) => theme.colors.primaryMuted};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const HighlightList = styled.View`
@@ -776,7 +776,7 @@ const HighlightTitle = styled.Text`
 const HighlightRating = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.primaryMuted};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const BadgeSummaryRow = styled.View`
@@ -793,7 +793,7 @@ const BadgeSummaryRow = styled.View`
 const BadgeSummaryLabel = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 13px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const BadgeSummaryValue = styled.Text`

@@ -295,7 +295,7 @@ const JoinedAt = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
   letter-spacing: 0.2px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const GenreRow = styled.View`
@@ -324,7 +324,7 @@ const Tagline = styled.Text`
   font-size: 13px;
   line-height: 20px;
   letter-spacing: 0.2px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const StatsRow = styled.View`
@@ -351,7 +351,7 @@ const StatItemLabel = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
   letter-spacing: 0.2px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
   text-align: center;
 `;
 
@@ -404,5 +404,5 @@ const MenuLabel = styled.Text`
 const MenuSubtitle = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;

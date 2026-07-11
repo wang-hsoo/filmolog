@@ -57,7 +57,7 @@ const EmptyText = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 13px;
   line-height: 20px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const ProfileList = styled.View`
@@ -97,5 +97,5 @@ const ProfileFill = styled.View`
 const ProfileMeta = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 11px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;

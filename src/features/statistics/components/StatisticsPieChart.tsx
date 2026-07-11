@@ -167,5 +167,5 @@ const LegendLabel = styled.Text`
 const LegendValue = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.primaryMuted};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;

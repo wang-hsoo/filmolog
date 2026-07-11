@@ -92,7 +92,7 @@ const RankName = styled.Text`
 const RankMeta = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.primaryMuted};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const RankTrack = styled.View`

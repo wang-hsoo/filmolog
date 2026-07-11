@@ -365,7 +365,7 @@ const SupportNotice = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
   line-height: 18px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const MenuPanel = styled.View`
@@ -424,11 +424,11 @@ const MenuLabel = styled.Text<{ $danger?: boolean }>`
 const MenuSubtitle = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 12px;
-  color: ${({ theme }) => theme.colors.dashboardText};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
 
 const VersionText = styled.Text`
   font-family: ${({ theme }) => theme.fonts.bodyLight};
   font-size: 14px;
-  color: ${({ theme }) => theme.colors.primaryMuted};
+  color: ${({ theme }) => theme.colors.goldSoft};
 `;
