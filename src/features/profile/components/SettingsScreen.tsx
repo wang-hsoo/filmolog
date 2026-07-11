@@ -24,8 +24,7 @@ import {
   useAuth,
 } from '../../../lib/supabase';
 import { AppScreen, theme } from '../../../theme';
-
-const APP_VERSION = '0.0.1';
+import { getAppVersion } from '../../../lib/version';
 
 function SettingsScreen() {
   const { t } = useTranslation();
@@ -34,6 +33,7 @@ function SettingsScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
+  const appVersion = getAppVersion();
 
   const handleLogout = () => {
     archiveAlert(t('dialogs.logout.title'), t('dialogs.logout.message'), [
@@ -97,7 +97,7 @@ function SettingsScreen() {
     (type: FeedbackFormType) => {
       void openFeedbackForm({
         type,
-        appVersion: APP_VERSION,
+        appVersion: appVersion,
         userId: user?.id,
       }).catch(error => {
         console.error('[SettingsScreen] openFeedbackForm failed', error);
@@ -250,7 +250,7 @@ function SettingsScreen() {
                 <MenuLabel>{t('settings.app.version.label')}</MenuLabel>
                 <MenuSubtitle>{t('settings.app.version.subtitle')}</MenuSubtitle>
               </MenuTextBlock>
-              <VersionText>{APP_VERSION}</VersionText>
+              <VersionText>{appVersion}</VersionText>
             </InfoRow>
 
             <MenuDivider />

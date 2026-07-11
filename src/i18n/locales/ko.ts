@@ -801,6 +801,16 @@ const translation = {
       title: "컬렉션 삭제",
       message: "\"{{name}}\" 컬렉션을 삭제할까요?\n담긴 영화 목록도 함께 삭제됩니다. (영화 기록은 유지됩니다)",
     },
+    appUpdate: {
+      title: "업데이트 안내",
+      message:
+        "새 버전 {{latest}}이 출시되었습니다. (현재 {{current}})\n스토어에서 업데이트하면 더 안정적으로 이용할 수 있어요.",
+      forceTitle: "업데이트가 필요합니다",
+      forceMessage:
+        "원활한 이용을 위해 최신 버전({{latest}})으로 업데이트가 필요합니다. (현재 {{current}})",
+      update: "업데이트",
+      later: "나중에",
+    },
   },
 };
 

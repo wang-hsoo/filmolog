@@ -10,4 +10,6 @@ export type ArchiveDialogConfig = {
   title: string;
   message: string;
   buttons: ArchiveAlertButton[];
+  /** false면 백드롭/뒤로가기로 닫히지 않음 (강제 업데이트 등) */
+  dismissible?: boolean;
 };

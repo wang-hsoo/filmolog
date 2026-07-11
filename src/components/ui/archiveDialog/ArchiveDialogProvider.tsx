@@ -55,6 +55,10 @@ function ArchiveDialogProvider({ children }: PropsWithChildren) {
         visible={!!config}
         animationType="fade"
         onRequestClose={() => {
+          if (config?.dismissible === false) {
+            return;
+          }
+
           const cancelButton = buttons.find(button => button.style === 'cancel');
           close(cancelButton);
         }}>
@@ -62,6 +66,10 @@ function ArchiveDialogProvider({ children }: PropsWithChildren) {
           <OverlayRoot>
             <BackdropPressable
               onPress={() => {
+                if (config.dismissible === false) {
+                  return;
+                }
+
                 const cancelButton = buttons.find(
                   button => button.style === 'cancel',
                 );

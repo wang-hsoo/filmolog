@@ -801,6 +801,16 @@ const translation = {
       title: "Delete collection",
       message: "Delete \"{{name}}\"?\nIts film list will be removed too. (Your film logs stay.)",
     },
+    appUpdate: {
+      title: "Update available",
+      message:
+        "Version {{latest}} is available. (You're on {{current}})\nUpdate from the store for the best experience.",
+      forceTitle: "Update required",
+      forceMessage:
+        "Please update to the latest version ({{latest}}) to continue. (You're on {{current}})",
+      update: "Update",
+      later: "Later",
+    },
   },
 };
 

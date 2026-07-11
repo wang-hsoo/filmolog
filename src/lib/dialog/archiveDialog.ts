@@ -18,6 +18,7 @@ export function archiveAlert(
   title: string,
   message?: string,
   buttons?: ArchiveAlertButton[],
+  options?: { dismissible?: boolean },
 ) {
   const resolvedButtons =
     buttons && buttons.length > 0
@@ -34,6 +35,7 @@ export function archiveAlert(
       title,
       message: message ?? '',
       buttons: resolvedButtons,
+      dismissible: options?.dismissible,
     });
     return;
   }

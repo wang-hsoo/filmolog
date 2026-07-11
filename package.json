@@ -9,6 +9,8 @@
     "start": "react-native start",
     "start:reset": "react-native start --reset-cache",
     "test": "jest",
+    "version:sync": "node scripts/sync-native-version.mjs",
+    "postversion": "node scripts/sync-native-version.mjs",
     "build:apk": "cd android && gradlew.bat assembleRelease",
     "build:aab": "cd android && gradlew.bat bundleRelease",
     "android:sha1": "cd android && gradlew.bat signingReport"
@@ -31,6 +33,8 @@
     "react": "19.2.3",
     "react-i18next": "^17.0.8",
     "react-native": "0.85.3",
+    "react-native-check-version": "^1.5.0",
+    "react-native-device-info": "^15.0.2",
     "react-native-elements": "^3.4.3",
     "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^3.0.0",

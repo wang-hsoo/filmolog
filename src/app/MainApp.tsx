@@ -9,6 +9,7 @@ import { useTheme } from 'styled-components/native';
 import { AdBootstrap, ArchiveDialogProvider } from '../components';
 import { BadgeUnlockProvider } from '../features/badges';
 import { bindSupabaseAuthAppState, useAuth } from '../lib/supabase/auth';
+import { AppUpdateChecker } from '../lib/version';
 import { navigationTheme } from '../theme';
 import { AuthNavigationSync } from './navigation/AuthNavigationSync';
 import { rootNavigationRef } from './navigation/navigationRef';
@@ -27,6 +28,7 @@ function MainAppContent() {
     <BadgeUnlockProvider userId={user?.id ?? null}>
       <AdBootstrap />
       <ArchiveDialogProvider>
+        <AppUpdateChecker />
         <NavigationContainer ref={rootNavigationRef} theme={navigationTheme}>
           <AuthNavigationSync />
           <StatusBar
